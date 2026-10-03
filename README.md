@@ -1,35 +1,19 @@
-# Bomba Certa v6.4 — login simples e estável
+# Bomba Certa v6.5 — login por username corrigido
 
-## Registo
-A pessoa escolhe:
-- Nome público
-- Username único
-- Palavra-passe
-- Email de recuperação
+## Causa
+O login por username estava a resolver corretamente o utilizador, mas a validação da password no backend estava a usar o cliente administrativo.
 
-## Login
-O login é feito apenas com:
-- Username
-- Palavra-passe
+Isso podia devolver `invalid_credentials` mesmo quando o username estava corretamente associado à conta.
 
-O email não é usado no login.
+## Correção
+A função `public-login` foi atualizada para:
+1. resolver `username -> user_id` numa tabela privada;
+2. obter internamente o email associado;
+3. validar a password com um cliente Auth normal;
+4. devolver a sessão ao browser;
+5. o browser grava essa sessão e entra na aplicação.
 
-## Email
-O email é apenas para recuperação da conta.
-Nesta versão deixou de haver bloqueio por domínio MX ou por listas de emails temporários: basta ter formato válido.
+O email continua escondido no login e serve apenas para recuperação.
 
-Isto evita condicionantes desnecessárias no registo.
-
-## Segurança
-- username é único;
-- associação username → conta fica em tabela privada;
-- password continua a ser validada pelo Supabase Auth;
-- o browser não precisa de conhecer o email interno para autenticar;
-- o painel Admin continua exclusivo da conta proprietária.
-
-## Registo concluído
-Depois de criar a conta, aparece claramente:
-
-`✓ Conta criada com sucesso. A entrar automaticamente na sua conta…`
-
-e a sessão é iniciada logo de seguida.
+## Estado
+`public-login` encontra-se ativo na versão 4 do backend.
