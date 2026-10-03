@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.7 — admin como antes</title>
+<title>Bomba Certa v5.9 — Admin exclusivo do proprietário</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -255,7 +255,7 @@ header{
         <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
         <span id="topLevel" class="top-profile-level">Novato</span>
       </button>
-      <button id="adminTopBtn" class="btn secondary">⚙️ Admin</button>
+      <button id="adminTopBtn" class="btn secondary hidden">⚙️ Admin</button>
       <button id="logoutBtn" class="btn secondary">Sair</button>
     </div>
   </div>
@@ -265,7 +265,7 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Os postos começam a aparecer automaticamente. A localização e os preços são atualizados em segundo plano.</p>
+      <p>Os postos começam a aparecer automaticamente. A localização e os preços são atualizados em segundo plano, com pesquisa oficial alargada para maximizar a cobertura.</p>
     </div>
 
     
@@ -424,7 +424,7 @@ header{
           <button id="editNameBtn" class="btn secondary" type="button">✏️ Alterar nome</button>
           <button id="changePhotoBtn" class="btn secondary" type="button">📷 Alterar fotografia</button>
 <button id="changePasswordBtn" class="btn secondary" type="button">🔐 Alterar palavra-passe</button>
-<button id="profileAdminBtn" class="btn secondary" type="button">⚙️ Administração</button>
+<button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
         </div>
 
         <div id="profileEditArea" class="form hidden" style="margin-top:12px">
@@ -495,7 +495,6 @@ header{
             <option value="especialista">Especialista</option>
             <option value="embaixador">Embaixador</option>
             <option value="editor">Editor de confiança</option>
-            <option value="administrador">Administrador</option>
           </select>
         </div>
         <button id="adminCreateUserBtn" class="btn">+ Criar utilizador</button>
@@ -524,7 +523,7 @@ header{
   <button class="nav" data-section="abastecimentos"><span>🧾</span>Os meus gastos</button>
   <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
   <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
-  <button id="adminNav" class="nav" data-section="admin"><span>⚙️</span>Admin</button>
+  <button id="adminNav" class="nav hidden" data-section="admin"><span>⚙️</span>Admin</button>
 </nav>
 </div>
 
@@ -840,7 +839,7 @@ function showSection(id){
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 $('profileTopBtn').onclick=()=>showSection('perfil');
-$('adminTopBtn').onclick=()=>showSection('admin');
+$('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 $('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
 
@@ -867,37 +866,25 @@ function hideAdminUI(){
 async function checkAdmin(){
   try{
     const {data:{user}}=await supabase.auth.getUser();
-    if(!user){hideAdminUI();return false}
+    const email=(user?.email||'').toLowerCase();
 
-    // A conta proprietária mostra o painel imediatamente, como nas versões anteriores.
-    if((user.email||'').toLowerCase()==='a.miguel.reis@gmail.com'){
-      showAdminUI()
+    // O painel administrativo é exclusivo da conta proprietária.
+    if(email!=='a.miguel.reis@gmail.com') {
+      hideAdminUI();
+      return false
     }
 
-    // Confirmar sempre no backend. Isto protege ações e outras contas admin.
+    // Mesmo para o proprietário, confirmar sempre o papel real no backend.
     const {data,error}=await supabase.rpc('is_app_admin');
-
     if(!error && data===true){
       showAdminUI();
       return true
     }
 
-    // Para contas que não sejam a proprietária, esconder se backend negar.
-    if((user.email||'').toLowerCase()!=='a.miguel.reis@gmail.com'){
-      hideAdminUI()
-    }
-
-    return isAdminUser
+    hideAdminUI();
+    return false
   }catch(e){
     console.error('Falha ao verificar administração:',e);
-
-    // A conta proprietária mantém o painel visível mesmo com falha transitória.
-    const {data:{user}}=await supabase.auth.getUser().catch(()=>({data:{user:null}}));
-    if((user?.email||'').toLowerCase()==='a.miguel.reis@gmail.com'){
-      showAdminUI();
-      return true
-    }
-
     hideAdminUI();
     return false
   }
@@ -979,7 +966,7 @@ async function loadAdminUsers(){
   $('adminUsers').innerHTML=rows.map(u=>{
     const self=u.user_id===user?.id;
     const name=esc(u.display_name||'Utilizador');
-    const currentLevel=u.is_admin?'administrador':u.trusted_publisher?'editor':
+    const currentLevel=u.trusted_publisher?'editor':
       u.level_name==='Embaixador'?'embaixador':
       u.level_name==='Especialista'?'especialista':
       u.level_name==='Guia'?'guia':
@@ -990,6 +977,10 @@ async function loadAdminUsers(){
         <div class="admin-email">${esc(u.email||'')}</div>
         <div class="tiny muted">Nível atual: ${esc(u.level_name||'Novato')} · Criada: ${u.created_at?new Date(u.created_at).toLocaleDateString('pt-PT'):'—'} · Último acesso: ${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-PT'):'—'}</div>
         <div class="actions" style="margin-top:8px">
+          <input id="name_${u.user_id}" class="input" maxlength="28" value="${esc(u.display_name||'')}" placeholder="Nome público" style="max-width:220px">
+          <button class="btn secondary" onclick="adminSetName('${u.user_id}')">Alterar nome</button>
+        </div>
+        <div class="actions" style="margin-top:8px">
           <select id="level_${u.user_id}" class="input" style="max-width:220px">
             <option value="novato" ${currentLevel==='novato'?'selected':''}>Novato</option>
             <option value="explorador" ${currentLevel==='explorador'?'selected':''}>Explorador</option>
@@ -997,7 +988,6 @@ async function loadAdminUsers(){
             <option value="especialista" ${currentLevel==='especialista'?'selected':''}>Especialista</option>
             <option value="embaixador" ${currentLevel==='embaixador'?'selected':''}>Embaixador</option>
             <option value="editor" ${currentLevel==='editor'?'selected':''}>Editor de confiança</option>
-            <option value="administrador" ${currentLevel==='administrador'?'selected':''}>Administrador</option>
           </select>
           <button class="btn secondary" onclick="adminSetLevel('${u.user_id}')">Alterar nível</button>
         </div>
@@ -1006,6 +996,37 @@ async function loadAdminUsers(){
     </div>`
   }).join('')
 }
+
+window.adminSetName=async(userId)=>{
+  const input=document.getElementById(`name_${userId}`);
+  if(!input)return;
+  const name=input.value.trim();
+  if(name.length<2){
+    alert('O nome deve ter pelo menos 2 caracteres.');
+    input.focus();
+    return
+  }
+
+  input.disabled=true;
+  try{
+    const {data,error}=await supabase.rpc('admin_set_user_name',{
+      p_user_id:userId,
+      p_name:name
+    });
+    if(error)throw error;
+
+    // Atualizar imediatamente a lista e o perfil, caso seja a própria conta.
+    await loadAdminUsers();
+    await loadLeaderboard().catch(()=>{});
+    await hydrateTopProfile().catch(()=>{});
+    alert(`Nome alterado para ${data||name}.`)
+  }catch(e){
+    alert('Não foi possível alterar o nome: '+errPT(e))
+  }finally{
+    input.disabled=false
+  }
+};
+
 window.adminSetLevel=async(userId)=>{
   const sel=document.getElementById(`level_${userId}`);if(!sel)return;
   const level=sel.value;
@@ -1111,9 +1132,6 @@ async function enterApp(){
   try{
     const {data:{user}}=await supabase.auth.getUser();
     currentAuthUserId=user?.id||null;
-    if((user?.email||'').toLowerCase()==='a.miguel.reis@gmail.com'){
-      showAdminUI()
-    }
   }catch{
     currentAuthUserId=null
   }
@@ -1186,7 +1204,7 @@ $('sendRecoveryBtn').onclick=async()=>{
   }
 };
 
-$('profileAdminBtn').onclick=()=>showSection('admin');
+$('profileAdminBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 
 $('changePasswordBtn').onclick=()=>{
   $('currentPassword').value='';
@@ -1716,8 +1734,9 @@ async function searchStations(){
 
       remember(nearbyStations).catch(()=>{});
       $('fastLocationInfo').classList.add('hidden');
+      const pricedCount=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
       $('fuelStatus').textContent=nearbyStations.length
-        ?`${nearbyStations.length} postos encontrados no raio selecionado.`
+        ?`${nearbyStations.length} postos encontrados · ${pricedCount} com preço disponível.`
         :'Não encontrei postos neste raio. Experimente aumentar a distância.'
     }).catch(()=>{
       $('fastLocationInfo').classList.add('hidden');
@@ -1791,7 +1810,7 @@ function updatePriceCoverage(){
   const priced=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
   if(!total){$('priceCoverage').textContent='';return}
   const pct=Math.round(priced/total*100);
-  $('priceCoverage').textContent=`Preços disponíveis em ${priced} de ${total} postos (${pct}%).`
+  $('priceCoverage').innerHTML=`<b>${priced}</b> de ${total} postos com preço (${pct}%) · <span>prioridade aos postos com preço disponível</span>`
 }
 
 function renderBasicStations(){
