@@ -1,23 +1,40 @@
-# Bomba Certa v6.0 — Admin e alteração de nomes corrigidos
+# Bomba Certa v6.1 — registo público corrigido
 
-## Painel Admin
-A conta `a.miguel.reis@gmail.com` volta a ver o painel imediatamente após autenticação.
+## Problema identificado
+Os logs do Supabase mostraram pedidos de registo a falhar com:
 
-A visibilidade do painel deixa de depender de uma resposta assíncrona que podia falhar momentaneamente. As ações administrativas continuam protegidas no backend.
+`429 email rate limit exceeded`
 
-## Alterar nome
-Foram corrigidos os dois cenários:
-- o utilizador altera o próprio nome no Perfil;
-- a conta proprietária altera o nome de qualquer utilizador no painel Admin.
+Ou seja, a criação de contas estava dependente do email de confirmação padrão do Supabase e atingia o limite de envio.
 
-Foi criada e verificada no backend a função:
-`admin_set_user_name(uuid, text)`
+## Solução
+Foi criada a Edge Function:
 
-Ela:
-- exige permissões administrativas;
-- atualiza o nome no perfil público;
-- sincroniza o nome nos metadados Auth;
-- não mexe em pontos, nível ou permissões.
+`public-register`
 
-Também permanece disponível:
-`update_my_display_name(text)` para o próprio utilizador.
+O novo fluxo:
+1. valida nome, email e palavra-passe;
+2. aplica proteção anti-abuso / rate limit;
+3. cria a conta no servidor;
+4. marca o email como confirmado;
+5. a aplicação inicia sessão imediatamente com o email e palavra-passe escolhidos;
+6. cria o perfil Bomba Certa e entra na aplicação.
+
+Assim, o registo público deixa de depender do envio de email de confirmação.
+
+## Segurança
+- service role nunca é exposta no browser;
+- função tem honeypot;
+- limita tentativas por IP e email;
+- valida nome/email/password;
+- não concede privilégios administrativos;
+- o painel Admin continua reservado à conta proprietária.
+
+## Utilização
+O utilizador preenche:
+- Nome público
+- Email
+- Palavra-passe
+- Confirma participação responsável
+
+Depois carrega em `Criar a minha conta` e entra automaticamente.
