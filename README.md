@@ -1,30 +1,23 @@
-# Bomba Certa v5.9 — Admin exclusivo do proprietário
+# Bomba Certa v6.0 — Admin e alteração de nomes corrigidos
 
-## Regra
-O painel de administração é visível exclusivamente para:
+## Painel Admin
+A conta `a.miguel.reis@gmail.com` volta a ver o painel imediatamente após autenticação.
 
-`a.miguel.reis@gmail.com`
+A visibilidade do painel deixa de depender de uma resposta assíncrona que podia falhar momentaneamente. As ações administrativas continuam protegidas no backend.
 
-## Comportamento
-- Admin fica oculto por defeito.
-- Só aparece depois de confirmar:
-  1. o email autenticado;
-  2. `is_app_admin()` no backend.
-- Outras contas nunca veem:
-  - botão Admin no topo;
-  - separador Admin no menu inferior;
-  - botão Administração no Perfil.
+## Alterar nome
+Foram corrigidos os dois cenários:
+- o utilizador altera o próprio nome no Perfil;
+- a conta proprietária altera o nome de qualquer utilizador no painel Admin.
 
-## Níveis
-Foi retirada da interface a opção de promover outros utilizadores para `Administrador`.
+Foi criada e verificada no backend a função:
+`admin_set_user_name(uuid, text)`
 
-Continuam disponíveis:
-- Novato
-- Explorador
-- Guia
-- Especialista
-- Embaixador
-- Editor de confiança
+Ela:
+- exige permissões administrativas;
+- atualiza o nome no perfil público;
+- sincroniza o nome nos metadados Auth;
+- não mexe em pontos, nível ou permissões.
 
-## Backend
-Foi confirmado que atualmente `private.app_admins` contém apenas a conta proprietária, com papel `owner`.
+Também permanece disponível:
+`update_my_display_name(text)` para o próprio utilizador.

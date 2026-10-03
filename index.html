@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.9 — Admin exclusivo do proprietário</title>
+<title>Bomba Certa v6.0 — Admin e nomes corrigidos</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -866,18 +866,18 @@ function hideAdminUI(){
 async function checkAdmin(){
   try{
     const {data:{user}}=await supabase.auth.getUser();
-    const email=(user?.email||'').toLowerCase();
+    const email=(user?.email||'').trim().toLowerCase();
 
-    // O painel administrativo é exclusivo da conta proprietária.
-    if(email!=='a.miguel.reis@gmail.com') {
-      hideAdminUI();
-      return false
-    }
-
-    // Mesmo para o proprietário, confirmar sempre o papel real no backend.
-    const {data,error}=await supabase.rpc('is_app_admin');
-    if(!error && data===true){
+    if(email==='a.miguel.reis@gmail.com') {
+      // A conta proprietária deve ver sempre o painel imediatamente.
       showAdminUI();
+
+      // Confirmar o papel em background, mas uma falha transitória não esconde o painel.
+      supabase.rpc('is_app_admin').then(({data,error})=>{
+        if(error)console.warn('Verificação admin temporariamente indisponível:',error)
+        else if(data!==true)console.warn('Conta proprietária sem flag admin no backend.')
+      }).catch(()=>{});
+
       return true
     }
 
@@ -1000,6 +1000,7 @@ async function loadAdminUsers(){
 window.adminSetName=async(userId)=>{
   const input=document.getElementById(`name_${userId}`);
   if(!input)return;
+
   const name=input.value.trim();
   if(name.length<2){
     alert('O nome deve ter pelo menos 2 caracteres.');
@@ -1007,7 +1008,9 @@ window.adminSetName=async(userId)=>{
     return
   }
 
+  const original=input.value;
   input.disabled=true;
+
   try{
     const {data,error}=await supabase.rpc('admin_set_user_name',{
       p_user_id:userId,
@@ -1015,12 +1018,25 @@ window.adminSetName=async(userId)=>{
     });
     if(error)throw error;
 
-    // Atualizar imediatamente a lista e o perfil, caso seja a própria conta.
+    const finalName=String(data||name);
+    input.value=finalName;
+
+    // Atualizar de imediato os textos visíveis na lista.
+    const card=input.closest('.admin-user');
+    const title=card?.querySelector('b');
+    if(title){
+      const selfBadge=title.querySelector('.admin-badge');
+      title.childNodes[0].nodeValue=finalName;
+      if(selfBadge && !title.contains(selfBadge))title.appendChild(selfBadge)
+    }
+
     await loadAdminUsers();
-    await loadLeaderboard().catch(()=>{});
-    await hydrateTopProfile().catch(()=>{});
-    alert(`Nome alterado para ${data||name}.`)
+    loadLeaderboard().catch(()=>{});
+    hydrateTopProfile().catch(()=>{});
+
+    alert(`Nome alterado para ${finalName}.`)
   }catch(e){
+    input.value=original;
     alert('Não foi possível alterar o nome: '+errPT(e))
   }finally{
     input.disabled=false
@@ -1132,6 +1148,8 @@ async function enterApp(){
   try{
     const {data:{user}}=await supabase.auth.getUser();
     currentAuthUserId=user?.id||null;
+    if((user?.email||'').trim().toLowerCase()==='a.miguel.reis@gmail.com') showAdminUI();
+    else hideAdminUI();
   }catch{
     currentAuthUserId=null
   }
@@ -2267,21 +2285,21 @@ $('saveNameBtn').onclick=async()=>{
     const {data,error}=await supabase.rpc('update_my_display_name',{p_name:n});
     if(error)throw error;
 
-    const finalName=data||n;
-    $('myName').textContent=finalName;
+    const finalName=String(data||n);
     $('profileName').value=finalName;
+    $('myName').textContent=finalName;
     $('profileStatus').textContent='✓ Nome atualizado.';
     $('profileEditArea').classList.add('hidden');
 
-    // Atualizar cache do mini-perfil para refletir logo em todas as páginas.
     try{
-      const cached=JSON.parse(localStorage.getItem('bombaCerta:topProfile')||'null')||{};
+      const cached=JSON.parse(localStorage.getItem('bombaCerta:topProfile')||'{}');
       cached.display_name=finalName;
       cached.ts=Date.now();
       localStorage.setItem('bombaCerta:topProfile',JSON.stringify(cached))
     }catch{}
 
-    await loadLeaderboard();
+    loadLeaderboard().catch(()=>{});
+    hydrateTopProfile().catch(()=>{})
   }catch(e){
     $('profileStatus').textContent=errPT(e)
   }finally{
