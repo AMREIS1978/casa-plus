@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.3 — acesso principal</title>
+<title>Bomba Certa v5.5 — mais preços oficiais</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -334,7 +334,7 @@ header{
         </select>
         <button id="locateBtn" class="btn">📍 Procurar perto de mim</button>
       </div>
-      <div id="fuelStatus" class="status">A preparar postos próximos…</div><div id="fastLocationInfo" class="quick-load hidden"><span class="quick-dot"></span><span>A atualizar em segundo plano…</span></div>
+      <div id="fuelStatus" class="status">A preparar postos próximos…</div><div id="fastLocationInfo" class="quick-load hidden"><span class="quick-dot"></span><span>A atualizar em segundo plano…</span></div><div id="priceCoverage" class="tiny muted" style="margin-top:5px"></div>
     </div>
 
     <div class="grid2">
@@ -1465,6 +1465,62 @@ async function reverseMunicipality(lat,lon){
   const j=await r.json(),a=j.address||{};
   return (a.municipality||a.city||a.town||a.village||a.county||'').trim()
 }
+
+async function officialPriceCache(lat,lon,radius){
+  const km=Number(radius)/1000;
+  const dy=km/111;
+  const dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const fuelType=$('fuelType').value;
+
+  const {data,error}=await supabase
+    .from('fuel_official_prices')
+    .select('dgeg_id,station_key,station_name,brand,address,latitude,longitude,price,source_updated_text,fetched_at')
+    .eq('fuel_type',fuelType)
+    .gte('latitude',lat-dy).lte('latitude',lat+dy)
+    .gte('longitude',lon-dx).lte('longitude',lon+dx)
+    .order('fetched_at',{ascending:false})
+    .limit(250);
+
+  if(error)return [];
+
+  return (data||[]).map(p=>({
+    key:p.station_key||`dgeg:${p.dgeg_id}`,
+    dgegId:Number(p.dgeg_id),
+    name:p.station_name||'Posto',
+    brand:p.brand||'',
+    address:p.address||'',
+    lat:Number(p.latitude),
+    lon:Number(p.longitude),
+    officialPrice:Number(p.price),
+    officialUpdated:p.source_updated_text||p.fetched_at||'',
+    source:'DGEG',
+    distance:haversine(lat,lon,Number(p.latitude),Number(p.longitude)),
+    fromOfficialCache:true
+  })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)&&s.distance<=km)
+}
+
+async function dgegServerStations(lat,lon,radius){
+  const fuelType=$('fuelType').value;
+  const {data,error}=await supabase.functions.invoke('dgeg-nearby-prices',{
+    body:{lat,lon,radius:Number(radius),fuel_type:fuelType}
+  });
+  if(error)throw error;
+  const rows=Array.isArray(data?.rows)?data.rows:[];
+  return rows.map(s=>({
+    key:s.key||`dgeg:${s.dgegId}`,
+    dgegId:Number(s.dgegId),
+    name:s.name||'Posto',
+    brand:s.brand||'',
+    address:s.address||'',
+    lat:Number(s.lat),
+    lon:Number(s.lon),
+    officialPrice:Number(s.officialPrice),
+    officialUpdated:s.officialUpdated||'',
+    source:'DGEG',
+    distance:Number(s.distance)
+  })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)&&Number.isFinite(s.officialPrice))
+}
+
 async function dgegStations(lat,lon,radius){
   const [types,districts,municipalities]=await Promise.all([
     dgegFuelTypes.length?Promise.resolve(dgegFuelTypes):dgeg('/GetTiposCombustiveis'),
@@ -1562,6 +1618,7 @@ async function searchStations(){
 
   // 1) Fontes rápidas: base própria + comunidade.
   Promise.allSettled([
+    officialPriceCache(currentLat,currentLon,r),
     registryStations(currentLat,currentLon,r),
     communityStations(currentLat,currentLon,r)
   ]).then(async results=>{
@@ -1571,7 +1628,7 @@ async function searchStations(){
     if(fast.length){
       nearbyStations=mergeStations([nearbyStations,fast]).filter(s=>s.distance<=r/1000);
       renderBasicStations();
-      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a atualizar preços…`;
+      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a completar preços oficiais…`;
       saveFastStationCache()
     }
   }).catch(()=>{});
@@ -1579,7 +1636,7 @@ async function searchStations(){
   // 2) DGEG + OSM entram em background, sem prender o ecrã.
   setTimeout(()=>{
     Promise.allSettled([
-      dgegStations(currentLat,currentLon,r),
+      dgegServerStations(currentLat,currentLon,r).catch(()=>dgegStations(currentLat,currentLon,r)),
       osmStations(currentLat,currentLon,r)
     ]).then(async results=>{
       const slow=results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
@@ -1588,7 +1645,7 @@ async function searchStations(){
       if(nearbyStations.length)renderBasicStations();
 
       // Limitar detalhes DGEG para não bloquear.
-      const detail=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,16);
+      const detail=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,10);
       await Promise.allSettled(detail.map(enrichDetail));
 
       if(nearbyStations.length){
@@ -1670,6 +1727,15 @@ function closedText(key,statuses){
   return n>=3?'⛔ Possivelmente encerrado · 3+ reportes':n===2?'⚠️ Possivelmente encerrado · 2 reportes':n===1?'⚠️ 1 reporte de possível encerramento':''
 }
 
+
+function updatePriceCoverage(){
+  const total=nearbyStations.length;
+  const priced=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
+  if(!total){$('priceCoverage').textContent='';return}
+  const pct=Math.round(priced/total*100);
+  $('priceCoverage').textContent=`Preços disponíveis em ${priced} de ${total} postos (${pct}%).`
+}
+
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
     const ap=a.officialPrice??a.displayPrice, bp=b.officialPrice??b.displayPrice;
@@ -1701,6 +1767,7 @@ function renderBasicStations(){
   }).join(''):'<div class="empty">Ainda não encontrei postos nesta zona.</div>';
 
   populateFillStations();
+  updatePriceCoverage();
 
   ensureMap();
   if(map && currentLat!=null){
@@ -1766,7 +1833,7 @@ async function renderStations(){
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
-  populateFillStations()
+  populateFillStations();updatePriceCoverage()
 }
 
 $('locateBtn').onclick=()=>{
@@ -2110,11 +2177,39 @@ async function loadLeaderboard(){
 }
 $('saveNameBtn').onclick=async()=>{
   const n=$('profileName').value.trim();
-  if(n.length<2){$('profileStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}
-  const {data:{user}}=await supabase.auth.getUser();
-  const {error}=await supabase.from('fuel_contributor_stats').update({display_name:n}).eq('user_id',user.id);
-  $('profileStatus').textContent=error?errPT(error):'Nome atualizado.';
-  if(!error){$('profileEditArea').classList.add('hidden');await loadLeaderboard()}
+  if(n.length<2){
+    $('profileStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';
+    return
+  }
+
+  const btn=$('saveNameBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A guardar…';
+  $('profileStatus').textContent='';
+
+  try{
+    const {data,error}=await supabase.rpc('update_my_display_name',{p_name:n});
+    if(error)throw error;
+
+    const finalName=data||n;
+    $('myName').textContent=finalName;
+    $('profileName').value=finalName;
+    $('profileStatus').textContent='✓ Nome atualizado.';
+    $('profileEditArea').classList.add('hidden');
+
+    // Atualizar cache do mini-perfil para refletir logo em todas as páginas.
+    try{
+      const cached=JSON.parse(localStorage.getItem('bombaCerta:topProfile')||'null')||{};
+      cached.display_name=finalName;
+      cached.ts=Date.now();
+      localStorage.setItem('bombaCerta:topProfile',JSON.stringify(cached))
+    }catch{}
+
+    await loadLeaderboard();
+  }catch(e){
+    $('profileStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
 };
 
 let pendingAvatarBlob=null;
