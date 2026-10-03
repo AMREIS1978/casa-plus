@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.5 — corrigida e rápida</title>
+<title>Bomba Certa v4.6 — fotografia corrigida</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -179,7 +179,7 @@ header{
     <div class="brand">Bomba <span>Certa</span></div>
     <div class="header-actions">
       <button id="profileTopBtn" class="top-profile-btn" aria-label="Abrir perfil">
-        <img id="topAvatar" class="top-profile-avatar" alt="">
+        <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
         <span id="topLevel" class="top-profile-level">Novato</span>
       </button>
       <button id="logoutBtn" class="btn secondary">Sair</button>
@@ -297,7 +297,7 @@ header{
         <div class="section-title"><h2>O meu perfil</h2><span class="pill">Comunidade</span></div>
         <div class="profile-hero">
           <div id="avatarWrap" class="avatar-wrap" role="button" tabindex="0" aria-label="Alterar fotografia">
-            <img id="myAvatar" class="avatar" alt="Fotografia de perfil">
+            <img id="myAvatar" class="avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
             <button id="avatarEditBtn" class="avatar-edit" type="button" aria-label="Alterar fotografia">📷</button>
           </div>
           <div id="myName" class="profile-name">Condutor</div>
@@ -1443,6 +1443,12 @@ function drawCharts(){
 
 function level(points){return points>=800?{n:'Embaixador',i:'🏆',m:800,x:null}:points>=400?{n:'Especialista',i:'⭐',m:400,x:800}:points>=150?{n:'Guia',i:'🧭',m:150,x:400}:points>=50?{n:'Explorador',i:'🗺️',m:50,x:150}:{n:'Novato',i:'🚗',m:0,x:50}}
 function fallbackAvatar(){return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="22" fill="#eef2f6"/><text x="50" y="62" text-anchor="middle" font-size="38">🚗</text></svg>')}`}
+function setAvatarSafe(img,url){
+  if(!img)return;
+  const fb=fallbackAvatar();
+  img.onerror=()=>{img.onerror=null;img.src=fb};
+  img.src=url||fb
+}
 async function loadLeaderboard(){
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
   await supabase.rpc('ensure_my_fuel_profile');
@@ -1459,15 +1465,18 @@ async function loadLeaderboard(){
     $('topLevel').textContent=visibleLevel;
     $('myPoints').textContent=mine.points+' pts';
     $('profileName').value=mine.display_name;
-    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();
-    $('myAvatar').src=src;$('topAvatar').src=src;
+    const src=mine.avatar_path
+      ? supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path)+'&t='+Date.now()
+      : fallbackAvatar();
+    setAvatarSafe($('myAvatar'),src);
+    setAvatarSafe($('topAvatar'),src);
     if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}
     else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
   }
   $('leaderboard').innerHTML=rows.length?rows.map((r,i)=>{
     const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl+'?v='+encodeURIComponent(r.avatar_path):fallbackAvatar();
     const pos=Number(r.rank_position||i+1);
-    return `<div class="leader"><div style="font-weight:900;text-align:center">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="level-only">${r.trusted_publisher?'✓ Editor de confiança':esc(r.level_name)}</div></div></div><span class="pill">${r.trusted_publisher?'Confiança máxima':esc(r.level_name)}</span></div>`
+    return `<div class="leader"><div style="font-weight:900;text-align:center">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt="" onerror="this.onerror=null;this.src='${fallbackAvatar()}'"><div><b>${esc(r.display_name)}</b><div class="level-only">${r.trusted_publisher?'✓ Editor de confiança':esc(r.level_name)}</div></div></div><span class="pill">${r.trusted_publisher?'Confiança máxima':esc(r.level_name)}</span></div>`
   }).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
 }
 $('saveNameBtn').onclick=async()=>{
@@ -1532,6 +1541,9 @@ $('saveAvatarBtn').onclick=async()=>{
   if(oldPath && oldPath!==path) supabase.storage.from('avatars').remove([oldPath]).catch(()=>{});
   pendingAvatarBlob=null;
   $('avatarStatus').textContent='Fotografia atualizada.';
+  const freshUrl=supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl+'?t='+Date.now();
+  setAvatarSafe($('myAvatar'),freshUrl);
+  setAvatarSafe($('topAvatar'),freshUrl);
   await loadLeaderboard();
   setTimeout(()=>$('avatarModal').classList.remove('open'),350)
 };
