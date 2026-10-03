@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v3.1 — combustíveis Portugal</title>
+<title>Bomba Certa v3.3 — GPS e confiança</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -82,12 +82,12 @@ header{
 .history-row:last-child{border-bottom:0}.muted{color:var(--muted)}.tiny{font-size:11px}
 .chart{height:280px}
 .rank-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px}
-.profile{display:flex;gap:13px;align-items:center}
-.avatar{width:64px;height:64px;border-radius:18px;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
+.profile{display:flex;gap:16px;align-items:center}.profile-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 4px 18px}.avatar-wrap{position:relative;width:112px;height:112px}.avatar-wrap .avatar{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(15,23,42,.12)}.avatar-edit{position:absolute;right:0;bottom:2px;width:38px;height:38px;border-radius:50%;border:3px solid white;background:#111827;color:white;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.profile-name{font-size:22px;font-weight:950;margin-top:10px}.profile-level{margin-top:3px;font-size:12px;color:var(--muted)}.profile-points{font-size:30px;font-weight:950;margin-top:4px}.quick-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.quick-profile-actions button{min-height:46px}
+.avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
 .points{font-size:28px;font-weight:950}
 .progress{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:#111827}
 .leader{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.leader img{width:38px;height:38px;border-radius:11px;object-fit:cover;border:1px solid var(--line)}
+.leader img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
 .bottom-nav{
   position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);
   border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
@@ -145,7 +145,7 @@ header{
   <div class="header-in">
     <div class="brand">Bomba <span>Certa</span></div>
     <div class="header-actions">
-      <button id="profileTopBtn" class="icon-btn" aria-label="Abrir perfil">👤</button>
+      <button id="profileTopBtn" class="icon-btn" aria-label="Abrir perfil" style="overflow:hidden;padding:0"><img id="topAvatar" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px"></button>
       <button id="logoutBtn" class="btn secondary">Sair</button>
     </div>
   </div>
@@ -155,7 +155,15 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Preços por posto, validação da comunidade e navegação até ao melhor ponto para abastecer.</p>
+      <p>Preços por posto, validação da comunidade e navegação direta no GPS do telemóvel.</p>
+    </div>
+
+    
+    <div class="card" style="margin-top:12px">
+      <div class="station-actions" style="margin-top:0">
+        <button id="quickLocateBtn" class="go" style="flex:1">📍 Ver postos perto de mim</button>
+        <button id="quickReportBtn" class="photo" style="flex:1">📷 Atualizar um preço</button>
+      </div>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -254,27 +262,38 @@ header{
 
   <section id="perfil" class="section">
     <div class="rank-grid">
-      <div class="card">
+      
+<div class="card">
         <div class="section-title"><h2>O meu perfil</h2><span class="pill">Comunidade</span></div>
-        <div class="profile">
-          <img id="myAvatar" class="avatar" alt="Fotografia de perfil">
-          <div>
-            <div id="myName" style="font-weight:900">Condutor</div>
-            <div id="myLevel" class="muted tiny">Novato</div>
-            <div id="myPoints" class="points">0 pts</div>
+        <div class="profile-hero">
+          <div id="avatarWrap" class="avatar-wrap" role="button" tabindex="0" aria-label="Alterar fotografia">
+            <img id="myAvatar" class="avatar" alt="Fotografia de perfil">
+            <button id="avatarEditBtn" class="avatar-edit" type="button" aria-label="Alterar fotografia">📷</button>
+          </div>
+          <div id="myName" class="profile-name">Condutor</div>
+          <div id="myLevel" class="profile-level">🚗 Novato</div>
+          <div id="myPoints" class="profile-points">0 pts</div>
+          <div class="progress" style="width:100%;max-width:340px"><div id="rankProgress" style="width:0%"></div></div>
+          <div id="rankNext" class="status"></div>
+        </div>
+
+        <div class="quick-profile-actions">
+          <button id="editNameBtn" class="btn secondary" type="button">✏️ Alterar nome</button>
+          <button id="changePhotoBtn" class="btn secondary" type="button">📷 Alterar fotografia</button>
+        </div>
+
+        <div id="profileEditArea" class="form hidden" style="margin-top:12px">
+          <input id="profileName" class="input" maxlength="28" placeholder="Nome público">
+          <div class="actions">
+            <button id="saveNameBtn" class="btn">Guardar nome</button>
+            <button id="cancelNameBtn" class="btn secondary" type="button">Cancelar</button>
           </div>
         </div>
-        <div class="progress"><div id="rankProgress" style="width:0%"></div></div>
-        <div id="rankNext" class="status"></div>
-        <div class="form" style="margin-top:12px">
-          <input id="profileName" class="input" maxlength="28" placeholder="Nome público">
-          <button id="saveNameBtn" class="btn secondary">Guardar nome</button>
-          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-          <button id="avatarBtn" class="btn secondary">Alterar fotografia</button>
-          <div id="profileStatus" class="status"></div>
-        </div>
+
+        <div id="profileStatus" class="status"></div>
       </div>
-      <div class="card">
+    </div>
+    <div class="card">
         <div class="section-title"><h2>Ranking</h2><span class="pill">Top 20</span></div>
         <div id="leaderboard" class="empty">Ainda não existem contribuições suficientes.</div>
       </div>
@@ -293,11 +312,33 @@ header{
 </main>
 
 <nav class="bottom-nav" aria-label="Navegação principal">
-  <button class="nav active" data-section="postos"><span>⛽</span>Postos</button>
-  <button class="nav" data-section="abastecimentos"><span>🧾</span>Abastecimentos</button>
+  <button class="nav active" data-section="postos"><span>⛽</span>Perto de mim</button>
+  <button class="nav" data-section="abastecimentos"><span>🧾</span>Os meus gastos</button>
   <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
   <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
 </nav>
+</div>
+
+
+<!-- Modal fotografia de perfil -->
+<div id="avatarModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Fotografia de perfil</h2><button class="btn secondary" data-close="avatarModal">Fechar</button></div>
+    <div class="form">
+      <div class="profile-hero" style="padding-top:4px">
+        <img id="avatarPreview" class="avatar" style="width:150px;height:150px" alt="Pré-visualização">
+      </div>
+      <div class="actions" style="justify-content:center">
+        <button id="takeAvatarPhotoBtn" class="btn" type="button">📷 Tirar fotografia</button>
+        <button id="chooseAvatarPhotoBtn" class="btn secondary" type="button">🖼️ Escolher da galeria</button>
+      </div>
+      <input id="avatarCameraInput" type="file" accept="image/*" capture="user" hidden>
+      <input id="avatarGalleryInput" type="file" accept="image/*" hidden>
+      <div class="ocr-tip">A imagem é cortada automaticamente em formato quadrado e otimizada antes do envio.</div>
+      <button id="saveAvatarBtn" class="btn hidden" type="button">Guardar fotografia</button>
+      <div id="avatarStatus" class="status"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal preço -->
@@ -576,7 +617,7 @@ async function communityData(){
   const ids=(reports||[]).map(x=>x.id);
   const [{data:validations},{data:contributors},{data:statuses}]=await Promise.all([
     ids.length?supabase.from('fuel_price_validations').select('*').in('report_id',ids):Promise.resolve({data:[]}),
-    supabase.from('fuel_contributor_stats').select('user_id,points'),
+    supabase.from('fuel_contributor_stats').select('user_id,points,trusted_publisher'),
     supabase.from('fuel_station_status_reports').select('*').gte('created_at',new Date(Date.now()-6*3600000).toISOString())
   ]);
   return {reports:reports||[],validations:validations||[],contributors:contributors||[],statuses:statuses||[]}
@@ -584,15 +625,17 @@ async function communityData(){
 function reqSupport(points){return points>=800?1:points>=400?2:points>=150?3:points>=50?4:5}
 function candidateFor(key,reports,validations,contributors){
   const rs=reports.filter(r=>r.station_key===key);if(!rs.length)return null;
-  const pts=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.points||0)])),groups={};
+  const pts=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.points||0)]));
+  const trusted=Object.fromEntries(contributors.map(x=>[x.user_id,Boolean(x.trusted_publisher)]));
+  const groups={};
   for(const r of rs){
     const k=Number(r.price).toFixed(3);groups[k]??={price:Number(r.price),reports:[],support:new Set(),max:0,latest:r.observed_at};
-    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.max=Math.max(g.max,pts[r.user_id]||0);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
+    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.max=Math.max(g.max,pts[r.user_id]||0);g.trusted=Boolean(g.trusted||trusted[r.user_id]);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
   }
   for(const g of Object.values(groups)){
     const ids=new Set(g.reports.map(x=>x.id));
     validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.max=Math.max(g.max,pts[v.user_id]||0)});
-    g.count=g.support.size;g.required=reqSupport(g.max);g.accepted=g.count>=g.required
+    g.count=g.support.size;g.required=g.trusted?1:reqSupport(g.max);g.accepted=g.trusted||g.count>=g.required
   }
   return Object.values(groups).sort((a,b)=>Number(b.accepted)-Number(a.accepted)||b.count-a.count||new Date(b.latest)-new Date(a.latest))[0]
 }
@@ -611,20 +654,22 @@ async function renderStations(){
     const c=s.candidate,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):null;
     const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade validada</span>':'<span class="source none">Sem preço confirmado</span>';
     const proposal=c&&!c.accepted?`<div class="warn">Proposta: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.count}/${c.required} apoios</div>`:'';
-    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="startRoute('${s.key}')">🧭 Ir</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
 
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
   for(const s of nearbyStations){
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="startRoute('${s.key}')">Ir para aqui</button>`);
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
   populateFillStations()
 }
 
+$('quickLocateBtn').onclick=()=>$('locateBtn').click();
+$('quickReportBtn').onclick=()=>{if(nearbyStations.length)openPrice(nearbyStations[0].key);else $('locateBtn').click()};
 $('locateBtn').onclick=()=>{
   if(!navigator.geolocation){$('fuelStatus').textContent='Este dispositivo não permite localização.';return}
   $('fuelStatus').textContent='A obter a sua localização…';
@@ -714,6 +759,21 @@ window.reportClosed=async key=>{
   await supabase.from('fuel_station_status_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,status:'closed',fuel_type:null});await renderStations()
 };
 
+
+function externalNavUrl(s){
+  const lat=Number(s.lat),lon=Number(s.lon),label=encodeURIComponent(s.name||'Posto');
+  const ua=navigator.userAgent||'';
+  if(/iPhone|iPad|iPod/i.test(ua)) return `maps://?daddr=${lat},${lon}&dirflg=d`;
+  if(/Android/i.test(ua)) return `geo:0,0?q=${lat},${lon}(${label})`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=driving`
+}
+window.openGps=key=>{
+  const s=nearbyStations.find(x=>x.key===key);if(!s)return;
+  const url=externalNavUrl(s);
+  if(/^https:/.test(url)) window.open(url,'_blank','noopener');
+  else window.location.href=url
+}
+
 function direction(step){
   const t=step.maneuver?.type||'',m=step.maneuver?.modifier||'',n=step.name||'',d={'left':'à esquerda','right':'à direita','straight':'em frente','slight left':'ligeiramente à esquerda','slight right':'ligeiramente à direita'}[m]||'';
   if(t==='arrive')return 'Chegou ao destino';if(t==='turn')return `Vire ${d}${n?' para '+n:''}`;if(t==='roundabout')return `Entre na rotunda${step.maneuver?.exit?' e use a '+step.maneuver.exit+'.ª saída':''}`;return `Siga${n?' por '+n:''}`
@@ -724,8 +784,8 @@ window.startRoute=async key=>{
     const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${currentLon},${currentLat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`),j=await r.json(),route=j.routes?.[0];if(!route)throw 0;
     if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.78}).addTo(map);map.fitBounds(routeLayer.getBounds().pad(.12));
     const google=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=driving`;
-    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><button class="btn secondary" onclick="window.open('${google}','_blank')">Abrir GPS</button></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
-  }catch{$('routeBox').innerHTML='<b>Não foi possível desenhar a rota agora.</b>'}
+    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><button class="btn" onclick="openGps('${s.key}')">🧭 Abrir GPS do telemóvel</button><a class="btn secondary" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">Google Maps</a></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
+  }catch{$('routeBox').innerHTML=`<b>Não foi possível desenhar a rota aqui.</b><div class="status">Pode continuar diretamente na app de navegação.</div><button class="btn" onclick="openGps('${s.key}')">🧭 Abrir GPS</button>`}
 };
 
 $('addStationBtn').onclick=()=>{$('stationModal').classList.add('open');$('stationStatus').textContent=''};
@@ -789,18 +849,83 @@ function fallbackAvatar(){return `data:image/svg+xml;charset=UTF-8,${encodeURICo
 async function loadLeaderboard(){
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
   await supabase.rpc('ensure_my_fuel_profile');
-  const {data:rows}=await supabase.from('fuel_contributor_stats').select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports').order('points',{ascending:false}).limit(20);
+  const {data:rows}=await supabase.from('fuel_contributor_stats').select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports,trusted_publisher').order('points',{ascending:false}).limit(20);
   const mine=(rows||[]).find(x=>x.user_id===user.id)||(await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle()).data;
   if(mine){
-    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=l.i+' '+l.n;$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
-    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl:fallbackAvatar();$('myAvatar').src=src;
+    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n;$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
+    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();$('myAvatar').src=src;$('topAvatar').src=src;
     if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
   }
-  $('leaderboard').innerHTML=(rows||[]).length?(rows||[]).map((r,i)=>{const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl:fallbackAvatar(),l=level(r.points);return `<div class="leader"><div style="font-weight:900;text-align:center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="tiny muted">${l.i} ${l.n}</div></div></div><b>${r.points} pts</b></div>`}).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
+  $('leaderboard').innerHTML=(rows||[]).length?(rows||[]).map((r,i)=>{const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl+'?v='+encodeURIComponent(r.avatar_path):fallbackAvatar(),l=level(r.points);return `<div class="leader"><div style="font-weight:900;text-align:center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="tiny muted">${r.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n}</div></div></div><b>${r.points} pts</b></div>`}).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
 }
-$('saveNameBtn').onclick=async()=>{const n=$('profileName').value.trim();if(n.length<2)return;const {data:{user}}=await supabase.auth.getUser();const {error}=await supabase.from('fuel_contributor_stats').update({display_name:n}).eq('user_id',user.id);$('profileStatus').textContent=error?errPT(error):'Nome atualizado.';if(!error)loadLeaderboard()};
-$('avatarBtn').onclick=()=>$('avatarFile').click();
-$('avatarFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>3*1024*1024){$('profileStatus').textContent='A imagem não pode ultrapassar 3 MB.';return}const {data:{user}}=await supabase.auth.getUser(),ext=(f.name.split('.').pop()||'jpg').toLowerCase(),path=`${user.id}/perfil.${ext}`;const {error}=await supabase.storage.from('avatars').upload(path,f,{upsert:true,contentType:f.type});if(error){$('profileStatus').textContent=errPT(error);return}await supabase.from('fuel_contributor_stats').update({avatar_path:path}).eq('user_id',user.id);$('profileStatus').textContent='Fotografia atualizada.';loadLeaderboard()};
+
+$('editNameBtn').onclick=()=>{$('profileEditArea').classList.remove('hidden');$('profileName').focus()};
+$('cancelNameBtn').onclick=()=>{$('profileEditArea').classList.add('hidden');$('profileStatus').textContent=''};
+$('saveNameBtn').onclick=async()=>{
+  const n=$('profileName').value.trim();
+  if(n.length<2){$('profileStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}
+  const {data:{user}}=await supabase.auth.getUser();
+  const {error}=await supabase.from('fuel_contributor_stats').update({display_name:n}).eq('user_id',user.id);
+  $('profileStatus').textContent=error?errPT(error):'Nome atualizado.';
+  if(!error){$('profileEditArea').classList.add('hidden');await loadLeaderboard()}
+};
+
+let pendingAvatarBlob=null;
+function openAvatarModal(){
+  pendingAvatarBlob=null;
+  $('saveAvatarBtn').classList.add('hidden');
+  $('avatarStatus').textContent='';
+  $('avatarPreview').src=$('myAvatar').src||fallbackAvatar();
+  $('avatarModal').classList.add('open')
+}
+$('avatarWrap').onclick=openAvatarModal;
+$('avatarEditBtn').onclick=e=>{e.stopPropagation();openAvatarModal()};
+$('changePhotoBtn').onclick=openAvatarModal;
+$('takeAvatarPhotoBtn').onclick=()=>$('avatarCameraInput').click();
+$('chooseAvatarPhotoBtn').onclick=()=>$('avatarGalleryInput').click();
+
+async function prepareAvatarFile(file){
+  if(!file)return;
+  if(!file.type.startsWith('image/')){$('avatarStatus').textContent='Escolha uma imagem válida.';return}
+  if(file.size>12*1024*1024){$('avatarStatus').textContent='A imagem é demasiado grande.';return}
+  $('avatarStatus').textContent='A preparar fotografia…';
+  try{
+    const bitmap=await createImageBitmap(file);
+    const side=Math.min(bitmap.width,bitmap.height);
+    const sx=(bitmap.width-side)/2,sy=(bitmap.height-side)/2;
+    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(bitmap,sx,sy,side,side,0,0,512,512);
+    bitmap.close?.();
+    pendingAvatarBlob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.88));
+    $('avatarPreview').src=URL.createObjectURL(pendingAvatarBlob);
+    $('saveAvatarBtn').classList.remove('hidden');
+    $('avatarStatus').textContent='Pré-visualização pronta. Carregue em “Guardar fotografia”.'
+  }catch(e){
+    $('avatarStatus').textContent='Não foi possível preparar esta imagem. Tente outra fotografia.'
+  }
+}
+$('avatarCameraInput').onchange=async e=>{await prepareAvatarFile(e.target.files?.[0]);e.target.value=''};
+$('avatarGalleryInput').onchange=async e=>{await prepareAvatarFile(e.target.files?.[0]);e.target.value=''};
+
+$('saveAvatarBtn').onclick=async()=>{
+  if(!pendingAvatarBlob)return;
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user)return;
+  $('avatarStatus').textContent='A guardar fotografia…';
+  const path=`${user.id}/perfil_${Date.now()}.jpg`;
+  const {error:upErr}=await supabase.storage.from('avatars').upload(path,pendingAvatarBlob,{contentType:'image/jpeg',cacheControl:'3600',upsert:false});
+  if(upErr){$('avatarStatus').textContent=errPT(upErr);return}
+  const current=await supabase.from('fuel_contributor_stats').select('avatar_path').eq('user_id',user.id).maybeSingle();
+  const oldPath=current.data?.avatar_path||null;
+  const {error}=await supabase.from('fuel_contributor_stats').update({avatar_path:path}).eq('user_id',user.id);
+  if(error){$('avatarStatus').textContent=errPT(error);return}
+  if(oldPath && oldPath!==path) supabase.storage.from('avatars').remove([oldPath]).catch(()=>{});
+  pendingAvatarBlob=null;
+  $('avatarStatus').textContent='Fotografia atualizada.';
+  await loadLeaderboard();
+  setTimeout(()=>$('avatarModal').classList.remove('open'),350)
+};
 
 function subscribeRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);

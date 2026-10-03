@@ -1,29 +1,27 @@
-# Bomba Certa v3.1 — combustíveis correntes em Portugal
+# Bomba Certa v3.3 — GPS robusto + editor de confiança
 
-A aplicação passa a suportar explicitamente:
+## GPS
+A navegação deixa de depender da rota interna.
 
-- Gasóleo simples
-- Gasóleo aditivado / premium
-- Gasolina simples 95
-- Gasolina 95 aditivada / premium
-- Gasolina 98
-- Gasolina 98 aditivada / premium
-- GPL Auto
+Cada posto passa a ter:
+- **GPS** — abre imediatamente a aplicação de navegação do dispositivo;
+- **Ver rota** — mantém a rota dentro da Bomba Certa.
 
-## Designações comerciais
-O OCR e a correspondência de combustíveis aceitam também aliases, incluindo:
-- Diesel Ultimate
-- Ultimate Diesel
-- Gasolina Ultimate
-- Diesel premium
-- Gasóleo aditivado
-- GPL / Autogas
+Comportamento:
+- iPhone/iPad: Apple Maps;
+- Android: app de mapas/navegação através do esquema `geo:`;
+- computador: Google Maps;
+- dentro da rota continuam disponíveis botões para GPS do telemóvel e Google Maps.
 
-## Fotografia
-Quando uma fotografia mostra várias linhas de preço, a aplicação tenta:
-1. reconhecer o nome do combustível;
-2. associar o preço à categoria correta;
-3. escolher primeiro o combustível que o utilizador tem selecionado;
-4. mostrar os restantes valores detetados para confirmação.
+## Editor de confiança
+A aplicação passa a suportar o campo `trusted_publisher` na tabela `fuel_contributor_stats`.
 
-A imagem de referência usada no desenvolvimento apresenta Gasóleo Simples, Gasolina Simples 95, Diesel Ultimate e Gasolina Ultimate; GPL Auto foi acrescentado como opção obrigatória.
+Quando esse campo está ativo:
+- um preço publicado por esse utilizador é aceite imediatamente;
+- não precisa de 5, 4, 3 ou 2 confirmações;
+- aparece no perfil/ranking como **Editor de confiança**.
+
+O privilégio não é controlado por uma palavra-passe escrita no código. Isso evita expor credenciais no HTML público.
+
+## Segurança
+Nunca colocar a palavra-passe de uma conta de administração dentro de `index.html`, JavaScript público ou README.
