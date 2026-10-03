@@ -1,36 +1,25 @@
-# Bomba Certa v7.3 — Analytics no painel Admin
+# Bomba Certa v7.4 — utilizador pode alterar o próprio nome
 
-## Novo resumo administrativo
-O painel de Administração apresenta agora:
+## Erro encontrado
+O botão `Alterar nome` existia visualmente, mas não tinha qualquer evento JavaScript associado.
+O mesmo acontecia com o botão `Cancelar`.
 
-- Utilizadores registados
-- Visualizações da página hoje
-- Visualizações totais
-- Visualizações acumuladas nos últimos 7 dias
-- Distribuição diária das visualizações dos últimos 7 dias
+A função backend já existia e estava correta:
+`public.update_my_display_name(p_name text)`
 
-## Como é medida uma visualização
-Cada carregamento real da página executa uma RPC segura `record_page_view`.
-É gerado um UUID único para esse carregamento, impedindo que a mesma chamada seja
-gravada duas vezes por acidente.
+Foi confirmado que:
+- é `SECURITY DEFINER`;
+- utilizadores autenticados têm permissão de `EXECUTE`.
 
-Não é necessário o utilizador estar autenticado para a visualização ser contabilizada.
-Quando está autenticado, o backend pode associar internamente o evento ao `auth.uid()`.
+## Correção
+Agora:
+1. O utilizador abre `Perfil`.
+2. Carrega em `✏️ Alterar nome`.
+3. Surge o campo com o nome atual já preenchido.
+4. Escreve o novo nome.
+5. Carrega em `Guardar nome` ou Enter.
+6. O nome é gravado através de `update_my_display_name`.
+7. O perfil, cabeçalho e ranking são atualizados.
+8. `Cancelar` ou Escape fecha a edição sem alterar nada.
 
-## Segurança
-Os eventos de visualização são guardados em `private.page_view_events`.
-O browser não tem acesso direto à tabela.
-
-A escrita é feita apenas por:
-`public.record_page_view(...)`
-
-O resumo só pode ser consultado por uma conta que passe:
-`public.is_app_admin()`
-
-através de:
-`public.admin_dashboard_summary()`
-
-## Nota importante
-A contagem de visualizações começa quando esta versão for publicada.
-Não é possível reconstruir com rigor visualizações históricas anteriores que nunca
-foram registadas pela aplicação.
+Nenhuma conta ou dado existente foi alterado.

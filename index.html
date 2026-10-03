@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.3 — analytics no Admin</title>
+<title>Bomba Certa v7.4 — nome próprio editável</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -449,7 +449,7 @@ header{
         </div>
 
         <div id="profileEditArea" class="form hidden" style="margin-top:12px">
-          <input id="profileName" class="input" maxlength="28" placeholder="Nome público">
+          <input id="profileName" class="input" maxlength="28" autocomplete="nickname" placeholder="Novo nome público">
           <div class="actions">
             <button id="saveNameBtn" class="btn">Guardar nome</button>
             <button id="cancelNameBtn" class="btn secondary" type="button">Cancelar</button>
@@ -2424,6 +2424,34 @@ async function loadLeaderboard(){
     return `<div class="leader"><div style="font-weight:900;text-align:center">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt="" onerror="this.onerror=null;this.src='${fallbackAvatar()}'"><div><b>${esc(r.display_name)}</b><div class="level-only">${r.trusted_publisher?'✓ Editor de confiança':esc(r.level_name)}</div></div></div><span class="pill">${r.trusted_publisher?'Confiança máxima':esc(r.level_name)}</span></div>`
   }).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
 }
+
+$('editNameBtn').onclick=()=>{
+  const current=($('myName').textContent||'').trim();
+  if(current && current!=='Condutor') $('profileName').value=current;
+  $('profileStatus').textContent='';
+  $('profileEditArea').classList.remove('hidden');
+  setTimeout(()=>{
+    $('profileName').focus();
+    $('profileName').select?.()
+  },50)
+};
+
+$('cancelNameBtn').onclick=()=>{
+  $('profileEditArea').classList.add('hidden');
+  $('profileStatus').textContent=''
+};
+
+$('profileName').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    $('saveNameBtn').click()
+  }
+  if(e.key==='Escape'){
+    e.preventDefault();
+    $('cancelNameBtn').click()
+  }
+});
+
 $('saveNameBtn').onclick=async()=>{
   const n=$('profileName').value.trim();
   if(n.length<2){
