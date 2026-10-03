@@ -4,11 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.3 — pesquisa automática</title>
+<title>Bomba Certa v4.4 — abertura imediata</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
   --bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#667085;--line:#e5e7eb;
@@ -49,7 +47,11 @@ header{
 .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 10px}
 .section-title h2{font-size:18px;margin:0;letter-spacing:-.02em}
 .pill{font-size:11px;font-weight:850;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:#475467}
-#fuelMap{height:430px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+#fuelMap{height:430px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#eef2f6;position:relative}
+.map-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#667085;font-size:12px;background:linear-gradient(135deg,#f8fafc,#eef2f6)}
+.map-placeholder .map-pin{font-size:32px}
+.map-placeholder .mini-spin{width:18px;height:18px;border:2px solid #d0d5dd;border-top-color:#111827;border-radius:50%;animation:spin .7s linear infinite}
+
 .station-list{display:grid;gap:10px}
 .station{
   border:1px solid var(--line);border-radius:16px;padding:14px;background:white;
@@ -199,7 +201,7 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Os postos começam a ser procurados automaticamente assim que entra. Use o botão apenas para atualizar a localização.</p>
+      <p>Os postos começam a aparecer assim que entra. A localização e os preços são atualizados automaticamente em segundo plano.</p>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -556,6 +558,45 @@ const kmFmt=v=>Number(v||0).toLocaleString('pt-PT',{maximumFractionDigits:1});
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 
 const scriptPromises={};
+
+let leafletPromise=null,leafletCssLoaded=false;
+function loadStylesheetOnce(href){
+  return new Promise((resolve,reject)=>{
+    const l=document.createElement('link');l.rel='stylesheet';l.href=href;
+    l.onload=()=>resolve(true);l.onerror=()=>reject(new Error('stylesheet'));
+    document.head.appendChild(l)
+  })
+}
+async function ensureLeaflet(){
+  if(window.L)return window.L;
+  if(leafletPromise)return leafletPromise;
+  leafletPromise=(async()=>{
+    if(!leafletCssLoaded){
+      leafletCssLoaded=true;
+      loadStylesheetOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css')
+        .catch(()=>loadStylesheetOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'))
+        .catch(()=>{})
+    }
+    try{
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js','L')
+    }catch{
+      delete scriptPromises['https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'];
+      await loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','L')
+    }
+    return window.L
+  })();
+  return leafletPromise
+}
+function showMapPlaceholder(text='A abrir mapa…'){
+  const el=$('fuelMap');
+  if(!el)return;
+  if(!el.querySelector('.map-placeholder')){
+    el.innerHTML=`<div class="map-placeholder"><div class="map-pin">📍</div><div class="mini-spin"></div><b>${esc(text)}</b></div>`
+  }else{
+    const b=el.querySelector('.map-placeholder b');if(b)b.textContent=text
+  }
+}
+
 function loadScriptOnce(src,key){
   if(window[key])return Promise.resolve(window[key]);
   if(scriptPromises[src])return scriptPromises[src];
@@ -646,7 +687,8 @@ function showSection(id){
   document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
   $(id)?.classList.add('active');
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
-  if(id==='abastecimentos'||id==='estatisticas')loadFillups();
+  if(id==='abastecimentos')loadFillups();
+  if(id==='estatisticas')loadFillups().then(()=>drawCharts().catch(()=>{}));
   if(id==='perfil')loadLeaderboard();
   if(id==='admin'&&isAdminUser){loadAdminUsers();loadAdminReports();}
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
@@ -784,16 +826,19 @@ $('refreshReportsBtn').onclick=loadAdminReports;
 
 async function enterApp(){
   $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');
+  showMapPlaceholder('A abrir mapa…');
   openMapImmediately();
+  setTimeout(()=>autoStartSearch().catch(()=>{}),0);
 
-  // Começar logo a pesquisa sem esperar pelo resto do bootstrap.
-  autoStartSearch().catch(()=>{});
-
-  const {data:{user}}=await supabase.auth.getUser();currentAuthUserId=user?.id||null;
-  await supabase.rpc('ensure_my_fuel_profile');
-  await checkAdmin();
-  await Promise.all([loadFillups(),loadLeaderboard()]);
-  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')) await Promise.all([loadAdminUsers(),loadAdminReports()]);
+  supabase.auth.getUser().then(({data:{user}})=>{currentAuthUserId=user?.id||null}).catch(()=>{});
+  supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+  checkAdmin().then(()=>{
+    loadLeaderboard().catch(()=>{});
+    if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
+      loadAdminUsers().catch(()=>{});loadAdminReports().catch(()=>{})
+    }
+  }).catch(()=>{});
+  loadFillups().catch(()=>{})
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
@@ -834,7 +879,7 @@ function getStationCache(lat,lon){
   try{
     const c=JSON.parse(localStorage.getItem(stationCacheKey())||'null');
     if(!c||!Array.isArray(c.stations)||!c.stations.length)return null;
-    if(Date.now()-Number(c.ts||0)>20*60*1000)return null;
+    if(Date.now()-Number(c.ts||0)>2*60*60*1000)return null;
     if(haversine(lat,lon,Number(c.lat),Number(c.lon))>3)return null;
     return c
   }catch{return null}
@@ -864,7 +909,7 @@ function saveLastLocation(lat,lon){
 function getLastLocation(){
   try{
     const v=JSON.parse(localStorage.getItem('bombaCerta:lastLocation')||'null');
-    if(v && Number.isFinite(v.lat) && Number.isFinite(v.lon) && Date.now()-v.ts<30*60*1000)return v
+    if(v && Number.isFinite(v.lat) && Number.isFinite(v.lon) && Date.now()-v.ts<24*60*60*1000)return v
   }catch{}
   return null
 }
@@ -874,16 +919,20 @@ async function autoStartSearch(){
   if(autoSearchStarted)return;
   autoSearchStarted=true;
 
-  ensureMap();
+  showMapPlaceholder('A procurar postos…');
+  ensureMap().catch(()=>{});
   showSearchState('A procurar automaticamente…');
 
   // 1) usar imediatamente localização guardada + postos em cache
   const cached=getLastLocation();
   if(cached){
     currentLat=cached.lat;currentLon=cached.lon;
-    map.setView([currentLat,currentLon],13,{animate:false});
-    if(userMarker)map.removeLayer(userMarker);
-    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('Última localização conhecida');
+    ensureMap().then(()=>{
+      if(!map)return;
+      map.setView([currentLat,currentLon],13,{animate:false});
+      if(userMarker)map.removeLayer(userMarker);
+      userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('Última localização conhecida')
+    }).catch(()=>{});
 
     const hadCache=await renderCachedStations(currentLat,currentLon);
     if(hadCache){
@@ -913,9 +962,12 @@ async function autoStartSearch(){
     const moved=currentLat==null || haversine(currentLat,currentLon,newLat,newLon)>.25;
     currentLat=newLat;currentLon=newLon;
     saveLastLocation(currentLat,currentLon);
-    map.setView([currentLat,currentLon],13,{animate:false});
-    if(userMarker)map.removeLayer(userMarker);
-    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    ensureMap().then(()=>{
+      if(!map)return;
+      map.setView([currentLat,currentLon],13,{animate:false});
+      if(userMarker)map.removeLayer(userMarker);
+      userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização')
+    }).catch(()=>{});
 
     if(moved || !nearbyStations.length){
       $('fuelStatus').textContent='Localização atualizada · a procurar postos…';
@@ -968,35 +1020,48 @@ async function useFastLocation(){
 
 
 function openMapImmediately(){
-  ensureMap();
+  showMapPlaceholder('A abrir mapa…');
   const cached=getLastLocation();
-  if(cached){
-    currentLat=cached.lat;currentLon=cached.lon;
-    map.setView([cached.lat,cached.lon],13,{animate:false});
-    if(userMarker)map.removeLayer(userMarker);
-    userMarker=L.marker([cached.lat,cached.lon]).addTo(map).bindPopup('Última localização conhecida');
-    const c=getStationCache(cached.lat,cached.lon);
-    if(c?.stations?.length){
-      nearbyStations=c.stations.map(s=>({...s,lat:Number(s.lat),lon:Number(s.lon),distance:haversine(cached.lat,cached.lon,Number(s.lat),Number(s.lon)),candidate:null,cached:true}));
-      renderCachedOnly()
+  ensureMap().then(()=>{
+    if(!map)return;
+    if(cached){
+      currentLat=cached.lat;currentLon=cached.lon;
+      map.setView([cached.lat,cached.lon],13,{animate:false});
+      if(userMarker)map.removeLayer(userMarker);
+      userMarker=L.marker([cached.lat,cached.lon]).addTo(map).bindPopup('Última localização conhecida');
+      const c=getStationCache(cached.lat,cached.lon);
+      if(c?.stations?.length){
+        nearbyStations=c.stations.map(s=>({...s,lat:Number(s.lat),lon:Number(s.lon),distance:haversine(cached.lat,cached.lon,Number(s.lat),Number(s.lon)),candidate:null,cached:true}));
+        renderCachedOnly()
+      }
     }
-  }else{
-    map.setView([39.55,-8.0],6,{animate:false});
-  }
-  requestAnimationFrame(()=>map.invalidateSize(false))
+  }).catch(()=>{})
 }
 
-function ensureMap(){
-  if(map)return;
-  map=L.map('fuelMap').setView([39.5,-8],6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19,
-    attribution:'© OpenStreetMap',
-    updateWhenIdle:false,
-    updateWhenZooming:true,
-    keepBuffer:4
-  }).addTo(map)
+async function ensureMap(){
+  if(map)return map;
+  showMapPlaceholder('A abrir mapa…');
+  try{
+    await ensureLeaflet();
+    const el=$('fuelMap');
+    if(el)el.innerHTML='';
+    map=L.map('fuelMap',{zoomControl:true,preferCanvas:true}).setView([39.55,-8.0],6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'© OpenStreetMap',
+      updateWhenIdle:true,
+      updateWhenZooming:false,
+      keepBuffer:2
+    }).addTo(map);
+    requestAnimationFrame(()=>map.invalidateSize(false));
+    return map
+  }catch(e){
+    const el=$('fuelMap');
+    if(el)el.innerHTML='<div class="map-placeholder"><div class="map-pin">🗺️</div><b>Mapa temporariamente indisponível</b><span>Os postos continuam disponíveis na lista.</span></div>';
+    return null
+  }
 }
+
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
   const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
@@ -1118,12 +1183,14 @@ function renderCachedOnly(){
     </div>`
   }).join(''):'<div class="empty">A procurar postos próximos…</div>';
 
-  ensureMap();
-  stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
-  for(const s of nearbyStations){
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice!=null?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'A atualizar…'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
-    stationMarkers.push(m)
-  }
+  ensureMap().then(()=>{
+    if(!map)return;
+    stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
+    for(const s of nearbyStations){
+      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice!=null?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'A atualizar…'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+      stationMarkers.push(m)
+    }
+  }).catch(()=>{})
 }
 
 async function renderCachedStations(lat,lon){
@@ -1174,35 +1241,30 @@ async function searchStations({instant=true}={}){
     }
   }).catch(()=>{});
 
-  // Segunda vaga: fontes externas, totalmente em paralelo
-  const slowPromise=Promise.allSettled([
-    dgegStations(currentLat,currentLon,r),
-    osmStations(currentLat,currentLon,r)
-  ]).then(async slowResults=>{
-    const slow=slowResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
-    nearbyStations=mergeStations([nearbyStations,...slow]).filter(s=>s.distance<=r/1000);
-    await renderStations();
+  setTimeout(()=>{
+    Promise.allSettled([
+      dgegStations(currentLat,currentLon,r),
+      osmStations(currentLat,currentLon,r)
+    ]).then(async slowResults=>{
+      const slow=slowResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+      nearbyStations=mergeStations([nearbyStations,...slow]).filter(s=>s.distance<=r/1000);
+      await renderStations();
 
-    // preços adicionais depois de já haver conteúdo visível
-    const enrich=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,24);
-    if(enrich.length){
-      await Promise.allSettled(enrich.map(enrichDetail));
-      await renderStations()
-    }
+      const enrich=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,18);
+      if(enrich.length){
+        Promise.allSettled(enrich.map(enrichDetail)).then(async()=>{
+          await renderStations();
+          saveStationCache()
+        }).catch(()=>{})
+      }else saveStationCache();
 
-    saveStationCache();
-    remember(nearbyStations).catch(()=>{});
-    $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`;
-    hideSearchState();
-    setLocateLoading(false)
-  }).catch(()=>{
-    hideSearchState();setLocateLoading(false);
-    if(nearbyStations.length)$('fuelStatus').textContent=`${nearbyStations.length} postos disponíveis.`;
-    else $('fuelStatus').textContent='Não foi possível completar a pesquisa. Tente novamente.'
-  });
+      remember(nearbyStations).catch(()=>{});
+      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`;
+      hideSearchState();setLocateLoading(false)
+    }).catch(()=>{hideSearchState();setLocateLoading(false)})
+  },180);
 
-  // não bloquear a interface: as duas vagas seguem em background
-  await Promise.race([fastPromise,new Promise(r=>setTimeout(r,900))]);
+  await Promise.race([fastPromise,new Promise(resolve=>setTimeout(resolve,350))]);
 }
 $('locateBtn').onclick=async()=>{
   setLocateLoading(true,'A atualizar…');
@@ -1432,7 +1494,7 @@ async function loadFillups(){
   $('totalSpend').textContent=money(ts);$('totalLiters').textContent=kmFmt(tl)+' L';$('statAvg').textContent=avg.toFixed(3).replace('.',',')+' €/L';
   const use={};fillups.forEach(x=>use[x.station_name]=(use[x.station_name]||0)+1);$('topStation').textContent=Object.entries(use).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
   $('fillHistory').innerHTML=fillups.length?fillups.map(x=>`<div class="history-row"><div><b>${esc(x.station_name)}</b><div class="tiny muted">${esc(x.fillup_date)} · ${esc(x.fuel_type)}</div></div><div class="detail"><b>${Number(x.liters).toLocaleString('pt-PT',{maximumFractionDigits:2})} L</b><div class="tiny muted">${Number(x.price_per_liter).toFixed(3).replace('.',',')} €/L</div></div><div class="detail"><b>${money(x.total_amount)}</b>${x.odometer_km?`<div class="tiny muted">${Number(x.odometer_km).toLocaleString('pt-PT')} km</div>`:''}</div><button class="btn danger" onclick="deleteFill('${x.id}')">Apagar</button></div>`).join(''):'<div class="empty">Ainda não existem abastecimentos registados.</div>';
-  drawCharts()
+  if($('estatisticas')?.classList.contains('active')) drawCharts().catch(()=>{})
 }
 async function drawCharts(){
   const Chart=await ensureChart();
