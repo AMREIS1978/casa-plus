@@ -1,11 +1,11 @@
-# Bomba Certa v7.1 — mensagem de boas-vindas
+# Bomba Certa v7.2
 
-Foi retirada a mensagem incorreta `Preço atualizado` que aparecia depois de criar uma nova conta.
+Foi removida por completo a expressão:
 
-Agora, após o registo e entrada automática, aparece apenas:
+`Preço atualizado`
 
-**Parabéns!**  
-**Conta criada com sucesso**  
-**Bem-vindo à Bomba Certa.**
+Também foi removido o texto associado:
 
-Também foi retirada a mensagem automática da “Primeira missão” nesse momento.
+`Obrigado por manter os preços atualizados.`
+
+Quando não há pontos a atribuir, o pop-up já não mostra essa mensagem.
