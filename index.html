@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v3.5 — administração</title>
+<title>Bomba Certa v3.7 — gestão de utilizadores</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -122,6 +122,19 @@ header{
   .kpis{grid-template-columns:1fr 1fr}
   .modal{padding:7px}.modal-card{border-radius:20px}
 }
+
+.location-fast{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:7px}
+.location-fast .pulse{width:8px;height:8px;border-radius:50%;background:#12b76a;box-shadow:0 0 0 0 rgba(18,183,106,.35);animation:locpulse 1.6s infinite}
+@keyframes locpulse{0%{box-shadow:0 0 0 0 rgba(18,183,106,.35)}70%{box-shadow:0 0 0 9px rgba(18,183,106,0)}100%{box-shadow:0 0 0 0 rgba(18,183,106,0)}}
+.reward-overlay{position:fixed;inset:0;z-index:3000;pointer-events:none;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.12);opacity:0;transition:opacity .2s}
+.reward-overlay.show{opacity:1}
+.reward-card{background:white;border:1px solid var(--line);border-radius:24px;box-shadow:0 28px 80px rgba(15,23,42,.24);padding:24px 28px;text-align:center;min-width:260px;transform:scale(.88);transition:transform .22s cubic-bezier(.2,.9,.2,1.2)}
+.reward-overlay.show .reward-card{transform:scale(1)}
+.reward-icon{font-size:42px}.reward-title{font-size:20px;font-weight:950;margin-top:7px}.reward-points{font-size:34px;font-weight:950;margin-top:5px;color:#0f172a}.reward-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.confetti{position:fixed;top:50%;left:50%;width:8px;height:14px;border-radius:2px;z-index:3100;pointer-events:none;animation:confetti-fly 1s ease-out forwards}
+@keyframes confetti-fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+.level-only{font-size:12px;font-weight:850;color:#475467}
+
 </style>
 </head>
 <body>
@@ -156,15 +169,13 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Preços por posto, validação da comunidade e navegação direta no GPS do telemóvel.</p>
+      <p>Veja rapidamente os postos perto de si. Atualize preços diretamente no cartão de cada posto.</p>
     </div>
 
     
     <div class="card" style="margin-top:12px">
-      <div class="station-actions" style="margin-top:0">
-        <button id="quickLocateBtn" class="go" style="flex:1">📍 Ver postos perto de mim</button>
-        <button id="quickReportBtn" class="photo" style="flex:1">📷 Atualizar um preço</button>
-      </div>
+      <button id="quickLocateBtn" class="btn" style="width:100%">📍 Ver postos perto de mim</button>
+      <div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -322,6 +333,26 @@ header{
       <div class="card kpi"><small>Preços</small><strong style="font-size:17px">Acesso total</strong></div>
       <div class="card kpi"><small>Contas</small><strong style="font-size:17px">Gestão total</strong></div>
     </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="section-title"><h2>Criar utilizador</h2><span class="pill">Admin</span></div>
+      <div class="form">
+        <input id="adminNewEmail" class="input" type="email" autocomplete="off" placeholder="Email">
+        <input id="adminNewPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)">
+        <select id="adminNewLevel" class="input">
+          <option value="novato">Novato</option>
+          <option value="explorador">Explorador</option>
+          <option value="guia">Guia</option>
+          <option value="especialista">Especialista</option>
+          <option value="embaixador">Embaixador</option>
+          <option value="editor">Editor de confiança</option>
+          <option value="administrador">Administrador</option>
+        </select>
+        <button id="adminCreateUserBtn" class="btn">Criar utilizador</button>
+        <div id="adminCreateStatus" class="status"></div>
+      </div>
+    </div>
+
     <div class="card" style="margin-top:12px">
       <div class="section-title"><h2>Contas registadas</h2><button id="refreshAdminBtn" class="btn secondary">Atualizar</button></div>
       <div id="adminUsers" class="empty">A carregar utilizadores…</div>
@@ -440,6 +471,16 @@ header{
   </div>
 </div>
 
+
+<div id="rewardOverlay" class="reward-overlay" aria-hidden="true">
+  <div class="reward-card">
+    <div class="reward-icon">✨</div>
+    <div id="rewardTitle" class="reward-title">Boa!</div>
+    <div id="rewardPoints" class="reward-points">+10 pts</div>
+    <div id="rewardSub" class="reward-sub">A comunidade ficou mais atualizada.</div>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm';
 
@@ -472,6 +513,42 @@ function fuelMatchesLabel(apiLabel,selected){
 
 let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[];
 let currentStation=null,currentPriceStation=null,fillups=[],monthlyChart=null,priceChart=null,fuelChannel=null,dgegFuelTypes=[];
+
+
+function playRewardTone(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),now=ctx.currentTime;
+    [523.25,659.25,783.99].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.0001,now+i*.07);g.gain.exponentialRampToValueAtTime(.08,now+i*.07+.02);g.gain.exponentialRampToValueAtTime(.0001,now+i*.07+.18);o.connect(g).connect(ctx.destination);o.start(now+i*.07);o.stop(now+i*.07+.2)});
+    setTimeout(()=>ctx.close(),700)
+  }catch{}
+}
+function confettiBurst(){
+  const pieces=18;
+  for(let i=0;i<pieces;i++){
+    const el=document.createElement('div');el.className='confetti';
+    el.style.background=['#12b76a','#f79009','#2e90fa','#7f56d9','#f04438'][i%5];
+    const angle=(Math.PI*2*i/pieces),dist=90+Math.random()*90;
+    el.style.setProperty('--x',`${Math.cos(angle)*dist}px`);
+    el.style.setProperty('--y',`${Math.sin(angle)*dist-40}px`);
+    el.style.setProperty('--r',`${Math.round(Math.random()*540)}deg`);
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1100)
+  }
+}
+function showReward(points,title='Boa!'){
+  $('rewardTitle').textContent=title;
+  $('rewardPoints').textContent=points>0?`+${points} pts`:'Preço atualizado';
+  $('rewardSub').textContent=points>0?'Ajudou a comunidade e subiu na reputação.':'Obrigado por manter os preços atualizados.';
+  const o=$('rewardOverlay');o.classList.add('show');
+  confettiBurst();playRewardTone();
+  navigator.vibrate?.([45,35,70]);
+  setTimeout(()=>o.classList.remove('show'),1450)
+}
+async function myPoints(){
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return 0;
+  const {data}=await supabase.from('fuel_contributor_stats').select('points').eq('user_id',user.id).maybeSingle();
+  return Number(data?.points||0)
+}
 
 function errPT(e){
   const m=String(e?.message||e||'').toLowerCase();
@@ -512,7 +589,7 @@ async function checkAdmin(){
 async function loadAdminUsers(){
   if(!isAdminUser)return;
   $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
-  const {data,error}=await supabase.rpc('admin_list_users');
+  const {data,error}=await supabase.rpc('admin_list_users_v2');
   if(error){$('adminUsers').textContent=errPT(error);return}
   const rows=data||[];
   $('adminUserCount').textContent=rows.length;
@@ -521,13 +598,40 @@ async function loadAdminUsers(){
   $('adminUsers').innerHTML=rows.map(u=>{
     const self=u.user_id===user?.id;
     const name=esc(u.display_name||'Utilizador');
+    const currentLevel=u.is_admin?'administrador':u.trusted_publisher?'editor':
+      u.level_name==='Embaixador'?'embaixador':
+      u.level_name==='Especialista'?'especialista':
+      u.level_name==='Guia'?'guia':
+      u.level_name==='Explorador'?'explorador':'novato';
     return `<div class="admin-user">
-      <div><b>${name}${self?'<span class="admin-badge">A sua conta</span>':''}</b>
-      <div class="admin-email">${esc(u.email||'')}</div>
-      <div class="tiny muted">Criada: ${u.created_at?new Date(u.created_at).toLocaleDateString('pt-PT'):'—'} · Último acesso: ${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-PT'):'—'} · ${Number(u.points||0)} pts</div></div>
+      <div>
+        <b>${name}${self?'<span class="admin-badge">A sua conta</span>':''}</b>
+        <div class="admin-email">${esc(u.email||'')}</div>
+        <div class="tiny muted">Nível atual: ${esc(u.level_name||'Novato')} · Criada: ${u.created_at?new Date(u.created_at).toLocaleDateString('pt-PT'):'—'} · Último acesso: ${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-PT'):'—'}</div>
+        <div class="actions" style="margin-top:8px">
+          <select id="level_${u.user_id}" class="input" style="max-width:220px">
+            <option value="novato" ${currentLevel==='novato'?'selected':''}>Novato</option>
+            <option value="explorador" ${currentLevel==='explorador'?'selected':''}>Explorador</option>
+            <option value="guia" ${currentLevel==='guia'?'selected':''}>Guia</option>
+            <option value="especialista" ${currentLevel==='especialista'?'selected':''}>Especialista</option>
+            <option value="embaixador" ${currentLevel==='embaixador'?'selected':''}>Embaixador</option>
+            <option value="editor" ${currentLevel==='editor'?'selected':''}>Editor de confiança</option>
+            <option value="administrador" ${currentLevel==='administrador'?'selected':''}>Administrador</option>
+          </select>
+          <button class="btn secondary" onclick="adminSetLevel('${u.user_id}')">Alterar nível</button>
+        </div>
+      </div>
       <div>${self?'<span class="pill">Proprietário</span>':`<button class="btn danger" onclick="adminDeleteUser('${u.user_id}','${esc((u.email||'').replace(/'/g,''))}')">Apagar conta</button>`}</div>
     </div>`
   }).join('')
+}
+window.adminSetLevel=async(userId)=>{
+  const sel=document.getElementById(`level_${userId}`);if(!sel)return;
+  const level=sel.value;
+  const {data,error}=await supabase.rpc('admin_set_user_level',{p_user_id:userId,p_level:level});
+  if(error){alert('Não foi possível alterar o nível: '+errPT(error));return}
+  await loadAdminUsers();
+  alert('Nível atualizado.')
 }
 window.adminDeleteUser=async(userId,email)=>{
   const phrase='APAGAR';
@@ -539,6 +643,22 @@ window.adminDeleteUser=async(userId,email)=>{
   if(!data){alert('A conta não foi encontrada ou já tinha sido eliminada.')}
   await loadAdminUsers()
 }
+
+$('adminCreateUserBtn').onclick=async()=>{
+  const email=$('adminNewEmail').value.trim().toLowerCase();
+  const password=$('adminNewPassword').value;
+  const level=$('adminNewLevel').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('adminCreateStatus').textContent='Introduza um email válido.';return}
+  if(password.length<8){$('adminCreateStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
+  $('adminCreateStatus').textContent='A criar utilizador…';
+  const {data,error}=await supabase.functions.invoke('admin-create-user',{body:{email,password,level}});
+  if(error){$('adminCreateStatus').textContent=errPT(error);return}
+  if(data?.error){$('adminCreateStatus').textContent=data.error;return}
+  $('adminNewEmail').value='';$('adminNewPassword').value='';$('adminNewLevel').value='novato';
+  $('adminCreateStatus').textContent=`Utilizador criado com nível ${level}.`;
+  await loadAdminUsers()
+}
+
 $('refreshAdminBtn').onclick=loadAdminUsers;
 
 async function enterApp(){
@@ -564,6 +684,46 @@ $('signupBtn').onclick=async()=>{
   $('authStatus').textContent=error?errPT(error):'Conta criada. Consulte o email e confirme o registo.'
 };
 $('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()};
+
+
+function saveLastLocation(lat,lon){
+  try{localStorage.setItem('bombaCerta:lastLocation',JSON.stringify({lat,lon,ts:Date.now()}))}catch{}
+}
+function getLastLocation(){
+  try{
+    const v=JSON.parse(localStorage.getItem('bombaCerta:lastLocation')||'null');
+    if(v && Number.isFinite(v.lat) && Number.isFinite(v.lon) && Date.now()-v.ts<30*60*1000)return v
+  }catch{}
+  return null
+}
+async function useFastLocation(){
+  const cached=getLastLocation();
+  if(cached){
+    currentLat=cached.lat;currentLon=cached.lon;
+    $('fastLocationInfo')?.classList.remove('hidden');
+    $('fuelStatus').textContent='A mostrar já os postos da última localização conhecida…';
+    searchStations().catch(()=>{});
+  }
+  if(!navigator.geolocation){
+    $('fuelStatus').textContent='Este dispositivo não permite localização.';
+    return
+  }
+  navigator.geolocation.getCurrentPosition(async p=>{
+    currentLat=p.coords.latitude;currentLon=p.coords.longitude;saveLastLocation(currentLat,currentLon);
+    $('fastLocationInfo')?.classList.add('hidden');
+    await searchStations();subscribeRealtime()
+  },()=>{
+    $('fastLocationInfo')?.classList.add('hidden');
+    if(!cached)$('fuelStatus').textContent='Não foi possível obter a localização. Autorize-a no navegador.'
+  },{enableHighAccuracy:false,timeout:4500,maximumAge:300000});
+
+  if(navigator.geolocation.watchPosition){
+    const watch=navigator.geolocation.watchPosition(async p=>{
+      currentLat=p.coords.latitude;currentLon=p.coords.longitude;saveLastLocation(currentLat,currentLon);
+      navigator.geolocation.clearWatch(watch)
+    },()=>{}, {enableHighAccuracy:true,timeout:12000,maximumAge:0})
+  }
+}
 
 function ensureMap(){
   if(map)return;
@@ -706,25 +866,24 @@ async function communityData(){
   const ids=(reports||[]).map(x=>x.id);
   const [{data:validations},{data:contributors},{data:statuses}]=await Promise.all([
     ids.length?supabase.from('fuel_price_validations').select('*').in('report_id',ids):Promise.resolve({data:[]}),
-    supabase.from('fuel_contributor_stats').select('user_id,points,trusted_publisher'),
+    supabase.rpc('community_contributor_levels'),
     supabase.from('fuel_station_status_reports').select('*').gte('created_at',new Date(Date.now()-6*3600000).toISOString())
   ]);
   return {reports:reports||[],validations:validations||[],contributors:contributors||[],statuses:statuses||[]}
 }
-function reqSupport(points){return points>=800?1:points>=400?2:points>=150?3:points>=50?4:5}
 function candidateFor(key,reports,validations,contributors){
   const rs=reports.filter(r=>r.station_key===key);if(!rs.length)return null;
-  const pts=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.points||0)]));
+  const required=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.required_support||5)]));
   const trusted=Object.fromEntries(contributors.map(x=>[x.user_id,Boolean(x.trusted_publisher)]));
   const groups={};
   for(const r of rs){
     const k=Number(r.price).toFixed(3);groups[k]??={price:Number(r.price),reports:[],support:new Set(),max:0,latest:r.observed_at};
-    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.max=Math.max(g.max,pts[r.user_id]||0);g.trusted=Boolean(g.trusted||trusted[r.user_id]);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
+    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.required=Math.min(g.required??5,required[r.user_id]||5);g.trusted=Boolean(g.trusted||trusted[r.user_id]);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
   }
   for(const g of Object.values(groups)){
     const ids=new Set(g.reports.map(x=>x.id));
-    validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.max=Math.max(g.max,pts[v.user_id]||0)});
-    g.count=g.support.size;g.required=g.trusted?1:reqSupport(g.max);g.accepted=g.trusted||g.count>=g.required;g.updatedAt=g.latest
+    validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.required=Math.min(g.required??5,required[v.user_id]||5);g.trusted=Boolean(g.trusted||trusted[v.user_id])});
+    g.count=g.support.size;g.required=g.trusted?1:(g.required||5);g.accepted=g.trusted||g.count>=g.required;g.updatedAt=g.latest
   }
   return Object.values(groups).sort((a,b)=>Number(b.accepted)-Number(a.accepted)||b.count-a.count||new Date(b.latest)-new Date(a.latest))[0]
 }
@@ -764,12 +923,7 @@ async function renderStations(){
 }
 
 $('quickLocateBtn').onclick=()=>$('locateBtn').click();
-$('quickReportBtn').onclick=()=>{if(nearbyStations.length)openPrice(nearbyStations[0].key);else $('locateBtn').click()};
-$('locateBtn').onclick=()=>{
-  if(!navigator.geolocation){$('fuelStatus').textContent='Este dispositivo não permite localização.';return}
-  $('fuelStatus').textContent='A obter a sua localização…';
-  navigator.geolocation.getCurrentPosition(async p=>{currentLat=p.coords.latitude;currentLon=p.coords.longitude;await searchStations();subscribeRealtime()},()=>{$('fuelStatus').textContent='Não foi possível obter a localização. Autorize-a no navegador.'},{enableHighAccuracy:false,timeout:10000,maximumAge:120000})
-};
+$('locateBtn').onclick=()=>{ $('fuelStatus').textContent='A localizar…'; useFastLocation() };
 $('refreshBtn').onclick=searchStations;
 $('fuelType').onchange=()=>currentLat!=null&&searchStations();
 $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
@@ -836,17 +990,23 @@ $('photoInput').onchange=async e=>{const f=e.target.files?.[0];if(f)await scanPh
 $('savePriceBtn').onclick=async()=>{
   if(!currentPriceStation)return;
   const price=Number($('priceInput').value.replace(',','.'));if(!(price>.5&&price<5)){$('priceStatus').textContent='Introduza um preço válido, por exemplo 1,799.';return}
+  const beforePoints=await myPoints();
   const {data:{user}}=await supabase.auth.getUser();const s=currentPriceStation;
   const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
   if(error){$('priceStatus').textContent=errPT(error);return}
   $('priceStatus').textContent='Preço atualizado agora.';
-  setTimeout(()=>{$('priceModal').classList.remove('open')},250);
-  await Promise.all([renderStations(),loadLeaderboard()])
+  await Promise.all([renderStations(),loadLeaderboard()]);
+  const afterPoints=await myPoints();
+  const gained=Math.max(0,afterPoints-beforePoints);
+  setTimeout(()=>{$('priceModal').classList.remove('open');showReward(gained,gained>0?'Excelente!':'Preço atualizado')},180)
 };
 window.confirmPrice=async(id,ok)=>{
+  const before=await myPoints();
   const {data:{user}}=await supabase.auth.getUser();
   await supabase.from('fuel_price_validations').upsert({report_id:id,user_id:user.id,is_confirmed:ok,created_at:new Date().toISOString()},{onConflict:'report_id,user_id'});
-  await renderStations()
+  await Promise.all([renderStations(),loadLeaderboard()]);
+  const after=await myPoints(),gained=Math.max(0,after-before);
+  if(gained>0)showReward(gained,'Obrigado!')
 };
 window.reportClosed=async key=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s||!confirm(`Reportar que ${s.name} parece estar encerrado?`))return;
@@ -946,18 +1106,28 @@ function fallbackAvatar(){return `data:image/svg+xml;charset=UTF-8,${encodeURICo
 async function loadLeaderboard(){
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
   await supabase.rpc('ensure_my_fuel_profile');
-  const {data:rows}=await supabase.from('fuel_contributor_stats').select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports,trusted_publisher').order('points',{ascending:false}).limit(20);
-  const mine=(rows||[]).find(x=>x.user_id===user.id)||(await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle()).data;
+  const [{data:publicRows},{data:mine}]=await Promise.all([
+    supabase.rpc('community_contributor_levels'),
+    supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle()
+  ]);
+  const rows=(publicRows||[]).sort((a,b)=>Number(a.rank_position)-Number(b.rank_position)).slice(0,20);
   if(mine){
-    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=isAdminUser?'👑 Proprietário / Administrador':(mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n);$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
-    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();$('myAvatar').src=src;$('topAvatar').src=src;
-    if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
+    const l=level(mine.points);
+    $('myName').textContent=mine.display_name;
+    $('myLevel').textContent=isAdminUser?'👑 Proprietário / Administrador':(mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n);
+    $('myPoints').textContent=mine.points+' pts';
+    $('profileName').value=mine.display_name;
+    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();
+    $('myAvatar').src=src;$('topAvatar').src=src;
+    if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}
+    else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
   }
-  $('leaderboard').innerHTML=(rows||[]).length?(rows||[]).map((r,i)=>{const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl+'?v='+encodeURIComponent(r.avatar_path):fallbackAvatar(),l=level(r.points);return `<div class="leader"><div style="font-weight:900;text-align:center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="tiny muted">${r.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n}</div></div></div><b>${r.points} pts</b></div>`}).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
+  $('leaderboard').innerHTML=rows.length?rows.map((r,i)=>{
+    const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl+'?v='+encodeURIComponent(r.avatar_path):fallbackAvatar();
+    const pos=Number(r.rank_position||i+1);
+    return `<div class="leader"><div style="font-weight:900;text-align:center">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="level-only">${r.trusted_publisher?'✓ Editor de confiança':esc(r.level_name)}</div></div></div><span class="pill">${r.trusted_publisher?'Confiança máxima':esc(r.level_name)}</span></div>`
+  }).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
 }
-
-$('editNameBtn').onclick=()=>{$('profileEditArea').classList.remove('hidden');$('profileName').focus()};
-$('cancelNameBtn').onclick=()=>{$('profileEditArea').classList.add('hidden');$('profileStatus').textContent=''};
 $('saveNameBtn').onclick=async()=>{
   const n=$('profileName').value.trim();
   if(n.length<2){$('profileStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}

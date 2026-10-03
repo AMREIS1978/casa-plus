@@ -1,30 +1,34 @@
-# Bomba Certa v3.5 — administração segura
+# Bomba Certa v3.7 — gestão completa de utilizadores
 
-## Conta proprietária
-A conta associada ao email configurado no projeto recebeu o papel de **owner/admin** no backend.
-
-## Poderes
-O administrador tem acesso de leitura/escrita/eliminação às tabelas principais da Bomba Certa através de políticas RLS específicas de administrador.
-
-Também dispõe de:
-- lista das contas registadas;
+## Criar utilizadores
+Na secção Administração passa a ser possível criar novas contas diretamente com:
 - email;
-- data de criação;
-- último acesso;
-- nome público;
-- pontos;
-- eliminação permanente de outras contas.
+- palavra-passe;
+- nível inicial.
 
-## Eliminar contas
-A eliminação exige duas confirmações:
-1. escrever `APAGAR`;
-2. confirmar novamente.
+## Níveis disponíveis
+- Novato
+- Explorador
+- Guia
+- Especialista
+- Embaixador
+- Editor de confiança
+- Administrador
 
-Ao eliminar um utilizador, os objetos de Storage que lhe pertenciam são transferidos para o administrador antes da eliminação, evitando bloqueios por propriedade de ficheiros.
+## Alterar níveis
+O administrador pode também alterar o nível de qualquer utilizador já existente.
 
-A última conta administradora não pode ser eliminada através desta função, evitando que a aplicação fique sem proprietário.
+Ao atribuir um nível, o backend ajusta automaticamente a reputação mínima correspondente.
 
 ## Segurança
-O estatuto de administrador é guardado no backend, numa tabela privada. Não é decidido por email, palavra-passe ou JavaScript do browser.
+A criação de utilizadores é feita numa Supabase Edge Function protegida por JWT e verificação de administrador.
 
-A palavra-passe nunca é guardada no código público.
+A `service_role` é usada apenas no backend da Edge Function e nunca aparece no HTML público.
+
+## Administradores
+Um utilizador com nível Administrador:
+- passa a integrar a lista privada de administradores;
+- tem acesso à Administração;
+- mantém as permissões administrativas já definidas.
+
+A última conta administradora continua protegida contra remoção acidental.
