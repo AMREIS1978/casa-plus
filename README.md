@@ -1,26 +1,36 @@
-# Bomba Certa v6.6 — login corrigido de vez
+# Bomba Certa v6.7 — registo estável sem invalidar contas existentes
 
-## Problema
-O campo de login tinha `maxlength=20` porque tinha sido pensado apenas para usernames.
+## Arquitetura
+As contas existentes não foram alteradas nem recriadas.
 
-Ao escrever um email, o browser cortava o texto, por exemplo:
-`a.miguel.reis@gmail.`
+Para novas contas:
+- o utilizador escolhe `username`;
+- escolhe a palavra-passe;
+- indica um email de recuperação;
+- o username é a identidade de acesso;
+- o email de recuperação é guardado separadamente da identidade interna do Supabase.
 
-## Correção
-O campo de login:
-- deixou de ter limite de 20 caracteres;
-- aceita username;
-- aceita também email como fallback;
-- mantém password normal;
-- não altera o modelo de registo: novos utilizadores continuam a escolher username e o email continua associado à recuperação.
+## Compatibilidade
+As contas antigas continuam a entrar:
+- com o respetivo username;
+- ou com o email já associado, quando aplicável.
 
-## Backend
-`public-login` foi atualizado para a versão 5.
+As novas contas entram:
+- com username;
+- e o backend também consegue resolver o email de recuperação para a conta correspondente.
 
-Se o texto contém `@`, valida diretamente como email.
-Caso contrário, resolve o username através da tabela privada.
+## Registo
+O backend `public-register` está na versão 5.
+O backend `public-login` está na versão 6.
 
-Assim:
-- utilizadores novos podem entrar com username;
-- contas antigas e utilizadores habituados ao email continuam a conseguir entrar;
-- não há truncagem do email.
+Depois do registo:
+`✓ Conta criada com sucesso. A entrar automaticamente na sua conta…`
+
+Se a entrada automática falhar por qualquer motivo, a aplicação não diz que o registo falhou:
+- muda para o ecrã de login;
+- preenche o username;
+- informa claramente que a conta foi criada;
+- pede apenas a palavra-passe para entrar.
+
+## Dados existentes
+Foi criada uma tabela privada de contactos de recuperação e as contas já existentes foram preenchidas automaticamente com os respetivos emails atuais.

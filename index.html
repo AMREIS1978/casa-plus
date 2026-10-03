@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.6 — login sem limite</title>
+<title>Bomba Certa v6.7 — registo estável e compatível</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -241,7 +241,7 @@ header{
       <div class="signup-icon">🎯</div>
       <div>
         <b>Primeira missão</b>
-        <div class="tiny muted">A conta fica pronta imediatamente. Depois, atualize ou confirme um preço e comece logo a construir reputação.</div>
+        <div class="tiny muted">O username é a sua identificação de acesso. O email fica separado e serve apenas para recuperação.</div>
       </div>
     </div>
     <div id="signupStatus" class="status"></div>
@@ -1420,7 +1420,7 @@ $('signupBtn').onclick=async()=>{
       const code=String(payload?.error||'').toLowerCase();
 
       if(code.includes('username_exists'))throw new Error('Este username já está a ser utilizado. Escolha outro.')
-      if(code.includes('email_exists'))throw new Error('Este email de recuperação já está associado a uma conta.')
+      if(code.includes('email_exists'))throw new Error('Este email de recuperação já está associado a uma conta existente. Use outro email ou recupere a conta existente.')
       if(code.includes('invalid_username'))throw new Error('Username inválido. Use 3–20 caracteres: letras, números, ponto, hífen ou underscore.')
       if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos e tente novamente.')
       if(code.includes('weak_password'))throw new Error('A palavra-passe deve ter pelo menos 8 caracteres.')
@@ -1444,22 +1444,27 @@ $('signupBtn').onclick=async()=>{
     let loginPayload={};
     try{loginPayload=await loginResponse.json()}catch{}
 
-    if(!loginResponse.ok || !loginPayload?.access_token || !loginPayload?.refresh_token){
-      throw new Error('A conta foi criada com sucesso. Use o username e a palavra-passe que acabou de escolher para entrar.')
+    if(loginResponse.ok && loginPayload?.access_token && loginPayload?.refresh_token){
+      const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
+        access_token:loginPayload.access_token,
+        refresh_token:loginPayload.refresh_token
+      });
+
+      if(!sessionError && sessionData?.session){
+        localStorage.setItem('bombaCerta:newUser','1');
+        await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+        $('signupStatus').textContent='✓ Conta criada com sucesso. Bem-vindo à Bomba Certa!';
+        await enterApp();
+        setTimeout(()=>showWelcomeMission(),250);
+        return
+      }
     }
 
-    const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
-      access_token:loginPayload.access_token,
-      refresh_token:loginPayload.refresh_token
-    });
-    if(sessionError || !sessionData?.session)throw sessionError||new Error('Não foi possível iniciar a sessão.');
-
-    localStorage.setItem('bombaCerta:newUser','1');
-    await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
-
-    $('signupStatus').textContent='✓ Conta criada com sucesso. Bem-vindo à Bomba Certa!';
-    await enterApp();
-    setTimeout(()=>showWelcomeMission(),250)
+    // A conta já foi criada. Se o login automático falhar, não apresentar o registo como falhado.
+    $('username').value=username;
+    $('password').value='';
+    showLoginPane();
+    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> Introduza a palavra-passe escolhida para entrar.';
   }catch(e){
     $('signupStatus').textContent=errPT(e)
   }finally{
