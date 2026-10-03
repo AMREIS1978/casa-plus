@@ -1,32 +1,35 @@
-# Bomba Certa v6.3 — login por username
+# Bomba Certa v6.4 — login simples e estável
 
 ## Registo
-Cada pessoa escolhe:
+A pessoa escolhe:
 - Nome público
 - Username único
 - Palavra-passe
 - Email de recuperação
 
 ## Login
-O login passa a ser feito apenas com:
+O login é feito apenas com:
 - Username
 - Palavra-passe
 
-O email deixa de aparecer no ecrã de login.
+O email não é usado no login.
 
 ## Email
-O email serve apenas para recuperação da conta.
+O email é apenas para recuperação da conta.
+Nesta versão deixou de haver bloqueio por domínio MX ou por listas de emails temporários: basta ter formato válido.
 
-No registo, continuam a ser aplicadas verificações ao domínio e bloqueio de emails descartáveis.
-
-## Contas já existentes
-Foi atribuído automaticamente um username às contas que já existiam.
-
-A conta principal ficou com:
-`MiguelReis`
-
-As restantes contas receberam como username a parte do email antes do `@`, com ajuste automático em caso de duplicação.
+Isto evita condicionantes desnecessárias no registo.
 
 ## Segurança
-A associação Username → conta fica numa tabela privada.
-O browser nunca recebe o email interno usado pelo Supabase para fazer autenticação por password.
+- username é único;
+- associação username → conta fica em tabela privada;
+- password continua a ser validada pelo Supabase Auth;
+- o browser não precisa de conhecer o email interno para autenticar;
+- o painel Admin continua exclusivo da conta proprietária.
+
+## Registo concluído
+Depois de criar a conta, aparece claramente:
+
+`✓ Conta criada com sucesso. A entrar automaticamente na sua conta…`
+
+e a sessão é iniciada logo de seguida.

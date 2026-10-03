@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.3 — login por username</title>
+<title>Bomba Certa v6.4 — username estável</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -203,7 +203,7 @@ header{
 <div id="authScreen" class="auth">
   <div class="auth-logo">Bomba Certa</div>
   <h1 id="authTitle">Combustível mais inteligente.</h1>
-  <p id="authLead">Entre com o seu username e palavra-passe para comparar preços e participar na comunidade.</p>
+  <p id="authLead">Entre apenas com o seu username e palavra-passe. O email fica reservado à recuperação da conta.</p>
 
   <div id="loginPane" class="form">
     <input id="username" class="input" type="text" autocomplete="username" maxlength="20" placeholder="Username">
@@ -227,7 +227,7 @@ header{
     </div>
     <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
     <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email válido e permanente">
-<div class="tiny muted" style="margin-top:-4px">O domínio do email é validado e emails temporários/descartáveis são bloqueados.</div>
+<div class="tiny muted" style="margin-top:-4px">Este email serve apenas para recuperar a conta. Não é usado para entrar.</div>
     <div style="position:relative">
       <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
       <button id="toggleSignupPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
@@ -1359,7 +1359,7 @@ function showLoginPane(){
   $('signupPane').classList.add('hidden');
   $('loginPane').classList.remove('hidden');
   $('authTitle').textContent='Combustível mais inteligente.';
-  $('authLead').textContent='Entre com o seu username e palavra-passe para comparar preços e participar na comunidade.'
+  $('authLead').textContent='Entre apenas com o seu username e palavra-passe. O email fica reservado à recuperação da conta.'
 }
 function showSignupPane(){
   $('loginPane').classList.add('hidden');
@@ -1422,14 +1422,12 @@ $('signupBtn').onclick=async()=>{
       if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos e tente novamente.')
       if(code.includes('weak_password'))throw new Error('A palavra-passe deve ter pelo menos 8 caracteres.')
       if(code.includes('invalid_email'))throw new Error('Introduza um email de recuperação válido.')
-      if(code.includes('disposable_email'))throw new Error('Não são permitidos emails temporários ou descartáveis.')
-      if(code.includes('email_domain_unreachable'))throw new Error('O domínio deste email não parece receber correio.')
-      if(code.includes('invalid_name'))throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
+                  if(code.includes('invalid_name'))throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
 
       throw new Error(payload?.error||`Não foi possível criar a conta (${response.status}).`)
     }
 
-    $('signupStatus').textContent='✓ Conta criada com sucesso. A entrar na sua conta…';
+    $('signupStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> A entrar automaticamente na sua conta…';
 
     const loginResponse=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
       method:'POST',
@@ -1444,7 +1442,7 @@ $('signupBtn').onclick=async()=>{
     try{loginPayload=await loginResponse.json()}catch{}
 
     if(!loginResponse.ok || !loginPayload?.access_token || !loginPayload?.refresh_token){
-      throw new Error('Conta criada com sucesso, mas não foi possível entrar automaticamente. Entre com o username e a palavra-passe.')
+      throw new Error('A conta foi criada com sucesso. Use o username e a palavra-passe que acabou de escolher para entrar.')
     }
 
     const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
