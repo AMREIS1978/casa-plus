@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.2 — sem preço atualizado</title>
+<title>Bomba Certa v7.3 — analytics no Admin</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -206,6 +206,12 @@ header{
 }
 .account-created-toast small{display:block;font-weight:500;opacity:.85;margin-top:3px}
 @keyframes accountToastIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+.admin-daily-views{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:10px}
+.admin-day{border:1px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;background:#fafbfc}
+.admin-day b{display:block;font-size:20px;line-height:1.1}
+.admin-day span{display:block;font-size:10px;color:var(--muted);margin-top:5px}
+@media(max-width:720px){.admin-daily-views{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -488,10 +494,23 @@ header{
       Esta área permite gerir contas da Bomba Certa. A eliminação de uma conta é permanente. A conta proprietária fica protegida de eliminação acidental enquanto for o único administrador.
     </div>
     <div class="kpis">
-      <div class="card kpi"><small>Utilizadores</small><strong id="adminUserCount">0</strong></div>
-      <div class="card kpi"><small>Estado</small><strong style="font-size:17px">Administrador</strong></div>
-      <div class="card kpi"><small>Preços</small><strong style="font-size:17px">Acesso total</strong></div>
-      <div class="card kpi"><small>Contas</small><strong style="font-size:17px">Gestão total</strong></div>
+      <div class="card kpi"><small>Utilizadores registados</small><strong id="adminUserCount">0</strong></div>
+      <div class="card kpi"><small>Visualizações hoje</small><strong id="adminViewsToday">0</strong></div>
+      <div class="card kpi"><small>Visualizações totais</small><strong id="adminViewsTotal">0</strong></div>
+      <div class="card kpi"><small>Últimos 7 dias</small><strong id="adminViews7Days">0</strong></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="section-title">
+        <h2>Tráfego da página</h2>
+        <span class="pill">Últimos 7 dias</span>
+      </div>
+      <div id="adminDailyViews" class="admin-daily-views">
+        <div class="empty">A carregar visualizações…</div>
+      </div>
+      <div class="tiny muted" style="margin-top:10px">
+        Cada carregamento da página conta como uma visualização. A contagem começa a partir da publicação desta versão.
+      </div>
     </div>
 
     <div class="card" style="margin-top:12px">
@@ -723,6 +742,20 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL='https://umyoydjigysnwweoyrot.supabase.co';
 const SUPABASE_KEY='sb_publishable_gXhUtu8LfYJlMlfIN3fLwA_xhZBuKGt';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function recordThisPageView(){
+  try{
+    const viewId=crypto.randomUUID();
+    await supabase.rpc('record_page_view',{
+      p_view_id:viewId,
+      p_path:location.pathname||'/'
+    })
+  }catch(e){
+    console.warn('Contagem de visualização indisponível:',e)
+  }
+}
+recordThisPageView();
+
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
 
 const $=id=>document.getElementById(id);
@@ -854,7 +887,7 @@ function showSection(id){
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
   if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
-  if(id==='admin'&&isAdminUser){loadAdminUsers();loadAdminReports();}
+  if(id==='admin'&&isAdminUser){loadAdminSummary();loadAdminUsers();loadAdminReports();}
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
@@ -974,13 +1007,38 @@ async function ensureFreshAdminSession(){
   return session
 }
 
+async function loadAdminSummary(){
+  if(!isAdminUser)return;
+  try{
+    const {data,error}=await supabase.rpc('admin_dashboard_summary');
+    if(error)throw error;
+
+    const s=data||{};
+    $('adminUserCount').textContent=Number(s.users_total||0).toLocaleString('pt-PT');
+    $('adminViewsToday').textContent=Number(s.views_today||0).toLocaleString('pt-PT');
+    $('adminViewsTotal').textContent=Number(s.views_total||0).toLocaleString('pt-PT');
+
+    const days=Array.isArray(s.views_last_7_days)?s.views_last_7_days:[];
+    const total7=days.reduce((sum,d)=>sum+Number(d.views||0),0);
+    $('adminViews7Days').textContent=total7.toLocaleString('pt-PT');
+
+    const fmt=new Intl.DateTimeFormat('pt-PT',{weekday:'short',day:'2-digit',month:'2-digit'});
+    $('adminDailyViews').innerHTML=days.length?days.map(d=>{
+      const dt=new Date(String(d.day)+'T12:00:00');
+      return `<div class="admin-day"><b>${Number(d.views||0).toLocaleString('pt-PT')}</b><span>${esc(fmt.format(dt))}</span></div>`
+    }).join(''):'<div class="empty">Ainda não existem visualizações registadas.</div>';
+  }catch(e){
+    console.warn('Resumo administrativo indisponível:',e);
+    $('adminDailyViews').innerHTML='<div class="empty">Não foi possível carregar as estatísticas.</div>'
+  }
+}
+
 async function loadAdminUsers(){
   if(!isAdminUser)return;
   $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
   const {data,error}=await supabase.rpc('admin_list_users_v2');
   if(error){$('adminUsers').textContent=errPT(error);return}
   const rows=data||[];
-  $('adminUserCount').textContent=rows.length;
   const {data:{user}}=await supabase.auth.getUser();
   $('adminUsers').className='';
   $('adminUsers').innerHTML=rows.map(u=>{
@@ -1079,7 +1137,7 @@ window.adminDeleteUser=async(userId,email)=>{
   const {data,error}=await supabase.rpc('admin_delete_user',{p_user_id:userId});
   if(error){alert('Não foi possível apagar a conta: '+errPT(error));return}
   if(!data){alert('A conta não foi encontrada ou já tinha sido eliminada.')}
-  await loadAdminUsers()
+  await Promise.all([loadAdminUsers(),loadAdminSummary()])
 }
 
 $('toggleAdminPassword').onclick=()=>{
@@ -1141,7 +1199,7 @@ $('adminCreateUserBtn').onclick=async()=>{
 
     // Dar tempo ao Auth/database para refletir a criação e atualizar a lista imediatamente.
     await new Promise(r=>setTimeout(r,220));
-    await loadAdminUsers();
+    await Promise.all([loadAdminUsers(),loadAdminSummary()]);
 
     const list=$('adminUsers');
     list?.scrollIntoView({behavior:'smooth',block:'nearest'})
@@ -1153,7 +1211,7 @@ $('adminCreateUserBtn').onclick=async()=>{
   }
 }
 
-$('refreshAdminBtn').onclick=async()=>{await loadAdminUsers()};
+$('refreshAdminBtn').onclick=async()=>{await Promise.all([loadAdminSummary(),loadAdminUsers()])};
 $('refreshReportsBtn').onclick=loadAdminReports;
 
 
@@ -1194,6 +1252,7 @@ async function enterApp(){
 
   loadLeaderboard().catch(()=>{});
   if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
+    loadAdminSummary().catch(()=>{});
     loadAdminUsers().catch(()=>{});
     loadAdminReports().catch(()=>{})
   }
