@@ -1,15 +1,34 @@
-# Bomba Certa v4.4 — abertura imediata
+# Bomba Certa v4.5 — corrigida e rápida
 
-Principais correções de desempenho:
+Esta versão foi reconstruída a partir da última base estável em vez de continuar a acumular alterações na v4.4.
 
-- Leaflet deixa de bloquear o HTML no arranque.
-- O mapa mostra um placeholder imediato e carrega em background.
-- A app tenta jsDelivr e usa unpkg como fallback para Leaflet.
-- A lista de postos continua funcional mesmo que o mapa demore.
-- Chart.js só é carregado quando a secção Estatísticas é aberta.
-- Perfil, ranking, administração e histórico já não bloqueiam o ecrã principal.
-- DGEG e OpenStreetMap arrancam depois do primeiro desenho do ecrã.
-- A última localização pode ser reutilizada durante 24 horas como ponto inicial.
-- O cache de postos pode ser reutilizado durante 2 horas e é atualizado em segundo plano.
+## O que muda
 
-Objetivo: nunca deixar o utilizador com um ecrã aparentemente parado.
+### Abertura
+Assim que entra:
+- o mapa é criado imediatamente;
+- a última localização conhecida é usada, se existir;
+- postos guardados aparecem logo;
+- a pesquisa real começa em paralelo.
+
+### Pesquisa progressiva
+1. cache local;
+2. base permanente Bomba Certa;
+3. postos da comunidade;
+4. DGEG e OpenStreetMap;
+5. detalhes dos preços;
+6. validações, autor, denúncias e informação social.
+
+A lista inicial já não espera pelas fases 4–6.
+
+### Mapa
+Volta ao carregamento estável da versão que funcionava.
+Foram retiradas as experiências de carregamento dinâmico da v4.4 que podiam deixar o mapa preso.
+
+### Perfil
+No topo, junto a `Sair`, aparece:
+- fotografia;
+- nível/status imediatamente por baixo.
+
+### Fiabilidade
+Se uma fonte externa estiver lenta, os postos já obtidos continuam visíveis e utilizáveis.

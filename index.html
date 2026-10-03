@@ -4,9 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.4 — abertura imediata</title>
+<title>Bomba Certa v4.5 — corrigida e rápida</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{
   --bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#667085;--line:#e5e7eb;
@@ -25,12 +29,11 @@ header{
   border-bottom:1px solid rgba(229,231,235,.8);padding:12px 0
 }
 .header-in{max-width:1120px;margin:auto;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-size:22px;font-weight:950;letter-spacing:-.04em;align-self:flex-start;margin-top:8px}.brand span{font-weight:650;color:#475467}
+.brand{font-size:22px;font-weight:950;letter-spacing:-.04em}.brand span{font-weight:650;color:#475467}
 .header-actions{display:flex;align-items:center;gap:10px}
-.top-profile-btn{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:54px}
-.top-profile-avatar{width:44px;height:44px;object-fit:cover;border-radius:14px;border:1px solid var(--line);box-shadow:0 3px 10px rgba(15,23,42,.08)}
-.top-profile-level{max-width:78px;font-size:9px;line-height:1.05;font-weight:900;color:#475467;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
+.top-profile-btn{border:0;background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:58px}
+.top-profile-avatar{width:44px;height:44px;border-radius:14px;object-fit:cover;border:1px solid var(--line);box-shadow:0 3px 10px rgba(15,23,42,.08)}
+.top-profile-level{font-size:9px;font-weight:900;color:#475467;max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.05}
 .btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;background:var(--accent);color:white;min-height:44px}
 .btn.secondary{background:white;color:var(--ink);border:1px solid var(--line)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
@@ -47,11 +50,7 @@ header{
 .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 10px}
 .section-title h2{font-size:18px;margin:0;letter-spacing:-.02em}
 .pill{font-size:11px;font-weight:850;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:#475467}
-#fuelMap{height:430px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#eef2f6;position:relative}
-.map-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;color:#667085;font-size:12px;background:linear-gradient(135deg,#f8fafc,#eef2f6)}
-.map-placeholder .map-pin{font-size:32px}
-.map-placeholder .mini-spin{width:18px;height:18px;border:2px solid #d0d5dd;border-top-color:#111827;border-radius:50%;animation:spin .7s linear infinite}
-
+#fuelMap{height:430px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
 .station-list{display:grid;gap:10px}
 .station{
   border:1px solid var(--line);border-radius:16px;padding:14px;background:white;
@@ -115,9 +114,6 @@ header{
 }
 .bottom-nav.admin-enabled{grid-template-columns:repeat(5,1fr)}
 @media(max-width:560px){
-  .top-profile-avatar{width:40px;height:40px;border-radius:12px}
-  .top-profile-level{font-size:8px;max-width:66px}
-
   .app{padding-left:10px;padding-right:10px}
   .header-in{padding:0 10px}.brand{font-size:19px}
   .hero{padding-top:16px}.hero h1{font-size:29px}
@@ -153,16 +149,10 @@ header{
 .report-meta{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
 
 
-.search-state{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:#667085;min-height:20px}
-.search-spinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btn.loading{opacity:.9;cursor:wait}
-.btn.loading:before{content:'';width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:7px;vertical-align:-2px}
-.station-skeleton{border:1px solid var(--line);border-radius:16px;padding:14px;background:white}
-.sk{height:12px;border-radius:7px;background:linear-gradient(90deg,#eef2f6 25%,#f8fafc 50%,#eef2f6 75%);background-size:200% 100%;animation:shimmer 1.1s infinite}
-.sk.w70{width:70%}.sk.w45{width:45%;margin-top:9px}.sk.w90{width:90%;margin-top:12px}
-@keyframes shimmer{to{background-position:-200% 0}}
-.cache-note{font-size:10px;color:#98a2b3;margin-top:5px}
+.quick-load{display:flex;align-items:center;gap:8px;font-size:12px;color:#667085;margin-top:7px;min-height:18px}
+.quick-dot{width:8px;height:8px;border-radius:50%;background:#12b76a;animation:qdot 1.2s infinite}
+@keyframes qdot{50%{opacity:.25}}
+.basic-note{font-size:10px;color:#98a2b3;margin-top:5px}
 
 </style>
 </head>
@@ -201,7 +191,7 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Os postos começam a aparecer assim que entra. A localização e os preços são atualizados automaticamente em segundo plano.</p>
+      <p>Os postos começam a aparecer automaticamente. A localização e os preços são atualizados em segundo plano.</p>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -236,7 +226,7 @@ header{
         </select>
         <button id="locateBtn" class="btn">📍 Procurar perto de mim</button>
       </div>
-      <div id="fuelStatus" class="status">A preparar postos próximos…</div><div id="searchState" class="search-state hidden"><span class="search-spinner"></span><span id="searchStateText">A localizar…</span></div><div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
+      <div id="fuelStatus" class="status">A preparar postos próximos…</div><div id="fastLocationInfo" class="quick-load hidden"><span class="quick-dot"></span><span>A atualizar em segundo plano…</span></div>
     </div>
 
     <div class="grid2">
@@ -557,68 +547,6 @@ const money=v=>Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'E
 const kmFmt=v=>Number(v||0).toLocaleString('pt-PT',{maximumFractionDigits:1});
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 
-const scriptPromises={};
-
-let leafletPromise=null,leafletCssLoaded=false;
-function loadStylesheetOnce(href){
-  return new Promise((resolve,reject)=>{
-    const l=document.createElement('link');l.rel='stylesheet';l.href=href;
-    l.onload=()=>resolve(true);l.onerror=()=>reject(new Error('stylesheet'));
-    document.head.appendChild(l)
-  })
-}
-async function ensureLeaflet(){
-  if(window.L)return window.L;
-  if(leafletPromise)return leafletPromise;
-  leafletPromise=(async()=>{
-    if(!leafletCssLoaded){
-      leafletCssLoaded=true;
-      loadStylesheetOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css')
-        .catch(()=>loadStylesheetOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'))
-        .catch(()=>{})
-    }
-    try{
-      await loadScriptOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js','L')
-    }catch{
-      delete scriptPromises['https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'];
-      await loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js','L')
-    }
-    return window.L
-  })();
-  return leafletPromise
-}
-function showMapPlaceholder(text='A abrir mapa…'){
-  const el=$('fuelMap');
-  if(!el)return;
-  if(!el.querySelector('.map-placeholder')){
-    el.innerHTML=`<div class="map-placeholder"><div class="map-pin">📍</div><div class="mini-spin"></div><b>${esc(text)}</b></div>`
-  }else{
-    const b=el.querySelector('.map-placeholder b');if(b)b.textContent=text
-  }
-}
-
-function loadScriptOnce(src,key){
-  if(window[key])return Promise.resolve(window[key]);
-  if(scriptPromises[src])return scriptPromises[src];
-  scriptPromises[src]=new Promise((resolve,reject)=>{
-    const s=document.createElement('script');s.src=src;s.async=true;
-    s.onload=()=>resolve(window[key]);s.onerror=()=>reject(new Error('Falha ao carregar '+src));
-    document.head.appendChild(s)
-  });
-  return scriptPromises[src]
-}
-async function ensureTesseract(){
-  if(window.Tesseract)return window.Tesseract;
-  await loadScriptOnce('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js','Tesseract');
-  return window.Tesseract
-}
-async function ensureChart(){
-  if(window.Chart)return window.Chart;
-  await loadScriptOnce('https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js','Chart');
-  return window.Chart
-}
-
-
 const FUEL_ALIASES={
   'Gasóleo simples':['gasoleo simples','gasóleo simples','diesel simples','diesel'],
   'Gasóleo especial':['gasoleo especial','gasóleo especial','gasoleo aditivado','gasóleo aditivado','diesel ultimate','ultimate diesel','diesel premium','gasoleo premium','gasóleo premium'],
@@ -687,8 +615,7 @@ function showSection(id){
   document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
   $(id)?.classList.add('active');
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
-  if(id==='abastecimentos')loadFillups();
-  if(id==='estatisticas')loadFillups().then(()=>drawCharts().catch(()=>{}));
+  if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
   if(id==='admin'&&isAdminUser){loadAdminUsers();loadAdminReports();}
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
@@ -825,20 +752,28 @@ $('refreshAdminBtn').onclick=loadAdminUsers;
 $('refreshReportsBtn').onclick=loadAdminReports;
 
 async function enterApp(){
-  $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');
-  showMapPlaceholder('A abrir mapa…');
-  openMapImmediately();
-  setTimeout(()=>autoStartSearch().catch(()=>{}),0);
+  $('authScreen').classList.add('hidden');
+  $('appShell').classList.remove('hidden');
 
-  supabase.auth.getUser().then(({data:{user}})=>{currentAuthUserId=user?.id||null}).catch(()=>{});
+  // Primeiro: mapa e pesquisa.
+  ensureMap();
+  setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
+
+  // Depois: tudo o resto em background.
+  supabase.auth.getUser().then(({data:{user}})=>{
+    currentAuthUserId=user?.id||null
+  }).catch(()=>{});
+
   supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
   checkAdmin().then(()=>{
     loadLeaderboard().catch(()=>{});
     if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
-      loadAdminUsers().catch(()=>{});loadAdminReports().catch(()=>{})
+      loadAdminUsers().catch(()=>{});
+      loadAdminReports().catch(()=>{})
     }
   }).catch(()=>{});
-  loadFillups().catch(()=>{})
+
+  setTimeout(()=>loadFillups().catch(()=>{}),250)
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
@@ -860,47 +795,28 @@ $('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()
 
 
 function stationCacheKey(){
-  return `bombaCerta:stations:${$('fuelType')?.value||''}:${$('fuelRadius')?.value||''}`
+  return `bombaCerta:fast:${$('fuelType')?.value||''}:${$('fuelRadius')?.value||''}`
 }
-function saveStationCache(){
+function saveFastStationCache(){
   try{
     localStorage.setItem(stationCacheKey(),JSON.stringify({
       lat:currentLat,lon:currentLon,ts:Date.now(),
       stations:nearbyStations.slice(0,80).map(s=>({
         key:s.key,dgegId:s.dgegId||null,name:s.name,brand:s.brand||'',address:s.address||'',
         lat:s.lat,lon:s.lon,officialPrice:s.officialPrice??null,officialUpdated:s.officialUpdated||'',
-        source:s.source||'',distance:s.distance??null,displayPrice:s.displayPrice??null,
-        priceSource:s.priceSource||null,lastUpdated:s.lastUpdated||null
+        source:s.source||'',displayPrice:s.displayPrice??null,priceSource:s.priceSource||null,lastUpdated:s.lastUpdated||null
       }))
     }))
   }catch{}
 }
-function getStationCache(lat,lon){
+function getFastStationCache(lat,lon){
   try{
     const c=JSON.parse(localStorage.getItem(stationCacheKey())||'null');
     if(!c||!Array.isArray(c.stations)||!c.stations.length)return null;
     if(Date.now()-Number(c.ts||0)>2*60*60*1000)return null;
-    if(haversine(lat,lon,Number(c.lat),Number(c.lon))>3)return null;
+    if(haversine(lat,lon,Number(c.lat),Number(c.lon))>5)return null;
     return c
   }catch{return null}
-}
-function showSearchState(text){
-  $('searchStateText').textContent=text;
-  $('searchState').classList.remove('hidden')
-}
-function hideSearchState(){
-  $('searchState').classList.add('hidden')
-}
-function setLocateLoading(on,label='A localizar…'){
-  const b=$('locateBtn');
-  if(on){
-    b.classList.add('loading');b.disabled=true;b.dataset.old=b.textContent;b.textContent=label
-  }else{
-    b.classList.remove('loading');b.disabled=false;b.textContent='📍 Procurar perto de mim'
-  }
-}
-function showStationSkeletons(){
-  $('stationList').innerHTML=Array.from({length:4},()=>`<div class="station-skeleton"><div class="sk w70"></div><div class="sk w45"></div><div class="sk w90"></div></div>`).join('')
 }
 
 function saveLastLocation(lat,lon){
@@ -914,79 +830,42 @@ function getLastLocation(){
   return null
 }
 
-let autoSearchStarted=false;
-async function autoStartSearch(){
-  if(autoSearchStarted)return;
-  autoSearchStarted=true;
+let initialSearchStarted=false;
+async function autoSearchOnOpen(){
+  if(initialSearchStarted)return;
+  initialSearchStarted=true;
 
-  showMapPlaceholder('A procurar postos…');
-  ensureMap().catch(()=>{});
-  showSearchState('A procurar automaticamente…');
+  ensureMap();
 
-  // 1) usar imediatamente localização guardada + postos em cache
   const cached=getLastLocation();
   if(cached){
     currentLat=cached.lat;currentLon=cached.lon;
-    ensureMap().then(()=>{
-      if(!map)return;
+    if(map){
       map.setView([currentLat,currentLon],13,{animate:false});
       if(userMarker)map.removeLayer(userMarker);
       userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('Última localização conhecida')
-    }).catch(()=>{});
-
-    const hadCache=await renderCachedStations(currentLat,currentLon);
-    if(hadCache){
-      $('fuelStatus').textContent='Postos mostrados imediatamente · a atualizar localização e preços…';
-    }else{
-      showStationSkeletons();
-      $('fuelStatus').textContent='A procurar postos próximos…';
     }
-
-    // arrancar pesquisa completa em background sem esperar geolocalização nova
-    searchStations({instant:false}).catch(()=>{});
-  }else{
-    showStationSkeletons();
+    renderFastCache(currentLat,currentLon);
+    $('fuelStatus').textContent='A atualizar automaticamente…';
+    searchStations().catch(()=>{})
   }
 
-  // 2) pedir geolocalização nova logo ao abrir
   if(!navigator.geolocation){
-    if(!cached){
-      hideSearchState();
-      $('fuelStatus').textContent='Ative a localização para procurar postos próximos.';
-    }
+    if(!cached)$('fuelStatus').textContent='Ative a localização para procurar postos próximos.';
     return
   }
 
   navigator.geolocation.getCurrentPosition(async p=>{
-    const newLat=p.coords.latitude,newLon=p.coords.longitude;
-    const moved=currentLat==null || haversine(currentLat,currentLon,newLat,newLon)>.25;
-    currentLat=newLat;currentLon=newLon;
+    currentLat=p.coords.latitude;currentLon=p.coords.longitude;
     saveLastLocation(currentLat,currentLon);
-    ensureMap().then(()=>{
-      if(!map)return;
-      map.setView([currentLat,currentLon],13,{animate:false});
-      if(userMarker)map.removeLayer(userMarker);
-      userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização')
-    }).catch(()=>{});
-
-    if(moved || !nearbyStations.length){
-      $('fuelStatus').textContent='Localização atualizada · a procurar postos…';
-      await searchStations({instant:true});
-    }else{
-      hideSearchState();
-      $('fuelStatus').textContent=`${nearbyStations.length} postos prontos.`;
-    }
+    await searchStations();
     subscribeRealtime()
-  },async ()=>{
-    if(cached){
-      currentLat=cached.lat;currentLon=cached.lon;
-      await searchStations({instant:true});
-      subscribeRealtime()
-    }else{
-      hideSearchState();
-      $('fuelStatus').textContent='Não consegui obter a localização. Toque em “Procurar perto de mim” para tentar novamente.'
+  },()=>{
+    if(!cached){
+      $('fuelStatus').textContent='Toque em “Procurar perto de mim” e autorize a localização.';
+      $('stationList').innerHTML='<div class="empty">Preciso da sua localização para mostrar os postos mais próximos.</div>'
     }
-  },{enableHighAccuracy:false,timeout:1800,maximumAge:900000})
+  },{enableHighAccuracy:false,timeout:5000,maximumAge:600000})
 }
 
 async function useFastLocation(){
@@ -1018,50 +897,11 @@ async function useFastLocation(){
   }
 }
 
-
-function openMapImmediately(){
-  showMapPlaceholder('A abrir mapa…');
-  const cached=getLastLocation();
-  ensureMap().then(()=>{
-    if(!map)return;
-    if(cached){
-      currentLat=cached.lat;currentLon=cached.lon;
-      map.setView([cached.lat,cached.lon],13,{animate:false});
-      if(userMarker)map.removeLayer(userMarker);
-      userMarker=L.marker([cached.lat,cached.lon]).addTo(map).bindPopup('Última localização conhecida');
-      const c=getStationCache(cached.lat,cached.lon);
-      if(c?.stations?.length){
-        nearbyStations=c.stations.map(s=>({...s,lat:Number(s.lat),lon:Number(s.lon),distance:haversine(cached.lat,cached.lon,Number(s.lat),Number(s.lon)),candidate:null,cached:true}));
-        renderCachedOnly()
-      }
-    }
-  }).catch(()=>{})
+function ensureMap(){
+  if(map)return;
+  map=L.map('fuelMap').setView([39.5,-8],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap',updateWhenIdle:true,keepBuffer:2}).addTo(map)
 }
-
-async function ensureMap(){
-  if(map)return map;
-  showMapPlaceholder('A abrir mapa…');
-  try{
-    await ensureLeaflet();
-    const el=$('fuelMap');
-    if(el)el.innerHTML='';
-    map=L.map('fuelMap',{zoomControl:true,preferCanvas:true}).setView([39.55,-8.0],6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19,
-      attribution:'© OpenStreetMap',
-      updateWhenIdle:true,
-      updateWhenZooming:false,
-      keepBuffer:2
-    }).addTo(map);
-    requestAnimationFrame(()=>map.invalidateSize(false));
-    return map
-  }catch(e){
-    const el=$('fuelMap');
-    if(el)el.innerHTML='<div class="map-placeholder"><div class="map-pin">🗺️</div><b>Mapa temporariamente indisponível</b><span>Os postos continuam disponíveis na lista.</span></div>';
-    return null
-  }
-}
-
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
   const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
@@ -1159,19 +999,156 @@ async function remember(stations){
   const payload=stations.slice(0,120).map(s=>({source_key:s.key,source:s.source==='Base Bomba Certa'?'Verificado':s.source,name:s.name,brand:s.brand||'',address:s.address||'',latitude:s.lat,longitude:s.lon,dgeg_id:s.dgegId||null})).filter(x=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(x.source));
   if(payload.length)await supabase.rpc('remember_fuel_stations',{p_stations:payload})
 }
+async function searchStations(){
+  if(currentLat==null)return;
 
+  const r=Number($('fuelRadius').value);
+  $('fastLocationInfo').classList.remove('hidden');
 
-function renderCachedOnly(){
-  $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
-    const price=s.displayPrice!=null?Number(s.displayPrice).toFixed(3).replace('.',','):null;
-    const source=s.priceSource==='community'?'<span class="source community">Comunidade</span>':
-      s.priceSource==='official'?'<span class="source official">DGEG</span>':
-      '<span class="source none">A atualizar…</span>';
+  ensureMap();
+  if(map){
+    if(userMarker)map.removeLayer(userMarker);
+    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    map.setView([currentLat,currentLon],13,{animate:false})
+  }
+
+  // Mostrar cache imediatamente, se existir.
+  const hadCache=renderFastCache(currentLat,currentLon);
+  if(hadCache){
+    $('fuelStatus').textContent=`${nearbyStations.length} postos mostrados · a atualizar…`
+  }else{
+    $('stationList').innerHTML='<div class="empty">A procurar postos próximos…</div>'
+  }
+
+  // 1) Fontes rápidas: base própria + comunidade.
+  Promise.allSettled([
+    registryStations(currentLat,currentLon,r),
+    communityStations(currentLat,currentLon,r)
+  ]).then(async results=>{
+    const fast=mergeStations(results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
+      .filter(s=>s.distance<=r/1000);
+
+    if(fast.length){
+      nearbyStations=mergeStations([nearbyStations,fast]).filter(s=>s.distance<=r/1000);
+      renderBasicStations();
+      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a atualizar preços…`;
+      saveFastStationCache()
+    }
+  }).catch(()=>{});
+
+  // 2) DGEG + OSM entram em background, sem prender o ecrã.
+  setTimeout(()=>{
+    Promise.allSettled([
+      dgegStations(currentLat,currentLon,r),
+      osmStations(currentLat,currentLon,r)
+    ]).then(async results=>{
+      const slow=results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+      nearbyStations=mergeStations([nearbyStations,...slow]).filter(s=>s.distance<=r/1000);
+
+      if(nearbyStations.length)renderBasicStations();
+
+      // Limitar detalhes DGEG para não bloquear.
+      const detail=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,16);
+      await Promise.allSettled(detail.map(enrichDetail));
+
+      if(nearbyStations.length){
+        renderBasicStations();
+        saveFastStationCache()
+      }
+
+      // Por último entram validações, autor, denúncias, etc.
+      try{await renderStations()}catch{}
+
+      remember(nearbyStations).catch(()=>{});
+      $('fastLocationInfo').classList.add('hidden');
+      $('fuelStatus').textContent=nearbyStations.length
+        ?`${nearbyStations.length} postos encontrados no raio selecionado.`
+        :'Não encontrei postos neste raio. Experimente aumentar a distância.'
+    }).catch(()=>{
+      $('fastLocationInfo').classList.add('hidden');
+      $('fuelStatus').textContent=nearbyStations.length
+        ?`${nearbyStations.length} postos disponíveis.`
+        :'Não foi possível completar a pesquisa.'
+    })
+  },80)
+}
+function fmtDateTime(ts){
+  if(!ts)return '';
+  const d=new Date(ts);
+  if(Number.isNaN(d.getTime()))return String(ts);
+  return d.toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+}
+function relativeTime(ts){
+  if(!ts)return '';
+  const d=new Date(ts); if(Number.isNaN(d.getTime()))return '';
+  const mins=Math.max(0,Math.round((Date.now()-d.getTime())/60000));
+  if(mins<1)return 'agora';
+  if(mins<60)return `há ${mins} min`;
+  const h=Math.round(mins/60);
+  if(h<24)return `há ${h} h`;
+  const days=Math.round(h/24);
+  if(days<7)return `há ${days} d`;
+  return fmtDateTime(ts)
+}
+
+async function communityData(){
+  if(currentLat==null)return {reports:[],validations:[],contributors:[],statuses:[]};
+  const km=Number($('fuelRadius').value)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(currentLat*Math.PI/180)));
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const {data:reports}=await supabase.from('fuel_price_reports').select('*').eq('fuel_type',$('fuelType').value).gte('observed_at',since).gte('latitude',currentLat-dy).lte('latitude',currentLat+dy).gte('longitude',currentLon-dx).lte('longitude',currentLon+dx);
+  const ids=(reports||[]).map(x=>x.id);
+  const [{data:validations},{data:contributors},{data:statuses}]=await Promise.all([
+    ids.length?supabase.from('fuel_price_validations').select('*').in('report_id',ids):Promise.resolve({data:[]}),
+    supabase.rpc('community_contributor_levels'),
+    supabase.from('fuel_station_status_reports').select('*').gte('created_at',new Date(Date.now()-6*3600000).toISOString())
+  ]);
+  return {reports:reports||[],validations:validations||[],contributors:contributors||[],statuses:statuses||[]}
+}
+function latestPriceFor(key,reports,validations,contributors){
+  const rs=reports.filter(r=>r.station_key===key).sort((a,b)=>new Date(b.observed_at)-new Date(a.observed_at));
+  if(!rs.length)return null;
+  const report=rs[0];
+  const author=contributors.find(x=>x.user_id===report.user_id)||null;
+  const votes=validations.filter(v=>v.report_id===report.id);
+  const confirmed=votes.filter(v=>v.is_confirmed===true).length;
+  const rejected=votes.filter(v=>v.is_confirmed===false).length;
+  return {
+    report,
+    reports:[report],
+    price:Number(report.price),
+    updatedAt:report.observed_at,
+    confirmed,
+    rejected,
+    authorUserId:report.user_id,
+    authorName:author?.display_name||'Utilizador',
+    authorLevel:author?.trusted_publisher?'Editor de confiança':(author?.level_name||'Novato'),
+    trusted:Boolean(author?.trusted_publisher)
+  }
+}
+function closedText(key,statuses){
+  const n=new Set(statuses.filter(x=>x.station_key===key&&x.status==='closed').map(x=>x.user_id)).size;
+  return n>=3?'⛔ Possivelmente encerrado · 3+ reportes':n===2?'⚠️ Possivelmente encerrado · 2 reportes':n===1?'⚠️ 1 reporte de possível encerramento':''
+}
+
+function renderBasicStations(){
+  const rows=[...nearbyStations].sort((a,b)=>{
+    const ap=a.officialPrice??a.displayPrice, bp=b.officialPrice??b.displayPrice;
+    if(ap!=null&&bp!=null)return Number(ap)-Number(bp);
+    if(ap!=null)return -1;if(bp!=null)return 1;
+    return Number(a.distance||0)-Number(b.distance||0)
+  });
+
+  $('stationList').innerHTML=rows.length?rows.map((s,i)=>{
+    const raw=s.officialPrice??s.displayPrice;
+    const price=raw!=null?Number(raw).toFixed(3).replace('.',','):null;
+    const source=s.officialPrice!=null
+      ?'<span class="source official">DGEG</span>'
+      :'<span class="source none">A atualizar</span>';
     return `<div class="station">
       <div>
         <div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div>
         <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-        <div class="cache-note">Dados guardados · a atualizar em segundo plano</div>
+        <div class="basic-note">A completar preços e validações em segundo plano</div>
         <div class="station-actions">
           <button class="go" onclick="openGps('${s.key}')">🧭 GPS</button>
           <button onclick="startRoute('${s.key}')">🗺️ Ver rota</button>
@@ -1181,122 +1158,85 @@ function renderCachedOnly(){
       </div>
       <div class="price">${price?price+' €':'—'}<small>${price?'por litro':'a atualizar'}</small></div>
     </div>`
-  }).join(''):'<div class="empty">A procurar postos próximos…</div>';
+  }).join(''):'<div class="empty">Ainda não encontrei postos nesta zona.</div>';
 
-  ensureMap().then(()=>{
-    if(!map)return;
+  populateFillStations();
+
+  ensureMap();
+  if(map && currentLat!=null){
     stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
-    for(const s of nearbyStations){
-      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice!=null?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'A atualizar…'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+    if(userMarker)map.removeLayer(userMarker);
+    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    for(const s of rows){
+      const p=s.officialPrice??s.displayPrice;
+      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L':'Preço a atualizar'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
       stationMarkers.push(m)
     }
-  }).catch(()=>{})
+    if(rows.length){
+      const bounds=L.latLngBounds([[currentLat,currentLon],...rows.map(s=>[s.lat,s.lon])]);
+      if(bounds.isValid())map.fitBounds(bounds.pad(.12),{maxZoom:14})
+    }else{
+      map.setView([currentLat,currentLon],13)
+    }
+  }
 }
-
-async function renderCachedStations(lat,lon){
-  const cache=getStationCache(lat,lon);
-  if(!cache)return false;
-  nearbyStations=cache.stations.map(s=>({
+function renderFastCache(lat,lon){
+  const c=getFastStationCache(lat,lon);
+  if(!c)return false;
+  nearbyStations=c.stations.map(s=>({
     ...s,
     lat:Number(s.lat),lon:Number(s.lon),
-    distance:haversine(lat,lon,Number(s.lat),Number(s.lon)),
-    candidate:null,
-    cached:true
+    distance:haversine(lat,lon,Number(s.lat),Number(s.lon))
   }));
-  renderCachedOnly();
-  $('fuelStatus').textContent=`${nearbyStations.length} postos mostrados imediatamente · a atualizar…`;
+  renderBasicStations();
   return true
 }
 
-async function searchStations({instant=true}={}){
-  if(currentLat==null)return;
-  const r=Number($('fuelRadius').value);
-  ensureMap();
+async function renderStations(){
+  const cd=await communityData();
+  nearbyStations=nearbyStations.map(s=>{
+    const c=latestPriceFor(s.key,cd.reports,cd.validations,cd.contributors);
+    const community=c?.price??null;
+    const displayPrice=community??s.officialPrice??null;
+    const priceSource=community!=null?'community':(s.officialPrice?'official':null);
+    const lastUpdated=priceSource==='community' ? c?.updatedAt : (s.officialUpdated||null);
+    return {...s,candidate:c,displayPrice,priceSource,lastUpdated,closed:closedText(s.key,cd.statuses)}
+  }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
+  $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
+    const c=s.candidate,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):null;
+    const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade</span>':'<span class="source none">Sem preço confirmado</span>';
+    const updateLine=s.lastUpdated
+      ? `<div class="price-update ${s.priceSource==='community'?'community':'official'}"><span class="dot"></span>${s.priceSource==='community'?'Preço comunicado pela comunidade':'Última atualização DGEG'} · ${relativeTime(s.lastUpdated)} <span>(${fmtDateTime(s.lastUpdated)})</span></div>`
+      : '';
+    const authorLine=c?`<div class="author-line">Comunicado por <b>${esc(c.authorName)}</b> · <span class="author-level">${esc(c.authorLevel)}</span></div>`:'';
+    const validationLine=c
+      ? `<div class="validation-line">${c.confirmed?`<span class="validation-ok">✓ ${c.confirmed} confirmação${c.confirmed===1?'':'ões'}</span>`:''}${c.rejected?`<span class="validation-bad">✕ ${c.rejected} rejeição${c.rejected===1?'':'ões'}</span>`:''}${!c.confirmed&&!c.rejected?'<span class="validation-pending">A aguardar validação</span>':''}${c.rejected>c.confirmed?'<span class="validation-bad">Preço contestado</span>':''}</div>`
+      : '';
+    const canValidate=c&&c.authorUserId!==currentAuthUserId;
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+  }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
+
+  ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
-  map.setView([currentLat,currentLon],13,{animate:false});
-  requestAnimationFrame(()=>map.invalidateSize(false));
-
-  let hadInstant=false;
-  if(instant){
-    hadInstant=await renderCachedStations(currentLat,currentLon);
-    if(!hadInstant)showStationSkeletons()
+  for(const s of nearbyStations){
+    const upd=s.lastUpdated?`<br><span style="font-size:11px;color:#667085">${s.priceSource==='community'?'Atualizado pela comunidade':'Atualização DGEG'} · ${relativeTime(s.lastUpdated)}</span>`:'';
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${upd}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+    stationMarkers.push(m)
   }
-
-  showSearchState(hadInstant?'A atualizar preços e postos…':'A procurar postos próximos…');
-
-  // Primeira vaga: fontes rápidas
-  const fastPromise=Promise.allSettled([
-    registryStations(currentLat,currentLon,r),
-    communityStations(currentLat,currentLon,r)
-  ]).then(async fastResults=>{
-    const fast=mergeStations(fastResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
-      .filter(s=>s.distance<=r/1000);
-
-    if(fast.length){
-      nearbyStations=mergeStations([nearbyStations,fast]).filter(s=>s.distance<=r/1000);
-      await renderStations();
-      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a completar informação…`;
-    }
-  }).catch(()=>{});
-
-  setTimeout(()=>{
-    Promise.allSettled([
-      dgegStations(currentLat,currentLon,r),
-      osmStations(currentLat,currentLon,r)
-    ]).then(async slowResults=>{
-      const slow=slowResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
-      nearbyStations=mergeStations([nearbyStations,...slow]).filter(s=>s.distance<=r/1000);
-      await renderStations();
-
-      const enrich=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,18);
-      if(enrich.length){
-        Promise.allSettled(enrich.map(enrichDetail)).then(async()=>{
-          await renderStations();
-          saveStationCache()
-        }).catch(()=>{})
-      }else saveStationCache();
-
-      remember(nearbyStations).catch(()=>{});
-      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`;
-      hideSearchState();setLocateLoading(false)
-    }).catch(()=>{hideSearchState();setLocateLoading(false)})
-  },180);
-
-  await Promise.race([fastPromise,new Promise(resolve=>setTimeout(resolve,350))]);
+  const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
+  populateFillStations()
 }
-$('locateBtn').onclick=async()=>{
-  setLocateLoading(true,'A atualizar…');
-  showSearchState('A atualizar localização…');
 
-  if(!navigator.geolocation){
-    hideSearchState();setLocateLoading(false);
-    $('fuelStatus').textContent='Este dispositivo não permite localização.';
-    return
-  }
-
-  navigator.geolocation.getCurrentPosition(async p=>{
-    currentLat=p.coords.latitude;currentLon=p.coords.longitude;
-    saveLastLocation(currentLat,currentLon);
-    $('fuelStatus').textContent='Localização atualizada.';
-    await searchStations({instant:true});
-    subscribeRealtime()
-  },async ()=>{
-    const cached=getLastLocation();
-    if(cached){
-      currentLat=cached.lat;currentLon=cached.lon;
-      await searchStations({instant:true});
-      subscribeRealtime()
-    }else{
-      hideSearchState();setLocateLoading(false);
-      $('fuelStatus').textContent='Não consegui obter a localização. Verifique a permissão do navegador.'
-    }
-  },{enableHighAccuracy:false,timeout:2200,maximumAge:300000})
+$('locateBtn').onclick=()=>{
+  $('fuelStatus').textContent='A localizar…';
+  $('fastLocationInfo').classList.remove('hidden');
+  useFastLocation()
 };
 $('refreshBtn').onclick=searchStations;
-$('fuelType').onchange=()=>{if(currentLat!=null){setLocateLoading(true,'A atualizar…');searchStations({instant:true})}};
-$('fuelRadius').onchange=()=>{if(currentLat!=null){setLocateLoading(true,'A atualizar…');searchStations({instant:true})}};
+$('fuelType').onchange=()=>currentLat!=null&&searchStations();
+$('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
 
 window.openPrice=key=>{
   currentPriceStation=nearbyStations.find(x=>x.key===key);if(!currentPriceStation)return;
@@ -1343,10 +1283,8 @@ function priceCandidates(text){
   return vals
 }
 async function scanPhoto(file){
-  $('photoStatus').textContent='A preparar leitura…';
+  $('photoStatus').textContent='A analisar fotografia…';
   try{
-    const Tesseract=await ensureTesseract();
-    $('photoStatus').textContent='A analisar fotografia…';
     const result=await Tesseract.recognize(file,'por',{logger:m=>{if(m.status==='recognizing text')$('photoStatus').textContent=`A ler fotografia… ${Math.round((m.progress||0)*100)}%`}});
     const text=result.data.text||'',rows=detectFuelRowsFromPhoto(text),vals=priceCandidates(text);
     if(vals.length){
@@ -1494,10 +1432,9 @@ async function loadFillups(){
   $('totalSpend').textContent=money(ts);$('totalLiters').textContent=kmFmt(tl)+' L';$('statAvg').textContent=avg.toFixed(3).replace('.',',')+' €/L';
   const use={};fillups.forEach(x=>use[x.station_name]=(use[x.station_name]||0)+1);$('topStation').textContent=Object.entries(use).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
   $('fillHistory').innerHTML=fillups.length?fillups.map(x=>`<div class="history-row"><div><b>${esc(x.station_name)}</b><div class="tiny muted">${esc(x.fillup_date)} · ${esc(x.fuel_type)}</div></div><div class="detail"><b>${Number(x.liters).toLocaleString('pt-PT',{maximumFractionDigits:2})} L</b><div class="tiny muted">${Number(x.price_per_liter).toFixed(3).replace('.',',')} €/L</div></div><div class="detail"><b>${money(x.total_amount)}</b>${x.odometer_km?`<div class="tiny muted">${Number(x.odometer_km).toLocaleString('pt-PT')} km</div>`:''}</div><button class="btn danger" onclick="deleteFill('${x.id}')">Apagar</button></div>`).join(''):'<div class="empty">Ainda não existem abastecimentos registados.</div>';
-  if($('estatisticas')?.classList.contains('active')) drawCharts().catch(()=>{})
+  drawCharts()
 }
-async function drawCharts(){
-  const Chart=await ensureChart();
+function drawCharts(){
   const monthly={};[...fillups].reverse().forEach(x=>{const k=String(x.fillup_date).slice(0,7);monthly[k]=(monthly[k]||0)+Number(x.total_amount)});
   const keys=Object.keys(monthly).sort().slice(-12);
   monthlyChart?.destroy();monthlyChart=new Chart($('monthlyChart'),{type:'bar',data:{labels:keys.map(k=>k.slice(5)+'/'+k.slice(2,4)),datasets:[{data:keys.map(k=>monthly[k])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
@@ -1608,8 +1545,6 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},()=>loadLeaderboard())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_user_reports'},()=>{if(isAdminUser)loadAdminReports()}).subscribe()
 }
-
-
 
 authCheck();
 </script>
