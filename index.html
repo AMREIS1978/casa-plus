@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CASA+ v1.0 — postos completos e comunidade</title>
+<title>CASA+ v1.1 — base permanente de postos</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -145,7 +145,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
         <option value="3000">3 km</option>
         <option value="5000" selected>5 km</option>
         <option value="10000">10 km</option>
-        <option value="20000">20 km</option>
+        <option value="20000">20 km</option><option value="30000">30 km</option><option value="50000">50 km</option>
       </select>
       <button id="locateFuelBtn" class="btn">📍 Localizar e procurar</button>
     </div>
@@ -656,6 +656,7 @@ async function fetchOsmStations(lat,lon,radius){
   }).filter(Boolean).sort((a,b)=>a.distance-b.distance)
 }
 
+
 async function fetchCommunityStations(lat,lon,radius){
   const radiusKm=Number(radius)/1000;
   const latDelta=radiusKm/111;
@@ -671,40 +672,101 @@ async function fetchCommunityStations(lat,lon,radius){
     officialPrice:null,officialUpdated:'',source:'Comunidade'
   })).filter(s=>s.distance<=radiusKm)
 }
+
+async function fetchRegistryStations(lat,lon,radius){
+  const radiusKm=Number(radius)/1000;
+  const latDelta=radiusKm/111;
+  const lonDelta=radiusKm/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const {data,error}=await supabase.from('fuel_station_registry')
+    .select('*')
+    .gte('latitude',lat-latDelta).lte('latitude',lat+latDelta)
+    .gte('longitude',lon-lonDelta).lte('longitude',lon+lonDelta);
+  if(error)throw error;
+  return (data||[]).map(s=>({
+    key:s.source_key,registryId:s.id,name:s.name,brand:s.brand||'',lat:Number(s.latitude),lon:Number(s.longitude),
+    address:s.address||'',distance:haversineKm(lat,lon,Number(s.latitude),Number(s.longitude)),
+    officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base CASA+':s.source,
+    registrySource:s.source
+  })).filter(s=>s.distance<=radiusKm)
+}
+
+async function rememberStations(stations){
+  const payload=(stations||[]).filter(s=>s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon))).slice(0,120).map(s=>({
+    source_key:String(s.key||'').slice(0,220),
+    source:s.source==='Base CASA+'?'Verificado':s.source,
+    name:s.name||'Posto de combustível',
+    brand:s.brand||'',
+    address:s.address||'',
+    latitude:Number(s.lat),
+    longitude:Number(s.lon)
+  })).filter(s=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(s.source) && s.source_key.length>2);
+  if(!payload.length)return;
+  const {error}=await supabase.rpc('remember_fuel_stations',{p_stations:payload});
+  if(error)console.warn('Não foi possível memorizar alguns postos:',error)
+}
+
 function mergeFuelStations(lists){
   const all=lists.flat().filter(Boolean).sort((a,b)=>{
-    const priority={DGEG:0,OpenStreetMap:1,Comunidade:2};
+    const priority={DGEG:0,'Base CASA+':1,OpenStreetMap:2,Comunidade:3};
     return (priority[a.source]??9)-(priority[b.source]??9)
   });
   const out=[];
   for(const s of all){
-    const dup=out.find(x=>haversineKm(x.lat,x.lon,s.lat,s.lon)<0.12 || (
-      norm(x.name)&&norm(s.name)&&(norm(x.name).includes(norm(s.name))||norm(s.name).includes(norm(x.name))) &&
-      haversineKm(x.lat,x.lon,s.lat,s.lon)<0.5
-    ));
+    const distanceDuplicate=out.find(x=>haversineKm(x.lat,x.lon,s.lat,s.lon)<0.16);
+    const nameDuplicate=out.find(x=>{
+      const an=norm(x.name),bn=norm(s.name);
+      if(!an||!bn)return false;
+      const sameish=an===bn||an.includes(bn)||bn.includes(an)||
+        (an.includes('rstar')&&bn.includes('rstar'))||
+        (an.includes('rstarenergy')&&bn.includes('rstarenergy'));
+      return sameish && haversineKm(x.lat,x.lon,s.lat,s.lon)<0.8
+    });
+    const dup=distanceDuplicate||nameDuplicate;
+
     if(!dup){
       out.push({...s});
       continue
     }
+
     if(!dup.officialPrice && s.officialPrice)dup.officialPrice=s.officialPrice;
     if(!dup.officialUpdated && s.officialUpdated)dup.officialUpdated=s.officialUpdated;
     if((!dup.address || dup.address.length<5) && s.address)dup.address=s.address;
     if(!dup.brand && s.brand)dup.brand=s.brand;
-    if(dup.source!=='DGEG' && s.source==='DGEG'){
-      dup.key=s.key;dup.dgegId=s.dgegId;dup.source='DGEG'
+
+    const priority={DGEG:0,'Base CASA+':1,OpenStreetMap:2,Comunidade:3};
+    if((priority[s.source]??9)<(priority[dup.source]??9)){
+      dup.key=s.key;
+      dup.source=s.source;
+      if(s.dgegId)dup.dgegId=s.dgegId;
+      if(s.communityId)dup.communityId=s.communityId;
+      if(s.registryId)dup.registryId=s.registryId
     }
   }
   return out
 }
+
 async function fetchNearbyStations(lat,lon,radius){
-  const results=await Promise.allSettled([
+  const remoteResults=await Promise.allSettled([
     fetchDgegNearbyStations(lat,lon,radius),
     fetchOsmStations(lat,lon,radius),
     fetchCommunityStations(lat,lon,radius)
   ]);
-  const lists=results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
-  if(!lists.length)throw new Error('Não foi possível obter os postos próximos.');
-  return mergeFuelStations(lists).filter(s=>s.distance<=Number(radius)/1000).sort((a,b)=>a.distance-b.distance)
+
+  const remoteLists=remoteResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+  const discovered=mergeFuelStations(remoteLists);
+
+  // Guardar tudo o que foi descoberto para nunca desaparecer em pesquisas futuras.
+  await rememberStations(discovered);
+
+  const registryResult=await Promise.allSettled([fetchRegistryStations(lat,lon,radius)]);
+  const registryLists=registryResult.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+
+  const combined=mergeFuelStations([...remoteLists,...registryLists])
+    .filter(s=>s.distance<=Number(radius)/1000)
+    .sort((a,b)=>a.distance-b.distance);
+
+  if(!combined.length)throw new Error('Não foram encontrados postos neste raio.');
+  return combined
 }
 async function fetchCommunityPrices(){
   if(fuelLat==null||fuelLon==null)return [];
@@ -805,7 +867,7 @@ async function renderFuelData(){
     }
     return `<div class="row fuel-card"><div><b>${i===0&&s.displayPrice?'🏆 ':''}${esc(s.name)}</b>
       <div class="muted tiny">${s.distance.toFixed(1)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':''}${communityLine}
+      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':s.source==='Base CASA+'?'<div class="community-station">✓ Posto guardado na base CASA+</div>':''}${communityLine}
       ${s.statusText?`<div class="tiny stale">${esc(s.statusText)}</div>`:''}
       <div class="fuel-actions">
         <button class="go" onclick="startFuelNavigation('${s.key}')">🧭 Ir para aqui</button>
@@ -1020,7 +1082,7 @@ async function locateAndSearchFuel(){
   el('fuelStatus').textContent='A obter a sua localização…';
   navigator.geolocation.getCurrentPosition(async pos=>{
     fuelLat=pos.coords.latitude;fuelLon=pos.coords.longitude;
-    try{el('fuelStatus').textContent='A procurar preços reais nos postos próximos…';nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Encontrados ${nearbyStations.length} postos. Os preços DGEG aparecem automaticamente; pode confirmá-los ou corrigi-los.`;subscribeFuelRealtime()}
+    try{el('fuelStatus').textContent='A procurar preços reais nos postos próximos…';nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Encontrados ${nearbyStations.length} postos no raio selecionado. A CASA+ juntou DGEG, OpenStreetMap, base permanente e comunidade.`;subscribeFuelRealtime()}
     catch(e){el('fuelStatus').textContent=mensagemErroPT(e)}
   },err=>{el('fuelStatus').textContent=err.code===1?'A localização foi recusada. Autorize-a nas definições do navegador.':'Não foi possível obter a localização.'},{enableHighAccuracy:false,timeout:10000,maximumAge:120000})
 }
@@ -1028,10 +1090,10 @@ function subscribeFuelRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
   fuelChannel=supabase.channel('fuel-community').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},async()=>{if(fuelLat!=null)await renderFuelData()})
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).subscribe()
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_registry'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).subscribe()
 }
 el('locateFuelBtn').onclick=locateAndSearchFuel;
-el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent='Pesquisa atualizada agora.'};
+el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Pesquisa atualizada: ${nearbyStations.length} postos encontrados.`};
 el('fuelType').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
 el('fuelRadius').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
 
