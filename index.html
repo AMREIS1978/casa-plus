@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.7 — registo estável e compatível</title>
+<title>Bomba Certa v6.8 — criação de conta corrigida</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -196,6 +196,16 @@ header{
 .share-btn{width:100%;margin-top:10px}
 @media(max-width:760px){.community-game{grid-template-columns:1fr}.game-actions{grid-template-columns:1fr 1fr 1fr}}
 
+
+.account-created-toast{
+  position:fixed;left:50%;top:22px;transform:translateX(-50%);
+  z-index:99999;background:#101828;color:white;padding:15px 18px;
+  border-radius:16px;box-shadow:0 14px 40px rgba(16,24,40,.28);
+  font-weight:800;text-align:center;max-width:calc(100vw - 32px);
+  animation:accountToastIn .22s ease-out;
+}
+.account-created-toast small{display:block;font-weight:500;opacity:.85;margin-top:3px}
+@keyframes accountToastIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </head>
 <body>
@@ -226,7 +236,9 @@ header{
       </div>
     </div>
     <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
-    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email válido e permanente">
+    <input id="signupUsername" class="input" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username">
+    <div class="tiny muted" style="margin-top:-4px">Escolha um username único para entrar na aplicação. Use 3–20 caracteres: letras, números, ponto, hífen ou underscore.</div>
+    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email de recuperação">
 <div class="tiny muted" style="margin-top:-4px">Este email serve apenas para recuperar a conta. Não é usado para entrar.</div>
     <div style="position:relative">
       <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
@@ -1368,7 +1380,7 @@ function showSignupPane(){
   $('loginPane').classList.add('hidden');
   $('signupPane').classList.remove('hidden');
   $('authTitle').textContent='Junte-se à comunidade.';
-  $('authLead').textContent='Crie a conta em menos de um minuto e comece logo a participar.';
+  $('authLead').textContent='Escolha o seu username, crie a palavra-passe e entre logo na Bomba Certa.';
   $('signupUsername').value=$('username').value.trim();
   $('signupName').focus()
 }
@@ -1380,9 +1392,25 @@ $('toggleSignupPassword').onclick=()=>{
   $('toggleSignupPassword').textContent=p.type==='password'?'👁':'🙈'
 };
 
+function showAccountCreatedToast(){
+  const old=document.getElementById('accountCreatedToast');
+  if(old)old.remove();
+  const el=document.createElement('div');
+  el.id='accountCreatedToast';
+  el.className='account-created-toast';
+  el.innerHTML='🎉 Conta criada com sucesso. Parabéns!<small>Bem-vindo à Bomba Certa.</small>';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),3800)
+}
+
 $('signupBtn').onclick=async()=>{
   const name=$('signupName').value.trim();
-  const username=$('signupUsername').value.trim();
+  const usernameField=$('signupUsername');
+  if(!usernameField){
+    $('signupStatus').textContent='Erro do formulário: campo Username indisponível. Atualize a página.';
+    return
+  }
+  const username=usernameField.value.trim();
   const usernameNorm=username.toLowerCase();
   const email=$('signupEmail').value.trim().toLowerCase();
   const password=$('signupPassword').value;
@@ -1401,7 +1429,7 @@ $('signupBtn').onclick=async()=>{
   const btn=$('signupBtn'),old=btn.textContent;
   btn.disabled=true;
   btn.textContent='A criar conta…';
-  $('signupStatus').textContent='A criar a sua conta…';
+  $('signupStatus').textContent='A criar a sua conta… não feche esta janela.';
 
   try{
     const response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
@@ -1430,7 +1458,7 @@ $('signupBtn').onclick=async()=>{
       throw new Error(payload?.error||`Não foi possível criar a conta (${response.status}).`)
     }
 
-    $('signupStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> A entrar automaticamente na sua conta…';
+    $('signupStatus').innerHTML='<b>✓ Conta criada com sucesso. Parabéns!</b> A entrar automaticamente na sua conta…';
 
     const loginResponse=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
       method:'POST',
@@ -1453,9 +1481,10 @@ $('signupBtn').onclick=async()=>{
       if(!sessionError && sessionData?.session){
         localStorage.setItem('bombaCerta:newUser','1');
         await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
-        $('signupStatus').textContent='✓ Conta criada com sucesso. Bem-vindo à Bomba Certa!';
+        $('signupStatus').textContent='✓ Conta criada com sucesso. Parabéns!';
         await enterApp();
-        setTimeout(()=>showWelcomeMission(),250);
+        showAccountCreatedToast();
+        setTimeout(()=>showWelcomeMission(),350);
         return
       }
     }
@@ -1464,7 +1493,7 @@ $('signupBtn').onclick=async()=>{
     $('username').value=username;
     $('password').value='';
     showLoginPane();
-    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> Introduza a palavra-passe escolhida para entrar.';
+    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso. Parabéns!</b> Introduza a palavra-passe escolhida para entrar.';
   }catch(e){
     $('signupStatus').textContent=errPT(e)
   }finally{
