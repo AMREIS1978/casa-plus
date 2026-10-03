@@ -1,32 +1,36 @@
-# Bomba Certa v6.8 — criação de conta corrigida
+# Bomba Certa v6.9 — registo final corrigido
 
-## Erro encontrado
-O frontend da versão anterior tentava ler `signupUsername`, mas o campo Username não estava presente no formulário HTML.
+## Causa real encontrada
+O backend estava a tentar aceder diretamente às tabelas do schema `private`
+através do Data API/PostgREST.
 
-Resultado:
-- o utilizador preenchia nome, email e password;
-- ao clicar em `Criar a minha conta`, o JavaScript parava antes de chamar o backend;
-- visualmente parecia que o botão ficava bloqueado.
+O Supabase devolvia `PGRST106 / 406`, por isso acontecia isto:
+- o utilizador preenchia corretamente o formulário;
+- o Auth chegava mesmo a criar o utilizador;
+- o passo seguinte, que ligava username e email de recuperação à conta, falhava;
+- o frontend recebia erro e parecia ficar bloqueado.
 
-## Correção
-O formulário passa a mostrar explicitamente:
-1. Nome público
-2. Username
-3. Email de recuperação
-4. Palavra-passe
-5. Aceitação da participação responsável
+## Correção aplicada no backend
+Foram criadas RPCs `SECURITY DEFINER` para fazer, de forma controlada:
+- procurar username;
+- procurar email de recuperação;
+- registar a associação username + contacto de recuperação.
 
-## Fluxo final
-Ao clicar em `Criar a minha conta`:
-- valida os campos;
-- cria a conta;
-- mostra `✓ Conta criada com sucesso. Parabéns!`;
-- faz login automático;
-- entra imediatamente na Bomba Certa;
-- mostra um aviso visível no topo durante alguns segundos.
+As Edge Functions deixaram de tentar aceder diretamente ao schema privado.
+
+Estado:
+- `public-register`: versão 6
+- `public-login`: versão 7
 
 ## Compatibilidade
-Nenhuma conta existente foi alterada ou eliminada.
+As contas já existentes não foram alteradas.
+Continuam a entrar como anteriormente.
 
-As contas antigas continuam compatíveis com username/email.
-As novas contas usam username como identificação principal e email como contacto de recuperação.
+## Experiência
+O estado do registo aparece agora imediatamente debaixo do botão.
+
+Depois da criação:
+`✅ Conta criada com sucesso. Parabéns!`
+`A entrar automaticamente na sua conta…`
+
+A aplicação entra logo na conta quando a sessão é criada.

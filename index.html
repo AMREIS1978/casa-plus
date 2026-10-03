@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.8 — criação de conta corrigida</title>
+<title>Bomba Certa v6.9 — registo final corrigido</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -247,6 +247,7 @@ header{
     <input id="signupWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
     <label class="tiny"><input id="signupAgree" type="checkbox"> Aceito participar de forma responsável e contribuir com informação verdadeira.</label>
     <button id="signupBtn" class="btn">Criar a minha conta</button>
+<div id="signupStatus" class="status" style="margin-top:10px;font-weight:700"></div>
 <div class="tiny muted" style="margin-top:-2px">Conta criada de imediato e entrada automática. Guarde bem o seu username.</div>
     <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta</button>
     <div class="signup-welcome" style="margin-top:4px">
@@ -256,7 +257,7 @@ header{
         <div class="tiny muted">O username é a sua identificação de acesso. O email fica separado e serve apenas para recuperação.</div>
       </div>
     </div>
-    <div id="signupStatus" class="status"></div>
+    
   </div>
 </div>
 
@@ -1429,7 +1430,7 @@ $('signupBtn').onclick=async()=>{
   const btn=$('signupBtn'),old=btn.textContent;
   btn.disabled=true;
   btn.textContent='A criar conta…';
-  $('signupStatus').textContent='A criar a sua conta… não feche esta janela.';
+  $('signupStatus').innerHTML='⏳ A criar a sua conta…';
 
   try{
     const response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
@@ -1455,10 +1456,10 @@ $('signupBtn').onclick=async()=>{
       if(code.includes('invalid_email'))throw new Error('Introduza um email de recuperação válido.')
                   if(code.includes('invalid_name'))throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
 
-      throw new Error(payload?.error||`Não foi possível criar a conta (${response.status}).`)
+      throw new Error(payload?.error==='registration_failed'?'Não foi possível concluir o registo. Tente novamente.':(payload?.error||`Não foi possível criar a conta (${response.status}).`))
     }
 
-    $('signupStatus').innerHTML='<b>✓ Conta criada com sucesso. Parabéns!</b> A entrar automaticamente na sua conta…';
+    $('signupStatus').innerHTML='<b>✅ Conta criada com sucesso. Parabéns!</b><br>A entrar automaticamente na sua conta…';
 
     const loginResponse=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
       method:'POST',
