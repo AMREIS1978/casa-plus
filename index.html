@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.0 — RPC corrigido</title>
+<title>Bomba Certa v7.1 — boas-vindas corrigidas</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -797,10 +797,15 @@ async function loadCommunityGame(){
 function showWelcomeMission(){
   if(localStorage.getItem('bombaCerta:newUser')!=='1')return;
   localStorage.removeItem('bombaCerta:newUser');
-  showReward(0,'Bem-vindo à comunidade!');
-  setTimeout(()=>{
-    alert('Primeira missão: confirme um preço de outro condutor ou atualize o preço de um posto. A comunidade cresce com cada ajuda.')
-  },1200)
+
+  $('rewardTitle').textContent='Parabéns!';
+  $('rewardPoints').textContent='Conta criada com sucesso';
+  $('rewardSub').textContent='Bem-vindo à Bomba Certa.';
+  const o=$('rewardOverlay');
+  o.classList.add('show');
+  confettiBurst();
+  playRewardTone();
+  navigator.vibrate?.([45,35,70]);
 }
 $('shareAppBtn').onclick=async()=>{
   const data={
