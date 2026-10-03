@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.5 — mais preços oficiais</title>
+<title>Bomba Certa v5.6 — administração restaurada</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -114,6 +114,7 @@ header{
 }
 .bottom-nav.admin-enabled{grid-template-columns:repeat(5,1fr)}
 @media(max-width:560px){
+  #adminTopBtn{padding:9px 10px;font-size:11px}
   .app{padding-left:10px;padding-right:10px}
   .header-in{padding:0 10px}.brand{font-size:19px}
   .hero{padding-top:16px}.hero h1{font-size:29px}
@@ -254,6 +255,7 @@ header{
         <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
         <span id="topLevel" class="top-profile-level">Novato</span>
       </button>
+      <button id="adminTopBtn" class="btn secondary hidden">⚙️ Admin</button>
       <button id="logoutBtn" class="btn secondary">Sair</button>
     </div>
   </div>
@@ -422,6 +424,7 @@ header{
           <button id="editNameBtn" class="btn secondary" type="button">✏️ Alterar nome</button>
           <button id="changePhotoBtn" class="btn secondary" type="button">📷 Alterar fotografia</button>
 <button id="changePasswordBtn" class="btn secondary" type="button">🔐 Alterar palavra-passe</button>
+<button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
         </div>
 
         <div id="profileEditArea" class="form hidden" style="margin-top:12px">
@@ -837,22 +840,57 @@ function showSection(id){
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 $('profileTopBtn').onclick=()=>showSection('perfil');
+$('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 $('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
 
 
 let isAdminUser=false;
 async function checkAdmin(){
-  const {data,error}=await supabase.rpc('is_app_admin');
-  isAdminUser=Boolean(!error&&data===true);
-  if(isAdminUser){
-    $('adminNav').classList.remove('hidden');
-    document.querySelector('.bottom-nav')?.classList.add('admin-enabled')
-  }else{
-    $('adminNav').classList.add('hidden');
-    document.querySelector('.bottom-nav')?.classList.remove('admin-enabled')
+  isAdminUser=false;
+
+  try{
+    // Garantir que a sessão já está efetivamente disponível antes de testar o papel.
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!session){
+      $('adminNav')?.classList.add('hidden');
+      $('adminTopBtn')?.classList.add('hidden');
+      $('profileAdminBtn')?.classList.add('hidden');
+      return false
+    }
+
+    let result=await supabase.rpc('is_app_admin');
+
+    // Em redes lentas ou imediatamente após login, repetir uma vez se houver erro.
+    if(result.error){
+      await new Promise(r=>setTimeout(r,220));
+      result=await supabase.rpc('is_app_admin')
+    }
+
+    isAdminUser=Boolean(!result.error && result.data===true);
+
+    if(isAdminUser){
+      $('adminNav')?.classList.remove('hidden');
+      $('adminTopBtn')?.classList.remove('hidden');
+      $('profileAdminBtn')?.classList.remove('hidden');
+      document.querySelector('.bottom-nav')?.classList.add('admin-enabled');
+
+      // Se o perfil já estiver visível, refletir imediatamente o papel real.
+      if($('topLevel'))$('topLevel').textContent='Administrador';
+      if($('myLevel'))$('myLevel').textContent='Administrador'
+    }else{
+      $('adminNav')?.classList.add('hidden');
+      $('adminTopBtn')?.classList.add('hidden');
+      document.querySelector('.bottom-nav')?.classList.remove('admin-enabled')
+    }
+
+    return isAdminUser
+  }catch(e){
+    console.error('Falha ao verificar administração:',e);
+    $('adminNav')?.classList.add('hidden');
+    $('adminTopBtn')?.classList.add('hidden');
+    return false
   }
-  return isAdminUser
 }
 
 function reportReasonPT(r){
@@ -1059,24 +1097,29 @@ async function enterApp(){
   ensureMap();
   setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
 
-  // Perfil do topo é carregado imediatamente e de forma independente.
-  hydrateTopProfile().catch(()=>{});
-
-  // Depois: tudo o resto em background.
-  supabase.auth.getUser().then(({data:{user}})=>{
+  // Confirmar identidade antes de decidir permissões administrativas.
+  try{
+    const {data:{user}}=await supabase.auth.getUser();
     currentAuthUserId=user?.id||null
-  }).catch(()=>{});
+  }catch{
+    currentAuthUserId=null
+  }
 
+  // Perfil visual pode carregar em paralelo.
+  hydrateTopProfile().catch(()=>{});
   supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
-  checkAdmin().then(()=>{
-    loadLeaderboard().catch(()=>{});
-    if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
-      loadAdminUsers().catch(()=>{});
-      loadAdminReports().catch(()=>{})
-    }
-  }).catch(()=>{});
 
-  setTimeout(()=>loadFillups().catch(()=>{}),250)
+  // O papel administrativo é prioritário e não fica dependente do ranking/perfil.
+  await checkAdmin();
+
+  loadLeaderboard().catch(()=>{});
+  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
+    loadAdminUsers().catch(()=>{});
+    loadAdminReports().catch(()=>{})
+  }
+
+  setTimeout(()=>loadFillups().catch(()=>{}),250);
+  setTimeout(()=>loadCommunityGame?.().catch(()=>{}),120)
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
@@ -1129,6 +1172,8 @@ $('sendRecoveryBtn').onclick=async()=>{
     btn.disabled=false;btn.textContent=old
   }
 };
+
+$('profileAdminBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 
 $('changePasswordBtn').onclick=()=>{
   $('currentPassword').value='';
@@ -2153,7 +2198,7 @@ async function loadLeaderboard(){
   if(mine){
     const l=level(mine.points);
     $('myName').textContent=mine.display_name;
-    const visibleLevel=mine.trusted_publisher?'Editor de confiança':l.n;
+    const visibleLevel=isAdminUser?'Administrador':(mine.trusted_publisher?'Editor de confiança':l.n);
     $('myLevel').textContent=visibleLevel;
     $('topLevel').textContent=visibleLevel;
     $('myPoints').textContent=mine.points+' pts';
