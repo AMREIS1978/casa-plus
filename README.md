@@ -1,23 +1,43 @@
-# Bomba Certa v4.8 — criação de contas corrigida
+# Bomba Certa v4.9 — registo corrigido + comunidade
 
-## Diagnóstico
-A Edge Function de criação estava ativa e o backend recebia pedidos com sucesso, mas a interface podia não refletir corretamente a criação da conta.
+## Registos corrigidos
+Os logs mostravam tentativas de `/signup` tratadas como registos anónimos, que o Auth rejeitava.
 
-## Correções
-Na Administração, antes de criar uma conta a aplicação agora:
-1. verifica se existe sessão;
-2. renova a sessão se estiver perto de expirar;
-3. confirma que o utilizador continua a ser administrador;
-4. envia explicitamente o JWT do utilizador + publishable key para a Edge Function;
-5. lê sempre a resposta real da função;
-6. mostra erros claros;
-7. atualiza imediatamente a lista de utilizadores após sucesso.
+A criação pública de conta passa agora por uma Edge Function própria:
+- nome público;
+- email;
+- palavra-passe;
+- conta criada e confirmada no backend;
+- login automático após a criação;
+- limite de registos por ligação para reduzir abuso;
+- honeypot anti-bot;
+- `service_role` nunca exposta no browser.
 
-## Interface
-- botão mostra `A criar conta…`;
-- fica temporariamente bloqueado para evitar duplo clique;
-- opção para ver/esconder a palavra-passe;
-- mensagem verde de confirmação;
-- tratamento claro de email duplicado, sessão expirada ou falta de permissões.
+## Perfil inicial
+O nome escolhido no registo é guardado nos metadados e usado automaticamente no perfil de contribuinte.
 
-A `service_role` continua exclusivamente no backend e nunca é exposta no browser.
+## Comunidade e jogo
+Nova área na página inicial:
+- sequência de dias com atividade;
+- contribuições de hoje;
+- preços atualizados hoje;
+- validações de hoje;
+- participantes ativos hoje;
+- nível atual;
+- missões simples;
+- botão para convidar um amigo.
+
+## Primeira missão
+Depois do primeiro registo aparece um onboarding curto:
+- confirmar um preço de outro condutor; ou
+- atualizar o preço de um posto.
+
+## Filosofia
+A gamificação incentiva ajuda real entre utilizadores:
+- pontos por contribuições úteis;
+- progressão por níveis;
+- desbloqueios;
+- reconhecimento;
+- comunidade ativa.
+
+Não existem apostas, prémios monetários aleatórios ou mecânicas escondidas.

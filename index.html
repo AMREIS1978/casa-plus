@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.8 — criação de contas corrigida</title>
+<title>Bomba Certa v4.9 — registo e comunidade</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -181,22 +181,56 @@ header{
 .admin-create-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:620px){.admin-create-row{grid-template-columns:1fr}}
 
+
+.signup-welcome{display:flex;gap:12px;align-items:center;border:1px solid var(--line);background:#f8fafc;border-radius:14px;padding:12px}
+.signup-icon{font-size:28px}
+.community-game{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin:12px 0}
+.game-card{background:linear-gradient(135deg,#111827,#344054);color:#fff;border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.game-card small{color:#d0d5dd}.game-card strong{display:block;font-size:24px;margin-top:4px}
+.game-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.mission{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px;min-height:102px}
+.mission .mi{font-size:20px}.mission b{display:block;font-size:11px;margin-top:5px}.mission span{display:block;font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
+.community-live{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}
+.live-dot{display:inline-block;width:8px;height:8px;background:#12b76a;border-radius:50%;margin-right:6px;box-shadow:0 0 0 5px rgba(18,183,106,.10)}
+.share-btn{width:100%;margin-top:10px}
+@media(max-width:760px){.community-game{grid-template-columns:1fr}.game-actions{grid-template-columns:1fr 1fr 1fr}}
+
 </style>
 </head>
 <body>
 
 <div id="authScreen" class="auth">
   <div class="auth-logo">Bomba Certa</div>
-  <h1>Combustível mais inteligente.</h1>
-  <p>Compare preços, atualize por fotografia, registe abastecimentos e acompanhe os seus gastos.</p>
-  <div class="form">
+  <h1 id="authTitle">Combustível mais inteligente.</h1>
+  <p id="authLead">Entre para comparar preços, ajudar a comunidade e evoluir o seu nível.</p>
+
+  <div id="loginPane" class="form">
     <input id="email" class="input" type="email" autocomplete="email" placeholder="Email">
     <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe">
-    <div class="actions">
-      <button id="loginBtn" class="btn">Entrar</button>
-      <button id="signupBtn" class="btn secondary">Criar conta</button>
-    </div>
+    <button id="loginBtn" class="btn">Entrar</button>
+    <button id="openSignupBtn" class="btn secondary" type="button">Criar conta grátis</button>
     <div id="authStatus" class="status"></div>
+  </div>
+
+  <div id="signupPane" class="form hidden">
+    <div class="signup-welcome">
+      <div class="signup-icon">🤝</div>
+      <div>
+        <b>Entre na comunidade Bomba Certa</b>
+        <div class="tiny muted">Ajude outros condutores, ganhe pontos e desbloqueie níveis.</div>
+      </div>
+    </div>
+    <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
+    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email">
+    <div style="position:relative">
+      <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
+      <button id="toggleSignupPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
+    </div>
+    <input id="signupWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label class="tiny"><input id="signupAgree" type="checkbox"> Aceito participar de forma responsável e contribuir com informação verdadeira.</label>
+    <button id="signupBtn" class="btn">Criar a minha conta</button>
+    <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta</button>
+    <div id="signupStatus" class="status"></div>
   </div>
 </div>
 
@@ -231,6 +265,30 @@ header{
         </div>
       </div>
       <button id="seeUnlocksBtn" class="btn secondary">Ver desbloqueios</button>
+    </div>
+
+    
+    <div class="community-game">
+      <div class="game-card">
+        <small>🔥 A minha sequência</small>
+        <strong id="myStreak">0 dias</strong>
+        <div id="todayActionText" class="tiny" style="color:#d0d5dd">Faça a primeira contribuição de hoje.</div>
+        <div class="game-actions">
+          <div class="mission"><div class="mi">📷</div><b>Atualizar preço</b><span>Publique um preço real. Se for confirmado, ganha pontos.</span></div>
+          <div class="mission"><div class="mi">✅</div><b>Confirmar</b><span>Ajude a validar preços comunicados por outros condutores.</span></div>
+          <div class="mission"><div class="mi">🚩</div><b>Proteger</b><span>Sinalize informação errada e mantenha a comunidade fiável.</span></div>
+        </div>
+      </div>
+      <div class="community-live">
+        <div><span class="live-dot"></span><b>Comunidade hoje</b></div>
+        <div class="kpis" style="grid-template-columns:1fr 1fr;margin-top:10px">
+          <div class="kpi" style="padding:8px"><small>Preços</small><strong id="communityPricesToday" style="font-size:20px">0</strong></div>
+          <div class="kpi" style="padding:8px"><small>Validações</small><strong id="communityValidationsToday" style="font-size:20px">0</strong></div>
+          <div class="kpi" style="padding:8px"><small>Participantes</small><strong id="communityActiveToday" style="font-size:20px">0</strong></div>
+          <div class="kpi" style="padding:8px"><small>Meu nível</small><strong id="communityMyLevel" style="font-size:14px">Novato</strong></div>
+        </div>
+        <button id="shareAppBtn" class="btn secondary share-btn">📣 Convidar um amigo</button>
+      </div>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -643,6 +701,52 @@ function confettiBurst(){
     document.body.appendChild(el);setTimeout(()=>el.remove(),1100)
   }
 }
+
+async function loadCommunityGame(){
+  const [mine,community]=await Promise.allSettled([
+    supabase.rpc('my_game_progress'),
+    supabase.rpc('community_today_activity')
+  ]);
+
+  const m=mine.status==='fulfilled'?mine.value.data?.[0]:null;
+  const c=community.status==='fulfilled'?community.value.data?.[0]:null;
+
+  if(m){
+    $('myStreak').textContent=`${Number(m.streak_days||0)} dia${Number(m.streak_days||0)===1?'':'s'}`;
+    $('todayActionText').textContent=Number(m.today_actions||0)>0
+      ?`${m.today_actions} contribuição${Number(m.today_actions)===1?'':'ões'} hoje. Continue a ajudar!`
+      :'Faça a primeira contribuição de hoje.';
+    $('communityMyLevel').textContent=m.level_name||'Novato'
+  }
+  if(c){
+    $('communityPricesToday').textContent=Number(c.prices_today||0);
+    $('communityValidationsToday').textContent=Number(c.validations_today||0);
+    $('communityActiveToday').textContent=Number(c.active_contributors_today||0)
+  }
+}
+function showWelcomeMission(){
+  if(localStorage.getItem('bombaCerta:newUser')!=='1')return;
+  localStorage.removeItem('bombaCerta:newUser');
+  showReward(0,'Bem-vindo à comunidade!');
+  setTimeout(()=>{
+    alert('Primeira missão: confirme um preço de outro condutor ou atualize o preço de um posto. A comunidade cresce com cada ajuda.')
+  },1200)
+}
+$('shareAppBtn').onclick=async()=>{
+  const data={
+    title:'Bomba Certa',
+    text:'Ajuda-me a manter os preços de combustível atualizados na Bomba Certa.',
+    url:window.location.origin
+  };
+  try{
+    if(navigator.share)await navigator.share(data);
+    else{
+      await navigator.clipboard.writeText(data.url);
+      alert('Link copiado. Partilhe com quem quiser ajudar a comunidade.')
+    }
+  }catch{}
+}
+
 function showReward(points,title='Boa!'){
   $('rewardTitle').textContent=title;
   $('rewardPoints').textContent=points>0?`+${points} pts`:'Preço atualizado';
@@ -662,7 +766,9 @@ function errPT(e){
   const m=String(e?.message||e||'').toLowerCase();
   if(m.includes('invalid login credentials'))return 'Email ou palavra-passe incorretos.';
   if(m.includes('email not confirmed'))return 'Confirme primeiro o email recebido.';
-  if(m.includes('rate limit'))return 'Demasiadas tentativas. Tente novamente mais tarde.';
+  if(m.includes('rate limit')||m.includes('demasiados registos'))return 'Foram feitos vários registos nesta ligação. Tente novamente mais tarde.';
+  if(m.includes('anonymous sign-ins'))return 'Preencha nome, email e palavra-passe para criar a conta.';
+  if(m.includes('already')||m.includes('já existe'))return 'Já existe uma conta com este email.';
   if(m.includes('network')||m.includes('fetch'))return 'Não foi possível ligar ao serviço.';
   return e?.message||String(e||'Ocorreu um erro.')
 }
@@ -921,7 +1027,7 @@ async function enterApp(){
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
-  if(session)await enterApp()
+  if(session){await enterApp();setTimeout(()=>showWelcomeMission(),350)}
 }
 $('loginBtn').onclick=async()=>{
   $('authStatus').textContent='A entrar…';
@@ -929,11 +1035,82 @@ $('loginBtn').onclick=async()=>{
   if(error){$('authStatus').textContent=errPT(error);return}
   $('authStatus').textContent='';await enterApp()
 };
-$('signupBtn').onclick=async()=>{
-  $('authStatus').textContent='A criar conta…';
-  const {error}=await supabase.auth.signUp({email:$('email').value.trim(),password:$('password').value,options:{emailRedirectTo:window.location.origin}});
-  $('authStatus').textContent=error?errPT(error):'Conta criada. Consulte o email e confirme o registo.'
+
+const signupStartedAt=Date.now();
+
+function showLoginPane(){
+  $('signupPane').classList.add('hidden');
+  $('loginPane').classList.remove('hidden');
+  $('authTitle').textContent='Combustível mais inteligente.';
+  $('authLead').textContent='Entre para comparar preços, ajudar a comunidade e evoluir o seu nível.'
+}
+function showSignupPane(){
+  $('loginPane').classList.add('hidden');
+  $('signupPane').classList.remove('hidden');
+  $('authTitle').textContent='Junte-se à comunidade.';
+  $('authLead').textContent='Crie a conta em menos de um minuto e comece logo a participar.';
+  $('signupEmail').value=$('email').value.trim();
+  $('signupName').focus()
+}
+$('openSignupBtn').onclick=showSignupPane;
+$('backLoginBtn').onclick=showLoginPane;
+$('toggleSignupPassword').onclick=()=>{
+  const p=$('signupPassword');
+  p.type=p.type==='password'?'text':'password';
+  $('toggleSignupPassword').textContent=p.type==='password'?'👁':'🙈'
 };
+
+$('signupBtn').onclick=async()=>{
+  const name=$('signupName').value.trim();
+  const email=$('signupEmail').value.trim().toLowerCase();
+  const password=$('signupPassword').value;
+  const website=$('signupWebsite').value;
+
+  if(name.length<2){$('signupStatus').textContent='Escolha um nome público com pelo menos 2 caracteres.';return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('signupStatus').textContent='Introduza um email válido.';return}
+  if(password.length<8){$('signupStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
+  if(!$('signupAgree').checked){$('signupStatus').textContent='Confirme a participação responsável na comunidade.';return}
+
+  const btn=$('signupBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A criar conta…';
+  $('signupStatus').textContent='A preparar o seu perfil…';
+
+  try{
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/public-signup`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+      body:JSON.stringify({
+        display_name:name,email,password,website,
+        started_at:signupStartedAt
+      })
+    });
+
+    let payload={};
+    try{payload=await response.json()}catch{}
+
+    if(!response.ok||payload?.error){
+      const msg=String(payload?.error||'Não foi possível criar a conta.');
+      if(msg.toLowerCase().includes('já existe')||msg.toLowerCase().includes('already')){
+        throw new Error('Já existe uma conta com este email.')
+      }
+      throw new Error(msg)
+    }
+
+    $('signupStatus').textContent='✓ Conta criada. A entrar…';
+
+    const login=await supabase.auth.signInWithPassword({email,password});
+    if(login.error)throw login.error;
+
+    localStorage.setItem('bombaCerta:newUser','1');
+    await enterApp();
+    setTimeout(()=>showWelcomeMission(),250)
+  }catch(e){
+    $('signupStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
 $('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()};
 
 
@@ -1449,7 +1626,7 @@ $('savePriceBtn').onclick=async()=>{
   const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
   if(error){$('priceStatus').textContent=errPT(error);return}
   $('priceStatus').textContent='Preço publicado. Já está visível e aguarda validação.';
-  await Promise.all([renderStations(),loadLeaderboard()]);
+  await Promise.all([renderStations(),loadLeaderboard()]);loadCommunityGame().catch(()=>{});
   setTimeout(()=>{$('priceModal').classList.remove('open');showReward(0,'Preço publicado!')},180)
 };
 window.confirmPrice=async(id,ok)=>{
@@ -1463,7 +1640,7 @@ window.confirmPrice=async(id,ok)=>{
   }
   await Promise.all([renderStations(),loadLeaderboard()]);
   const after=await myPoints(),gained=Math.max(0,after-before);
-  if(gained>0)showReward(gained,ok?'Obrigado por confirmar!':'Obrigado por sinalizar!')
+  if(gained>0)showReward(gained,ok?'Obrigado por confirmar!':'Obrigado por sinalizar!');loadCommunityGame().catch(()=>{})
 };
 
 let currentReportedPriceId=null,currentReportedUserId=null;
