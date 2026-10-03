@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.2 — recuperação e alteração de palavra-passe</title>
+<title>Bomba Certa v5.3 — acesso principal</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -206,11 +206,14 @@ header{
 
   <div id="loginPane" class="form">
     <input id="email" class="input" type="email" autocomplete="email" placeholder="Email">
-    <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe">
+    <div style="position:relative">
+      <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe" style="padding-right:54px">
+      <button id="toggleLoginPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
+    </div>
     <button id="loginBtn" class="btn">Entrar</button>
     <button id="openSignupBtn" class="btn secondary" type="button">Criar conta grátis</button>
-<button id="forgotPasswordBtn" class="btn secondary" type="button">Esqueci-me da palavra-passe</button>
-    <div id="authStatus" class="status"></div>
+<button id="forgotPasswordBtn" class="btn secondary" type="button">🔐 Recuperar acesso à conta</button>
+    <div class="tiny muted" style="margin-top:2px">Se o navegador preencher uma palavra-passe antiga, use o botão 👁 para confirmar o que está escrito.</div><div id="authStatus" class="status"></div>
   </div>
 
   <div id="signupPane" class="form hidden">
@@ -530,7 +533,7 @@ header{
   <div class="modal-card">
     <div class="section-title"><h2>Recuperar palavra-passe</h2><button class="btn secondary" data-close="forgotPasswordModal">Fechar</button></div>
     <div class="form">
-      <p class="tiny muted">Introduza o email da conta. Receberá um link seguro para definir uma nova palavra-passe.</p>
+      <p class="tiny muted">Introduza o email da conta. Receberá um link seguro para definir imediatamente uma nova palavra-passe.</p>
       <input id="recoveryEmail" class="input" type="email" autocomplete="email" placeholder="Email">
       <button id="sendRecoveryBtn" class="btn">Enviar link de recuperação</button>
       <div id="recoveryStatus" class="status"></div>
@@ -1093,8 +1096,15 @@ async function authCheck(){
 });
 
 
+
+$('toggleLoginPassword').onclick=()=>{
+  const p=$('password');
+  p.type=p.type==='password'?'text':'password';
+  $('toggleLoginPassword').textContent=p.type==='password'?'👁':'🙈'
+};
+
 $('forgotPasswordBtn').onclick=()=>{
-  $('recoveryEmail').value=$('email').value.trim();
+  $('recoveryEmail').value=$('email').value.trim()||'a.miguel.reis@gmail.com';
   $('recoveryStatus').textContent='';
   $('forgotPasswordModal').classList.add('open')
 };
@@ -1223,7 +1233,7 @@ $('loginBtn').onclick=async()=>{
       // Mantém a sessão iniciada e a app visível, sem culpar as credenciais.
     }
   }catch(e){
-    $('authStatus').textContent=errPT(e)
+    $('authStatus').textContent=errPT(e);$('password').focus();$('password').select()
   }finally{
     btn.disabled=false;
     btn.textContent=old

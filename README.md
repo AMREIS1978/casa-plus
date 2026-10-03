@@ -1,23 +1,18 @@
-# Bomba Certa v5.2 — palavras-passe
+# Bomba Certa v5.3 — acesso principal
 
-## Recuperação no login
-Foi acrescentado:
-`Esqueci-me da palavra-passe`
+## Login
+- botão 👁 para confirmar visualmente a palavra-passe realmente preenchida;
+- mensagem clara quando o navegador pode estar a reutilizar uma password antiga;
+- após erro, o campo da password fica selecionado para substituição imediata.
 
-O utilizador introduz o email e recebe o link oficial do Supabase Auth para definir uma nova palavra-passe.
+## Recuperar acesso
+O botão passa a chamar-se:
+`🔐 Recuperar acesso à conta`
 
-## Alterar palavra-passe no perfil
-Cada utilizador autenticado pode agora:
-1. abrir Perfil;
-2. carregar em `Alterar palavra-passe`;
-3. introduzir a palavra-passe atual;
-4. introduzir e repetir a nova palavra-passe;
-5. guardar.
+Ao abrir:
+- usa o email que estiver no login;
+- se estiver vazio, preenche a conta principal;
+- envia o fluxo oficial do Supabase para definir uma nova palavra-passe.
 
-A app volta a autenticar a palavra-passe atual antes de permitir a alteração.
-
-## Recuperação
-Quando o utilizador abre o link de recuperação recebido por email, a aplicação abre diretamente a janela para escolher uma nova palavra-passe e entra depois da alteração.
-
-## Segurança
-As palavras-passe nunca são guardadas no HTML, JavaScript, localStorage ou tabelas públicas.
+## Perfil
+Mantém a opção `Alterar palavra-passe` para todos os utilizadores autenticados.
