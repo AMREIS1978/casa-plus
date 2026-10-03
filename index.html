@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.6 — fotografia corrigida</title>
+<title>Bomba Certa v4.7 — perfil imediato e desbloqueios</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -154,6 +154,26 @@ header{
 @keyframes qdot{50%{opacity:.25}}
 .basic-note{font-size:10px;color:#98a2b3;margin-top:5px}
 
+
+.top-profile-btn.ready .top-profile-avatar{box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(18,183,106,.18),0 3px 10px rgba(15,23,42,.08)}
+.unlock-teaser{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);background:linear-gradient(135deg,#ffffff,#f8fafc);border-radius:16px;padding:14px 16px;margin:12px 0}
+.unlock-teaser-icon{font-size:28px}
+.unlock-teaser-title{font-size:14px;font-weight:950;letter-spacing:-.02em}
+.unlock-teaser-copy{font-size:11px;color:var(--muted);margin-top:3px}
+.unlock-panel{margin-top:12px}
+.unlock-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.unlock-current{font-size:12px;color:var(--muted);margin-top:3px}
+.unlock-track{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin:14px 0 10px}
+.unlock-track>div{height:100%;background:#111827;border-radius:999px;transition:width .35s ease}
+.unlock-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.unlock-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fafbfc;min-height:118px;position:relative}
+.unlock-item.unlocked{background:#fff;border-color:#cfd6df}
+.unlock-item .u-icon{font-size:22px}.unlock-item .u-name{font-size:12px;font-weight:900;margin-top:6px}
+.unlock-item .u-desc{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.35}
+.unlock-item .u-state{font-size:9px;font-weight:900;margin-top:8px}
+.unlock-item.unlocked .u-state{color:#18794e}.unlock-item.locked .u-state{color:#98a2b3}
+@media(max-width:720px){.unlock-grid{grid-template-columns:1fr 1fr}.unlock-teaser{align-items:flex-start}.unlock-teaser .btn{white-space:nowrap}}
+
 </style>
 </head>
 <body>
@@ -192,6 +212,18 @@ header{
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
       <p>Os postos começam a aparecer automaticamente. A localização e os preços são atualizados em segundo plano.</p>
+    </div>
+
+    
+    <div class="unlock-teaser">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="unlock-teaser-icon">🏆</div>
+        <div>
+          <div class="unlock-teaser-title">Ganhe pontos. Suba de nível. Desbloqueie benefícios.</div>
+          <div id="homeUnlockCopy" class="unlock-teaser-copy">Contribua com preços e validações para evoluir o seu perfil.</div>
+        </div>
+      </div>
+      <button id="seeUnlocksBtn" class="btn secondary">Ver desbloqueios</button>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -324,6 +356,18 @@ header{
         </div>
 
         <div id="profileStatus" class="status"></div>
+      </div>
+
+      <div class="card unlock-panel">
+        <div class="unlock-head">
+          <div>
+            <h2 style="margin:0;font-size:18px">Desbloqueios</h2>
+            <div id="unlockCurrentText" class="unlock-current">Continue a contribuir para desbloquear novos benefícios.</div>
+          </div>
+          <span id="unlockLevelBadge" class="pill">Novato</span>
+        </div>
+        <div class="unlock-track"><div id="unlockProgress" style="width:0%"></div></div>
+        <div id="unlockGrid" class="unlock-grid"></div>
       </div>
     </div>
     <div class="card">
@@ -622,6 +666,7 @@ function showSection(id){
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 $('profileTopBtn').onclick=()=>showSection('perfil');
+$('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
 
 
@@ -758,6 +803,9 @@ async function enterApp(){
   // Primeiro: mapa e pesquisa.
   ensureMap();
   setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
+
+  // Perfil do topo é carregado imediatamente e de forma independente.
+  hydrateTopProfile().catch(()=>{});
 
   // Depois: tudo o resto em background.
   supabase.auth.getUser().then(({data:{user}})=>{
@@ -1441,6 +1489,92 @@ function drawCharts(){
   const rows=[...fillups].reverse().slice(-30);priceChart?.destroy();priceChart=new Chart($('priceChart'),{type:'line',data:{labels:rows.map(x=>x.fillup_date),datasets:[{data:rows.map(x=>Number(x.price_per_liter)),tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})
 }
 
+
+function profileLevelName(points,trusted=false){
+  if(trusted)return 'Editor de confiança';
+  return level(points).n
+}
+function saveTopProfileCache(data){
+  try{
+    localStorage.setItem('bombaCerta:topProfile',JSON.stringify({
+      ts:Date.now(),
+      display_name:data.display_name||'Condutor',
+      points:Number(data.points||0),
+      trusted_publisher:Boolean(data.trusted_publisher),
+      avatar_path:data.avatar_path||null
+    }))
+  }catch{}
+}
+function readTopProfileCache(){
+  try{
+    const v=JSON.parse(localStorage.getItem('bombaCerta:topProfile')||'null');
+    if(!v||Date.now()-Number(v.ts||0)>7*24*60*60*1000)return null;
+    return v
+  }catch{return null}
+}
+function applyTopProfile(data){
+  if(!data)return;
+  const lvl=profileLevelName(Number(data.points||0),Boolean(data.trusted_publisher));
+  $('topLevel').textContent=lvl;
+  $('homeUnlockCopy').textContent=`Nível atual: ${lvl}. Continue a contribuir para desbloquear mais.`;
+
+  const src=data.avatar_path
+    ? supabase.storage.from('avatars').getPublicUrl(data.avatar_path).data.publicUrl+'?v='+encodeURIComponent(data.avatar_path)
+    : fallbackAvatar();
+  setAvatarSafe($('topAvatar'),src);
+  $('profileTopBtn')?.classList.add('ready')
+}
+async function hydrateTopProfile(){
+  const cached=readTopProfileCache();
+  if(cached)applyTopProfile(cached);
+
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user)return;
+
+  await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+  const {data,error}=await supabase
+    .from('fuel_contributor_stats')
+    .select('display_name,points,trusted_publisher,avatar_path')
+    .eq('user_id',user.id)
+    .maybeSingle();
+
+  if(error||!data)return;
+  saveTopProfileCache(data);
+  applyTopProfile(data)
+}
+
+const UNLOCKS=[
+  {points:50,level:'Explorador',icon:'🔔',name:'Alertas pessoais',desc:'Acesso preparado para alertas e notificações de preço.'},
+  {points:150,level:'Guia',icon:'📈',name:'Análise avançada',desc:'Nível preparado para comparações e histórico mais detalhado.'},
+  {points:400,level:'Especialista',icon:'🧭',name:'Rotas de poupança',desc:'Acesso preparado para ferramentas avançadas de rota e custo.'},
+  {points:800,level:'Embaixador',icon:'👑',name:'Área Embaixador',desc:'Nível máximo da comunidade e benefícios exclusivos.'}
+];
+function renderUnlocks(points,trusted=false){
+  const lvl=profileLevelName(points,trusted);
+  $('unlockLevelBadge').textContent=lvl;
+
+  let next=UNLOCKS.find(x=>points<x.points);
+  let pct=100;
+  if(next){
+    const prev=[0,...UNLOCKS.map(x=>x.points).filter(x=>x.points<next.points)].pop()||0;
+    pct=Math.max(0,Math.min(100,(points-prev)/(next.points-prev)*100));
+    $('unlockCurrentText').textContent=`Faltam ${Math.max(0,next.points-points)} pontos para desbloquear ${next.name}.`
+  }else{
+    $('unlockCurrentText').textContent='Todos os níveis de progressão estão desbloqueados.'
+  }
+  $('unlockProgress').style.width=pct+'%';
+
+  $('unlockGrid').innerHTML=UNLOCKS.map(u=>{
+    const unlocked=trusted||points>=u.points;
+    return `<div class="unlock-item ${unlocked?'unlocked':'locked'}">
+      <div class="u-icon">${u.icon}</div>
+      <div class="u-name">${esc(u.name)}</div>
+      <div class="u-desc">${esc(u.desc)}</div>
+      <div class="u-state">${unlocked?'✓ DESBLOQUEADO':`🔒 ${u.points} PTS`}</div>
+    </div>`
+  }).join('')
+}
+
 function level(points){return points>=800?{n:'Embaixador',i:'🏆',m:800,x:null}:points>=400?{n:'Especialista',i:'⭐',m:400,x:800}:points>=150?{n:'Guia',i:'🧭',m:150,x:400}:points>=50?{n:'Explorador',i:'🗺️',m:50,x:150}:{n:'Novato',i:'🚗',m:0,x:50}}
 function fallbackAvatar(){return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="22" fill="#eef2f6"/><text x="50" y="62" text-anchor="middle" font-size="38">🚗</text></svg>')}`}
 function setAvatarSafe(img,url){
@@ -1460,10 +1594,13 @@ async function loadLeaderboard(){
   if(mine){
     const l=level(mine.points);
     $('myName').textContent=mine.display_name;
-    const visibleLevel=isAdminUser?'Administrador':(mine.trusted_publisher?'Editor de confiança':l.n);
+    const visibleLevel=mine.trusted_publisher?'Editor de confiança':l.n;
     $('myLevel').textContent=visibleLevel;
     $('topLevel').textContent=visibleLevel;
     $('myPoints').textContent=mine.points+' pts';
+    saveTopProfileCache(mine);
+    applyTopProfile(mine);
+    renderUnlocks(Number(mine.points||0),Boolean(mine.trusted_publisher));
     $('profileName').value=mine.display_name;
     const src=mine.avatar_path
       ? supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path)+'&t='+Date.now()
@@ -1545,6 +1682,7 @@ $('saveAvatarBtn').onclick=async()=>{
   setAvatarSafe($('myAvatar'),freshUrl);
   setAvatarSafe($('topAvatar'),freshUrl);
   await loadLeaderboard();
+  hydrateTopProfile().catch(()=>{});
   setTimeout(()=>$('avatarModal').classList.remove('open'),350)
 };
 
