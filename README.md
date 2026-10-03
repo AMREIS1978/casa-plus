@@ -1,31 +1,32 @@
-# Bomba Certa v4.2 — pesquisa instantânea
+# Bomba Certa v4.3 — pesquisa automática ao abrir
 
-## Problema resolvido
-Ao tocar em `📍 Procurar perto de mim`, o utilizador deixa de ficar à espera sem perceber o que está a acontecer.
+## Alteração principal
+A aplicação já não espera que o utilizador carregue em `Procurar perto de mim`.
 
-## Novo comportamento
-1. O botão muda imediatamente para `A localizar…`.
-2. O mapa centra imediatamente na última posição conhecida, quando disponível.
-3. Os últimos postos conhecidos aparecem do cache local quase instantaneamente.
-4. Se ainda não existirem dados, aparecem cartões skeleton enquanto a pesquisa decorre.
-5. Base Bomba Certa + comunidade chegam primeiro.
-6. DGEG + OpenStreetMap atualizam depois, em paralelo.
-7. Os preços DGEG mais detalhados são enriquecidos apenas depois de já existir conteúdo no ecrã.
-8. Quando termina, o botão volta automaticamente a `Procurar perto de mim`.
+Assim que o utilizador entra:
+1. o mapa abre imediatamente;
+2. usa a última localização conhecida;
+3. mostra logo os últimos postos guardados, se existirem;
+4. começa imediatamente a atualizar postos e preços;
+5. pede uma localização nova ao navegador em paralelo;
+6. corrige a zona automaticamente se a posição tiver mudado.
 
-## Cache
-A aplicação guarda temporariamente:
-- localização recente: até 30 minutos;
-- lista de postos: até 20 minutos, desde que a nova posição esteja a menos de 3 km da posição guardada.
+## Botão
+`📍 Procurar perto de mim` passa a servir apenas para:
+- forçar nova localização;
+- repetir a pesquisa;
+- atualizar manualmente.
 
-Os dados em cache são mostrados como resposta imediata e depois atualizados em segundo plano.
+## Otimização adicional
+A lista em cache já não chama o backend antes de aparecer.
 
-## Pré-aquecimento
-Se o utilizador já tiver concedido permissão de localização, a app começa discretamente a preparar localização e postos logo após entrar, antes de carregar no botão.
+Antes:
+cache → esperar comunidade/backend → mostrar.
 
-## Perceção de velocidade
-A prioridade passa a ser:
-`reagir imediatamente → mostrar algo útil → atualizar silenciosamente`
+Agora:
+cache → mostrar imediatamente → atualizar backend em segundo plano.
 
-em vez de:
-`esperar por todas as fontes → só depois mostrar resultados`.
+Isto elimina um dos maiores atrasos percebidos.
+
+## Timeout de localização
+A primeira tentativa usa um timeout curto, porque a interface já tem dados para mostrar em paralelo. Assim a app não fica bloqueada à espera do GPS.
