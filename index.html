@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CASA+ Combustíveis Combustíveis — preços, mapa e comunidade</title>
+<title>Bomba Certa — preços, abastecimentos e comunidade</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -56,9 +56,18 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 
 @media(max-width:520px){.app{padding:14px 12px 102px}.grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:19px}.card{padding:15px}.bottom{width:96%}.nav{font-size:11px}.items-grid{grid-template-columns:1fr 62px 75px 78px;gap:5px}}
 
-#inicio,#dinheiro,#compras,#casa{display:none!important}
-.nav[data-view="inicio"],.nav[data-view="dinheiro"],.nav[data-view="compras"],.nav[data-view="casa"]{display:none!important}
-.bottom-nav{grid-template-columns:repeat(2,1fr)!important}
+#inicio,#dinheiro,#compras,#casa,#assistente{display:none!important}
+.nav[data-view="inicio"],.nav[data-view="dinheiro"],.nav[data-view="compras"],.nav[data-view="casa"],.nav[data-view="assistente"]{display:none!important}
+.bottom{grid-template-columns:repeat(3,1fr)!important}
+
+
+.fillup-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-big{font-size:28px;font-weight:900;margin-top:5px}
+.history-row{display:grid;grid-template-columns:1.2fr .8fr .8fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.history-row:last-child{border-bottom:0}
+.price-source{font-size:11px;font-weight:800}
+.price-source.official{color:#176b4d}.price-source.community{color:#8a5a18}
+@media(max-width:720px){.fillup-grid{grid-template-columns:1fr 1fr}.history-row{grid-template-columns:1fr auto}.history-row .h-detail{grid-column:1/-1}}
 
 </style>
 </head>
@@ -82,7 +91,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 </header>
 
 <section id="inicio" class="view active">
-  <div class="hero"><div class="eyebrow">Saldo líquido registado</div><div id="balanceHero" class="amount">0,00 €</div><div class="sub" id="heroSub">Dados reais da sua CASA+ Combustíveis</div></div>
+  <div class="hero"><div class="eyebrow">Saldo líquido registado</div><div id="balanceHero" class="amount">0,00 €</div><div class="sub" id="heroSub">Dados reais da sua Bomba Certa</div></div>
   <div class="grid">
     <div class="card kpi"><small>Entrou este mês</small><strong id="incomeKpi">0,00 €</strong></div>
     <div class="card kpi"><small>Saiu este mês</small><strong id="expenseKpi">0,00 €</strong></div>
@@ -114,7 +123,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
   <div class="section-title"><h2>Compras e faturas</h2><span class="pill">OCR gratuito no dispositivo</span></div>
   <div class="drop">
     <div style="font-size:44px">📷</div><h2>Fotografe ou carregue uma fatura</h2>
-    <p class="muted">A CASA+ Combustíveis lê a fatura, identifica entidade, NIF, data, total e produtos. Antes de guardar, pode corrigir tudo.</p>
+    <p class="muted">A Bomba Certa lê a fatura, identifica entidade, NIF, data, total e produtos. Antes de guardar, pode corrigir tudo.</p>
     <div class="actions" style="justify-content:center">
       <button class="btn" onclick="document.getElementById('invoiceFile').click()">Escolher fatura</button>
       <button class="btn secondary" onclick="document.getElementById('cameraFile').click()">Tirar fotografia</button>
@@ -146,11 +155,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 
 <section id="combustiveis" class="view active">
   <div class="focus-hero">
-    <h1>Combustíveis perto de si</h1>
-    <p>Preços por posto, comunidade em tempo real, mapa, rota e ranking.</p>
+    <h1>Bomba Certa</h1>
+    <p>Encontre o melhor preço, registe os seus abastecimentos e acompanhe quanto gasta.</p>
   </div>
   <div class="ad-slot compact">
-    <div><div class="ad-label">Publicidade</div><div class="ad-copy">Espaço reservado para parceiro local ou marca automóvel.</div></div>
+    <div><div class="ad-label">Publicidade</div><div class="ad-copy">Espaço reservado para parceiro de mobilidade, combustível ou automóvel.</div></div>
   </div>
 
   <div class="section-title"><h2>Combustíveis perto de mim</h2><div class="actions"><span class="pill">DGEG + OSM + comunidade</span><button id="addStationBtn" class="btn secondary">+ Adicionar posto</button></div></div>
@@ -191,12 +200,12 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
   <div class="ad-slot">
       <div>
         <div class="ad-label">Publicidade</div>
-        <div class="ad-copy">Formato discreto entre pesquisa de postos e comunidade. Sem sobrepor mapa ou resultados.</div>
+        <div class="ad-copy">Publicidade nativa e discreta, sem interferir com preços, mapa ou navegação.</div>
       </div>
     </div>
     <div class="rank-grid">
     <div class="card rank-card">
-      <div class="section-title" style="margin-top:0"><h2>A minha reputação</h2><span class="pill">CASA+ Combustíveis Comunidade</span></div>
+      <div class="section-title" style="margin-top:0"><h2>A minha reputação</h2><span class="pill">Bomba Certa Comunidade</span></div>
       <div class="rank-me">
         <div style="position:relative"><img id="myRankAvatar" class="rank-avatar" alt="Fotografia de perfil"><div id="myRankBadge" class="rank-badge" style="position:absolute;right:-8px;bottom:-8px;width:28px;height:28px;border-radius:9px;font-size:15px">🚗</div></div>
         <div style="min-width:0;flex:1">
@@ -250,12 +259,43 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
     </div>
     <div class="warn" style="margin-top:12px">
     <b>Preços oficiais + validação comunitária</b>
-    <div class="tiny" style="margin-top:5px">A CASA+ Combustíveis procura o preço comunicado à DGEG. Pode confirmar esse valor ou corrigi-lo no momento. A correção fica visível aos restantes utilizadores.</div>
+    <div class="tiny" style="margin-top:5px">A Bomba Certa procura o preço comunicado à DGEG. Pode confirmar esse valor ou corrigi-lo no momento. A correção fica visível aos restantes utilizadores.</div>
+  </div>
+</section>
+
+
+<section id="abastecimentos" class="view">
+  <div class="section-title"><h2>Abastecimentos</h2><button id="newFillupBtn" class="btn">+ Novo abastecimento</button></div>
+
+  <div class="fillup-grid">
+    <div class="card"><small class="muted">Gasto este mês</small><div id="fillMonthSpend" class="stat-big">0,00 €</div></div>
+    <div class="card"><small class="muted">Litros este mês</small><div id="fillMonthLiters" class="stat-big">0,0 L</div></div>
+    <div class="card"><small class="muted">Preço médio/L</small><div id="fillAvgPrice" class="stat-big">0,000 €</div></div>
+    <div class="card"><small class="muted">Abastecimentos</small><div id="fillCount" class="stat-big">0</div></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="section-title" style="margin-top:0"><h2>Histórico</h2><span class="pill">Dados pessoais</span></div>
+    <div id="fillupHistory" class="empty">Ainda não existem abastecimentos registados.</div>
+  </div>
+</section>
+
+<section id="estatisticas" class="view">
+  <div class="section-title"><h2>Estatísticas</h2><span class="pill">Os seus abastecimentos</span></div>
+  <div class="fillup-grid">
+    <div class="card"><small class="muted">Total gasto</small><div id="statTotalSpend" class="stat-big">0,00 €</div></div>
+    <div class="card"><small class="muted">Total abastecido</small><div id="statTotalLiters" class="stat-big">0,0 L</div></div>
+    <div class="card"><small class="muted">Preço médio</small><div id="statAvgPrice" class="stat-big">0,000 €/L</div></div>
+    <div class="card"><small class="muted">Posto mais usado</small><div id="statTopStation" class="stat-big" style="font-size:18px">—</div></div>
+  </div>
+  <div class="two" style="margin-top:12px">
+    <div class="card"><div class="section-title" style="margin-top:0"><h2>Gasto mensal</h2></div><div class="chart-wrap"><canvas id="monthlyFuelChart"></canvas></div></div>
+    <div class="card"><div class="section-title" style="margin-top:0"><h2>Evolução do preço/L</h2></div><div class="chart-wrap"><canvas id="priceFuelChart"></canvas></div></div>
   </div>
 </section>
 
 <section id="assistente" class="view">
-  <div class="section-title"><h2>Ajuda CASA+ Combustíveis</h2><span class="pill">Dados da sua casa</span></div>
+  <div class="section-title"><h2>Ajuda Bomba Certa</h2><span class="pill">Dados da sua casa</span></div>
   <div class="card">
     <div class="notice"><b>Perguntas rápidas</b><div class="muted tiny" style="margin-top:5px">O assistente responde com base nos movimentos e produtos já guardados.</div></div>
     <div class="actions" style="margin:14px 0"><button class="btn ghost ask" data-q="month">Quanto gastei este mês?</button><button class="btn ghost ask" data-q="top">Onde gasto mais?</button><button class="btn ghost ask" data-q="products">Quantos produtos tenho?</button></div>
@@ -266,7 +306,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 </div>
 
 <div id="bottomNav" class="bottom hidden">
-  <div class="nav active" data-view="inicio">⌂<br>Início</div>
+  <div class="nav active" data-view="combustiveis">⛽<br>Postos</div>
+  <div class="nav" data-view="abastecimentos">🧾<br>Abastecimentos</div>
+  <div class="nav" data-view="estatisticas">📊<br>Estatísticas</div>
+</div>
   <div class="nav" data-view="dinheiro">€<br>Dinheiro</div>
   <div class="nav" data-view="compras">🛒<br>Compras</div>
   <div class="nav" data-view="casa">🏠<br>Casa</div>
@@ -309,6 +352,33 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 </div>
 
 
+
+
+<div id="fillupModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Registar abastecimento</h2><button class="btn secondary" onclick="closeFillupModal()">Fechar</button></div>
+    <div class="form">
+      <select id="fillStation" class="input"><option value="">Outro posto / escrever manualmente</option></select>
+      <input id="fillStationManual" class="input" placeholder="Nome do posto">
+      <select id="fillFuelType" class="input">
+        <option>Gasóleo simples</option><option>Gasóleo especial</option><option>Gasolina simples 95</option><option>Gasolina especial 95</option><option>Gasolina 98</option><option>GPL Auto</option>
+      </select>
+      <div class="two">
+        <input id="fillDate" class="input" type="date">
+        <input id="fillLiters" class="input" type="number" step="0.001" min="0.001" placeholder="Litros">
+      </div>
+      <div class="two">
+        <input id="fillPrice" class="input" type="number" step="0.001" min="0.001" placeholder="Preço €/L">
+        <input id="fillTotal" class="input" type="number" step="0.01" min="0.01" placeholder="Total pago €">
+      </div>
+      <input id="fillOdometer" class="input" type="number" step="0.1" min="0" placeholder="Quilometragem (opcional)">
+      <label class="tiny"><input id="fillFullTank" type="checkbox"> Depósito cheio</label>
+      <textarea id="fillNotes" class="input" rows="2" placeholder="Nota (opcional)"></textarea>
+      <button id="saveFillupBtn" class="btn">Guardar abastecimento</button>
+      <div id="fillupStatus" class="status"></div>
+    </div>
+  </div>
+</div>
 
 <div id="addStationModal" class="modal">
   <div class="modal-card">
@@ -623,6 +693,131 @@ window.deleteTransaction=async(id,kind,invoiceId)=>{
 }
 
 let fuelMap=null,userMarker=null,fuelMarkers=[],nearbyStations=[],fuelLat=null,fuelLon=null,fuelChannel=null,routeLayer=null,navWatch=null,currentFuelStation=null,dgegFuelTypes=[];
+
+let fuelFillups=[],monthlyFuelChart=null,priceFuelChart=null;
+
+function money(v){return Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}
+function litersFmt(v){return Number(v||0).toLocaleString('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1})+' L'}
+
+function populateFillStations(){
+  const sel=el('fillStation'); if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">Outro posto / escrever manualmente</option>'+
+    (nearbyStations||[]).map((s,i)=>`<option value="${i}">${esc(s.name)}${s.displayPrice?' · '+Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':''}</option>`).join('');
+  if([...sel.options].some(o=>o.value===current))sel.value=current
+}
+window.openFillupForStation=(key)=>{
+  openFillupModal();
+  const idx=nearbyStations.findIndex(s=>s.key===key);
+  if(idx>=0){
+    el('fillStation').value=String(idx);
+    const s=nearbyStations[idx];
+    el('fillStationManual').value=s.name;
+    if(s.displayPrice)el('fillPrice').value=Number(s.displayPrice).toFixed(3);
+  }
+}
+window.openFillupModal=()=>{
+  populateFillStations();
+  el('fillupModal').classList.add('open');
+  el('fillDate').value=new Date().toISOString().slice(0,10);
+  el('fillFuelType').value=el('fuelType')?.value||'Gasóleo simples';
+  el('fillupStatus').textContent=''
+}
+window.closeFillupModal=()=>el('fillupModal').classList.remove('open');
+el('newFillupBtn').onclick=window.openFillupModal;
+
+el('fillStation').onchange=()=>{
+  const idx=Number(el('fillStation').value);
+  if(Number.isInteger(idx)&&nearbyStations[idx]){
+    const s=nearbyStations[idx];
+    el('fillStationManual').value=s.name;
+    if(s.displayPrice)el('fillPrice').value=Number(s.displayPrice).toFixed(3)
+  }
+}
+function recalcFillTotal(source){
+  const liters=Number(el('fillLiters').value),price=Number(el('fillPrice').value),total=Number(el('fillTotal').value);
+  if(source!=='total'&&liters>0&&price>0)el('fillTotal').value=(liters*price).toFixed(2);
+  else if(source==='total'&&liters>0&&total>0)el('fillPrice').value=(total/liters).toFixed(3)
+}
+el('fillLiters').oninput=()=>recalcFillTotal('liters');
+el('fillPrice').oninput=()=>recalcFillTotal('price');
+el('fillTotal').oninput=()=>recalcFillTotal('total');
+
+el('saveFillupBtn').onclick=async()=>{
+  const liters=Number(el('fillLiters').value),price=Number(el('fillPrice').value),total=Number(el('fillTotal').value);
+  if(!(liters>0)){el('fillupStatus').textContent='Indique os litros abastecidos.';return}
+  if(!(price>0)){el('fillupStatus').textContent='Indique o preço por litro.';return}
+  if(!(total>0)){el('fillupStatus').textContent='Indique o total pago.';return}
+  const {data:{user}}=await supabase.auth.getUser(); if(!user)return;
+  const idx=Number(el('fillStation').value),s=Number.isInteger(idx)?nearbyStations[idx]:null;
+  const stationName=(el('fillStationManual').value.trim()||s?.name||'Posto não identificado');
+  el('fillupStatus').textContent='A guardar…';
+  const {error}=await supabase.from('fuel_fillups').insert({
+    user_id:user.id,station_key:s?.key||null,station_name:stationName,fuel_type:el('fillFuelType').value,
+    fillup_date:el('fillDate').value||new Date().toISOString().slice(0,10),
+    liters,price_per_liter:price,total_amount:total,
+    odometer_km:el('fillOdometer').value?Number(el('fillOdometer').value):null,
+    full_tank:el('fillFullTank').checked,notes:el('fillNotes').value.trim()||null
+  });
+  if(error){el('fillupStatus').textContent=mensagemErroPT(error);return}
+  window.closeFillupModal(); await loadFuelFillups()
+}
+
+window.deleteFillup=async(id)=>{
+  if(!confirm('Apagar este abastecimento?'))return;
+  const {error}=await supabase.from('fuel_fillups').delete().eq('id',id);
+  if(error){alert(mensagemErroPT(error));return}
+  await loadFuelFillups()
+}
+
+async function loadFuelFillups(){
+  const {data:{user}}=await supabase.auth.getUser(); if(!user)return;
+  const {data,error}=await supabase.from('fuel_fillups').select('*').eq('user_id',user.id).order('fillup_date',{ascending:false}).order('created_at',{ascending:false});
+  if(error){console.warn(error);return}
+  fuelFillups=data||[];
+  renderFuelFillups()
+}
+function renderFuelFillups(){
+  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const month=fuelFillups.filter(x=>String(x.fillup_date).startsWith(ym));
+  const mSpend=month.reduce((s,x)=>s+Number(x.total_amount),0),mLiters=month.reduce((s,x)=>s+Number(x.liters),0);
+  const totalSpend=fuelFillups.reduce((s,x)=>s+Number(x.total_amount),0),totalLiters=fuelFillups.reduce((s,x)=>s+Number(x.liters),0);
+  const avg=totalLiters>0?totalSpend/totalLiters:0;
+
+  el('fillMonthSpend').textContent=money(mSpend);el('fillMonthLiters').textContent=litersFmt(mLiters);
+  el('fillAvgPrice').textContent=avg.toLocaleString('pt-PT',{minimumFractionDigits:3,maximumFractionDigits:3})+' €';
+  el('fillCount').textContent=fuelFillups.length;
+  el('statTotalSpend').textContent=money(totalSpend);el('statTotalLiters').textContent=litersFmt(totalLiters);
+  el('statAvgPrice').textContent=avg.toLocaleString('pt-PT',{minimumFractionDigits:3,maximumFractionDigits:3})+' €/L';
+
+  const byStation={};fuelFillups.forEach(x=>byStation[x.station_name]=(byStation[x.station_name]||0)+1);
+  const top=Object.entries(byStation).sort((a,b)=>b[1]-a[1])[0];el('statTopStation').textContent=top?top[0]:'—';
+
+  const box=el('fillupHistory');
+  if(!fuelFillups.length){box.className='empty';box.textContent='Ainda não existem abastecimentos registados.'}
+  else{
+    box.className='';
+    box.innerHTML=fuelFillups.map(x=>`<div class="history-row">
+      <div><b>${esc(x.station_name)}</b><div class="muted tiny">${esc(x.fillup_date)} · ${esc(x.fuel_type)}</div></div>
+      <div class="h-detail"><b>${Number(x.liters).toLocaleString('pt-PT',{maximumFractionDigits:2})} L</b><div class="muted tiny">${Number(x.price_per_liter).toFixed(3).replace('.',',')} €/L</div></div>
+      <div class="h-detail"><b>${money(x.total_amount)}</b>${x.odometer_km?`<div class="muted tiny">${Number(x.odometer_km).toLocaleString('pt-PT')} km</div>`:''}</div>
+      <button class="danger-link" onclick="deleteFillup('${x.id}')">Apagar</button>
+    </div>`).join('')
+  }
+  renderFuelStatsCharts()
+}
+function renderFuelStatsCharts(){
+  const monthly={};
+  [...fuelFillups].reverse().forEach(x=>{const k=String(x.fillup_date).slice(0,7);monthly[k]=(monthly[k]||0)+Number(x.total_amount)});
+  const keys=Object.keys(monthly).sort().slice(-12);
+  if(monthlyFuelChart)monthlyFuelChart.destroy();
+  monthlyFuelChart=new Chart(el('monthlyFuelChart'),{type:'bar',data:{labels:keys.map(k=>{const [y,m]=k.split('-');return `${m}/${y.slice(2)}`}),datasets:[{label:'Gasto €',data:keys.map(k=>monthly[k])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+  const rows=[...fuelFillups].reverse().slice(-30);
+  if(priceFuelChart)priceFuelChart.destroy();
+  priceFuelChart=new Chart(el('priceFuelChart'),{type:'line',data:{labels:rows.map(x=>x.fillup_date),datasets:[{label:'€/L',data:rows.map(x=>Number(x.price_per_liter)),tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})
+}
+
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
 
 function haversineKm(a,b,c,d){
@@ -717,7 +912,7 @@ async function fetchRegistryStations(lat,lon,radius){
   return (data||[]).map(s=>({
     key:s.source_key,registryId:s.id,name:s.name,brand:s.brand||'',lat:Number(s.latitude),lon:Number(s.longitude),
     address:s.address||'',distance:haversineKm(lat,lon,Number(s.latitude),Number(s.longitude)),
-    officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base CASA+ Combustíveis':s.source,
+    officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base Bomba Certa':s.source,
     registrySource:s.source,dgegId:s.dgeg_id||null
   })).filter(s=>s.distance<=radiusKm)
 }
@@ -725,7 +920,7 @@ async function fetchRegistryStations(lat,lon,radius){
 async function rememberStations(stations){
   const payload=(stations||[]).filter(s=>s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon))).slice(0,120).map(s=>({
     source_key:String(s.key||'').slice(0,220),
-    source:s.source==='Base CASA+ Combustíveis'?'Verificado':s.source,
+    source:s.source==='Base Bomba Certa'?'Verificado':s.source,
     name:s.name||'Posto de combustível',
     brand:s.brand||'',
     address:s.address||'',
@@ -740,7 +935,7 @@ async function rememberStations(stations){
 
 function mergeFuelStations(lists){
   const all=lists.flat().filter(Boolean).sort((a,b)=>{
-    const priority={DGEG:0,'Base CASA+ Combustíveis':1,OpenStreetMap:2,Comunidade:3};
+    const priority={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
     return (priority[a.source]??9)-(priority[b.source]??9)
   });
   const out=[];
@@ -766,7 +961,7 @@ function mergeFuelStations(lists){
     if((!dup.address || dup.address.length<5) && s.address)dup.address=s.address;
     if(!dup.brand && s.brand)dup.brand=s.brand;
 
-    const priority={DGEG:0,'Base CASA+ Combustíveis':1,OpenStreetMap:2,Comunidade:3};
+    const priority={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
     if((priority[s.source]??9)<(priority[dup.source]??9)){
       dup.key=s.key;
       dup.source=s.source;
@@ -948,7 +1143,7 @@ async function renderFuelData(){
     }
     return `<div class="row fuel-card"><div><b>${i===0&&s.displayPrice?'🏆 ':''}${esc(s.name)}</b>
       <div class="muted tiny">${s.distance.toFixed(1)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':s.source==='Base CASA+ Combustíveis'?'<div class="community-station">✓ Posto guardado na base CASA+ Combustíveis</div>':''}${communityLine}
+      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':s.source==='Base Bomba Certa'?'<div class="community-station">✓ Posto guardado na base Bomba Certa</div>':''}${communityLine}
       ${s.statusText?`<div class="tiny stale">${esc(s.statusText)}</div>`:''}
       <div class="fuel-actions">
         <button class="go" onclick="startFuelNavigation('${s.key}')">🧭 Ir para aqui</button>
@@ -967,7 +1162,7 @@ async function renderFuelData(){
     fuelMarkers.push(L.marker([s.lat,s.lon]).addTo(fuelMap).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${extra}<br><button onclick="startFuelNavigation('${s.key}')">Ir para aqui</button>`))
   }
   const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14});
-  await loadFuelLeaderboard()
+  await loadFuelLeaderboard();populateFillStations()
 }
 window.openFuelPriceModal=(key)=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s)return;currentFuelStation=s;
@@ -1168,7 +1363,7 @@ async function locateAndSearchFuel(){
   el('fuelStatus').textContent='A obter a sua localização…';
   navigator.geolocation.getCurrentPosition(async pos=>{
     fuelLat=pos.coords.latitude;fuelLon=pos.coords.longitude;
-    try{el('fuelStatus').textContent='A procurar preços reais nos postos próximos…';nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Encontrados ${nearbyStations.length} postos no raio selecionado. A CASA+ Combustíveis juntou DGEG, OpenStreetMap, base permanente e comunidade.`;subscribeFuelRealtime()}
+    try{el('fuelStatus').textContent='A procurar preços reais nos postos próximos…';nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Encontrados ${nearbyStations.length} postos no raio selecionado. A Bomba Certa juntou DGEG, OpenStreetMap, base permanente e comunidade.`;subscribeFuelRealtime()}
     catch(e){el('fuelStatus').textContent=mensagemErroPT(e)}
   },err=>{el('fuelStatus').textContent=err.code===1?'A localização foi recusada. Autorize-a nas definições do navegador.':'Não foi possível obter a localização.'},{enableHighAccuracy:false,timeout:10000,maximumAge:120000})
 }
@@ -1176,7 +1371,7 @@ function subscribeFuelRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
   fuelChannel=supabase.channel('fuel-community').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},async()=>{if(fuelLat!=null)await renderFuelData()})
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_registry'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).subscribe()
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_registry'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_fillups'},async()=>{await loadFuelFillups()}).subscribe()
 }
 el('locateFuelBtn').onclick=locateAndSearchFuel;
 el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Pesquisa atualizada: ${nearbyStations.length} postos encontrados.`};
@@ -1185,7 +1380,7 @@ el('fuelRadius').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetch
 
 document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); if(el('combustiveis')) el('combustiveis').classList.add('active'); document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active')); const fuelNav=document.querySelector('.nav[data-view="combustiveis"]'); if(fuelNav) fuelNav.classList.add('active');
 
-document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));n.classList.add('active');el(n.dataset.view).classList.add('active');if(n.dataset.view==='combustiveis')loadFuelLeaderboard()})
+document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));n.classList.add('active');el(n.dataset.view).classList.add('active');if(n.dataset.view==='combustiveis')loadFuelLeaderboard();if(n.dataset.view==='abastecimentos'||n.dataset.view==='estatisticas')loadFuelFillups()})
 document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>{
   const q=b.dataset.q;let ans='';if(q==='month'){const v=lastData.month.filter(x=>x.kind==='expense').reduce((s,x)=>s+Number(x.amount),0);ans=`Este mês gastou ${euro(v)}.`}
   if(q==='top'){const by={};lastData.month.filter(x=>x.kind==='expense').forEach(x=>{const k=x.categories?.name||'Sem categoria';by[k]=(by[k]||0)+Number(x.amount)});const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];ans=top?`A maior categoria este mês é ${top[0]}, com ${euro(top[1])}.`:'Ainda não há despesas este mês.'}

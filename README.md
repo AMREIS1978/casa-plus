@@ -1,27 +1,50 @@
-# CASA+ Combustíveis — versão focada
+# Bomba Certa — preços, abastecimentos e estatísticas
 
-Esta versão separa o módulo de combustíveis da antiga aplicação de gestão doméstica.
+A aplicação deixa de usar a marca CASA+ e passa a chamar-se **Bomba Certa**.
 
-## Foco principal
-- preços por posto;
-- DGEG + OpenStreetMap + base permanente CASA+ + comunidade;
-- mapa e localização;
-- rota e abertura em GPS;
-- propostas de novos preços;
-- validação comunitária;
-- reputação, pontos e ranking;
-- perfil público com nome e fotografia;
-- possibilidade de adicionar postos em falta.
+Slogan sugerido:
+**Preço certo. Posto certo. Rota certa.**
+
+## Postos
+- DGEG + OpenStreetMap + base permanente + comunidade;
+- preços oficiais nunca são substituídos por uma proposta comunitária não validada;
+- propostas comunitárias seguem a hierarquia de confiança;
+- mapa, distância, rota e GPS;
+- postos em falta podem ser acrescentados.
+
+## Abastecimentos
+Cada utilizador pode registar:
+- data;
+- posto;
+- combustível;
+- litros;
+- preço por litro;
+- total pago;
+- quilometragem opcional;
+- depósito cheio;
+- notas.
+
+O total é calculado automaticamente a partir de litros × preço/L e pode também ser introduzido para recalcular o preço/L.
+
+## Histórico
+- lista cronológica;
+- posto e combustível;
+- litros;
+- preço/L;
+- total pago;
+- quilometragem;
+- apagar registos.
+
+## Estatísticas
+- gasto do mês;
+- litros do mês;
+- preço médio ponderado/L;
+- número de abastecimentos;
+- total gasto;
+- total de litros;
+- posto mais utilizado;
+- gráfico de gasto mensal;
+- gráfico da evolução do preço por litro.
 
 ## Publicidade
-Foram reservados espaços discretos e integrados:
-1. pequeno espaço após o cabeçalho da pesquisa;
-2. espaço entre pesquisa/resultados e ranking;
-3. pequeno espaço contextual antes da informação complementar.
-
-Os espaços não tapam o mapa, não interrompem a navegação e não impedem o acesso a preços ou ações principais.
-
-Nesta fase são apenas placeholders visuais. A rede de publicidade pode ser ligada mais tarde (Google AdSense, parceiros diretos, campanhas locais, etc.).
-
-## Gestão doméstica
-A parte de despesas, faturas, stock e orçamento deve seguir numa aplicação separada, reutilizando a base já desenvolvida sem misturar a experiência com combustíveis.
+Mantêm-se espaços discretos, claramente assinalados como publicidade, sem cobrir o mapa, preços ou botões principais.
