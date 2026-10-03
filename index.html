@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v3.9 — validação e denúncias</title>
+<title>Bomba Certa v4.0 — status no perfil</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -82,7 +82,7 @@ header{
 .history-row:last-child{border-bottom:0}.muted{color:var(--muted)}.tiny{font-size:11px}
 .chart{height:280px}
 .rank-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px}
-.profile{display:flex;gap:16px;align-items:center}.profile-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 4px 18px}.avatar-wrap{position:relative;width:112px;height:112px}.avatar-wrap .avatar{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(15,23,42,.12)}.avatar-edit{position:absolute;right:0;bottom:2px;width:38px;height:38px;border-radius:50%;border:3px solid white;background:#111827;color:white;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.profile-name{font-size:22px;font-weight:950;margin-top:10px}.profile-level{margin-top:3px;font-size:12px;color:var(--muted)}.profile-points{font-size:30px;font-weight:950;margin-top:4px}.quick-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.quick-profile-actions button{min-height:46px}
+.profile{display:flex;gap:16px;align-items:center}.profile-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 4px 18px}.avatar-wrap{position:relative;width:112px;height:112px}.avatar-wrap .avatar{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(15,23,42,.12)}.avatar-edit{position:absolute;right:0;bottom:2px;width:38px;height:38px;border-radius:50%;border:3px solid white;background:#111827;color:white;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.profile-name{font-size:22px;font-weight:950;margin-top:10px}.profile-level{margin-top:8px;font-size:12px;color:var(--muted)}.profile-status-card{margin-top:10px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900;color:#344054}.profile-status-card .status-dot{width:8px;height:8px;border-radius:50%;background:#12b76a}.profile-points{font-size:30px;font-weight:950;margin-top:4px}.quick-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.quick-profile-actions button{min-height:46px}
 .avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
 .points{font-size:28px;font-weight:950}
 .progress{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:#111827}
@@ -289,7 +289,10 @@ header{
             <button id="avatarEditBtn" class="avatar-edit" type="button" aria-label="Alterar fotografia">📷</button>
           </div>
           <div id="myName" class="profile-name">Condutor</div>
-          <div id="myLevel" class="profile-level">🚗 Novato</div>
+          <div class="profile-status-card">
+            <span class="status-dot"></span>
+            <span>Nível: <span id="myLevel">Novato</span></span>
+          </div>
           <div id="myPoints" class="profile-points">0 pts</div>
           <div class="progress" style="width:100%;max-width:340px"><div id="rankProgress" style="width:0%"></div></div>
           <div id="rankNext" class="status"></div>
@@ -1230,7 +1233,7 @@ async function loadLeaderboard(){
   if(mine){
     const l=level(mine.points);
     $('myName').textContent=mine.display_name;
-    $('myLevel').textContent=isAdminUser?'👑 Proprietário / Administrador':(mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n);
+    $('myLevel').textContent=isAdminUser?'Administrador':(mine.trusted_publisher?'Editor de confiança':l.n);
     $('myPoints').textContent=mine.points+' pts';
     $('profileName').value=mine.display_name;
     const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();
