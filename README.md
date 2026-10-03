@@ -1,14 +1,23 @@
-# Bomba Certa v5.1 — login corrigido
+# Bomba Certa v5.2 — palavras-passe
 
-## Diagnóstico
-Os logs do Supabase confirmam que a conta administrativa consegue autenticar por email/password com sucesso.
+## Recuperação no login
+Foi acrescentado:
+`Esqueci-me da palavra-passe`
 
-O problema estava na interface: depois de uma autenticação aceite, qualquer falha posterior no arranque da app podia deixar ou voltar a mostrar uma mensagem de credenciais incorretas.
+O utilizador introduz o email e recebe o link oficial do Supabase Auth para definir uma nova palavra-passe.
 
-## Correções
-- autenticação e arranque da app foram separados;
-- assim que o Supabase aceita o login, a sessão é considerada válida;
-- o ecrã de login desaparece imediatamente;
-- uma falha posterior no carregamento de mapa/perfil/comunidade não volta a ser apresentada como erro de palavra-passe;
-- mensagens antigas desaparecem assim que o utilizador volta a escrever;
-- se já existir uma sessão válida, a app entra diretamente sem voltar a pedir login.
+## Alterar palavra-passe no perfil
+Cada utilizador autenticado pode agora:
+1. abrir Perfil;
+2. carregar em `Alterar palavra-passe`;
+3. introduzir a palavra-passe atual;
+4. introduzir e repetir a nova palavra-passe;
+5. guardar.
+
+A app volta a autenticar a palavra-passe atual antes de permitir a alteração.
+
+## Recuperação
+Quando o utilizador abre o link de recuperação recebido por email, a aplicação abre diretamente a janela para escolher uma nova palavra-passe e entra depois da alteração.
+
+## Segurança
+As palavras-passe nunca são guardadas no HTML, JavaScript, localStorage ou tabelas públicas.

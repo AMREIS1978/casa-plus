@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v5.1 — login corrigido</title>
+<title>Bomba Certa v5.2 — recuperação e alteração de palavra-passe</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -85,7 +85,7 @@ header{
 .history-row:last-child{border-bottom:0}.muted{color:var(--muted)}.tiny{font-size:11px}
 .chart{height:280px}
 .rank-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px}
-.profile{display:flex;gap:16px;align-items:center}.profile-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 4px 18px}.avatar-wrap{position:relative;width:112px;height:112px}.avatar-wrap .avatar{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(15,23,42,.12)}.avatar-edit{position:absolute;right:0;bottom:2px;width:38px;height:38px;border-radius:50%;border:3px solid white;background:#111827;color:white;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.profile-name{font-size:22px;font-weight:950;margin-top:10px}.profile-level{margin-top:8px;font-size:12px;color:var(--muted)}.profile-status-card{margin-top:10px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900;color:#344054}.profile-status-card .status-dot{width:8px;height:8px;border-radius:50%;background:#12b76a}.profile-points{font-size:30px;font-weight:950;margin-top:4px}.quick-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.quick-profile-actions button{min-height:46px}
+.profile{display:flex;gap:16px;align-items:center}.profile-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 4px 18px}.avatar-wrap{position:relative;width:112px;height:112px}.avatar-wrap .avatar{width:112px;height:112px;border-radius:50%;box-shadow:0 8px 24px rgba(15,23,42,.12)}.avatar-edit{position:absolute;right:0;bottom:2px;width:38px;height:38px;border-radius:50%;border:3px solid white;background:#111827;color:white;display:grid;place-items:center;font-size:17px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.profile-name{font-size:22px;font-weight:950;margin-top:10px}.profile-level{margin-top:8px;font-size:12px;color:var(--muted)}.profile-status-card{margin-top:10px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900;color:#344054}.profile-status-card .status-dot{width:8px;height:8px;border-radius:50%;background:#12b76a}.profile-points{font-size:30px;font-weight:950;margin-top:4px}.quick-profile-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.quick-profile-actions button{min-height:46px}
 .avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
 .points{font-size:28px;font-weight:950}
 .progress{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:#111827}
@@ -172,7 +172,7 @@ header{
 .unlock-item .u-desc{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.35}
 .unlock-item .u-state{font-size:9px;font-weight:900;margin-top:8px}
 .unlock-item.unlocked .u-state{color:#18794e}.unlock-item.locked .u-state{color:#98a2b3}
-@media(max-width:720px){.unlock-grid{grid-template-columns:1fr 1fr}.unlock-teaser{align-items:flex-start}.unlock-teaser .btn{white-space:nowrap}}
+@media(max-width:720px){.unlock-grid{grid-template-columns:1fr 1fr}.unlock-teaser{align-items:flex-start}.unlock-teaser .btn{white-space:nowrap}.quick-profile-actions{grid-template-columns:1fr}}
 
 
 .admin-create-success{background:#ecfdf3;border:1px solid #abefc6;color:#166534;border-radius:12px;padding:11px 12px;font-size:12px;font-weight:800}
@@ -209,6 +209,7 @@ header{
     <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe">
     <button id="loginBtn" class="btn">Entrar</button>
     <button id="openSignupBtn" class="btn secondary" type="button">Criar conta grátis</button>
+<button id="forgotPasswordBtn" class="btn secondary" type="button">Esqueci-me da palavra-passe</button>
     <div id="authStatus" class="status"></div>
   </div>
 
@@ -417,6 +418,7 @@ header{
         <div class="quick-profile-actions">
           <button id="editNameBtn" class="btn secondary" type="button">✏️ Alterar nome</button>
           <button id="changePhotoBtn" class="btn secondary" type="button">📷 Alterar fotografia</button>
+<button id="changePasswordBtn" class="btn secondary" type="button">🔐 Alterar palavra-passe</button>
         </div>
 
         <div id="profileEditArea" class="form hidden" style="margin-top:12px">
@@ -521,6 +523,47 @@ header{
 </div>
 
 
+
+
+<!-- Modal recuperar palavra-passe -->
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Recuperar palavra-passe</h2><button class="btn secondary" data-close="forgotPasswordModal">Fechar</button></div>
+    <div class="form">
+      <p class="tiny muted">Introduza o email da conta. Receberá um link seguro para definir uma nova palavra-passe.</p>
+      <input id="recoveryEmail" class="input" type="email" autocomplete="email" placeholder="Email">
+      <button id="sendRecoveryBtn" class="btn">Enviar link de recuperação</button>
+      <div id="recoveryStatus" class="status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal alterar palavra-passe -->
+<div id="changePasswordModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Alterar palavra-passe</h2><button class="btn secondary" data-close="changePasswordModal">Fechar</button></div>
+    <div class="form">
+      <input id="currentPassword" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe atual">
+      <input id="newPassword" class="input" type="password" autocomplete="new-password" placeholder="Nova palavra-passe (mín. 8 caracteres)">
+      <input id="confirmNewPassword" class="input" type="password" autocomplete="new-password" placeholder="Repetir nova palavra-passe">
+      <button id="savePasswordBtn" class="btn">Guardar nova palavra-passe</button>
+      <div id="passwordStatus" class="status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal definir nova palavra-passe -->
+<div id="recoveryNewPasswordModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Definir nova palavra-passe</h2></div>
+    <div class="form">
+      <input id="recoveryNewPassword" class="input" type="password" autocomplete="new-password" placeholder="Nova palavra-passe (mín. 8 caracteres)">
+      <input id="recoveryConfirmPassword" class="input" type="password" autocomplete="new-password" placeholder="Repetir nova palavra-passe">
+      <button id="saveRecoveryPasswordBtn" class="btn">Guardar e entrar</button>
+      <div id="recoveryNewPasswordStatus" class="status"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal denunciar utilizador -->
 <div id="userReportModal" class="modal">
@@ -1048,6 +1091,97 @@ async function authCheck(){
 ['email','password'].forEach(id=>{
   $(id).addEventListener('input',()=>{$('authStatus').textContent=''})
 });
+
+
+$('forgotPasswordBtn').onclick=()=>{
+  $('recoveryEmail').value=$('email').value.trim();
+  $('recoveryStatus').textContent='';
+  $('forgotPasswordModal').classList.add('open')
+};
+
+$('sendRecoveryBtn').onclick=async()=>{
+  const email=$('recoveryEmail').value.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    $('recoveryStatus').textContent='Introduza um email válido.';return
+  }
+  const btn=$('sendRecoveryBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A enviar…';
+  $('recoveryStatus').textContent='';
+  try{
+    const {error}=await supabase.auth.resetPasswordForEmail(email,{
+      redirectTo:location.origin
+    });
+    if(error)throw error;
+    $('recoveryStatus').textContent='✓ Link enviado. Abra o email e siga o link para definir uma nova palavra-passe.'
+  }catch(e){
+    $('recoveryStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+$('changePasswordBtn').onclick=()=>{
+  $('currentPassword').value='';
+  $('newPassword').value='';
+  $('confirmNewPassword').value='';
+  $('passwordStatus').textContent='';
+  $('changePasswordModal').classList.add('open')
+};
+
+$('savePasswordBtn').onclick=async()=>{
+  const current=$('currentPassword').value;
+  const next=$('newPassword').value;
+  const confirm=$('confirmNewPassword').value;
+  if(next.length<8){$('passwordStatus').textContent='A nova palavra-passe deve ter pelo menos 8 caracteres.';return}
+  if(next!==confirm){$('passwordStatus').textContent='As novas palavras-passe não coincidem.';return}
+  const btn=$('savePasswordBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A guardar…';
+  try{
+    const {data:{user}}=await supabase.auth.getUser();
+    if(!user?.email)throw new Error('Sessão inválida.');
+
+    const check=await supabase.auth.signInWithPassword({email:user.email,password:current});
+    if(check.error)throw new Error('A palavra-passe atual está incorreta.');
+
+    const {error}=await supabase.auth.updateUser({password:next});
+    if(error)throw error;
+
+    $('passwordStatus').textContent='✓ Palavra-passe alterada com sucesso.';
+    setTimeout(()=>$('changePasswordModal').classList.remove('open'),700)
+  }catch(e){
+    $('passwordStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+supabase.auth.onAuthStateChange(async(event)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.add('hidden');
+    $('recoveryNewPasswordModal').classList.add('open')
+  }
+});
+
+$('saveRecoveryPasswordBtn').onclick=async()=>{
+  const next=$('recoveryNewPassword').value;
+  const confirm=$('recoveryConfirmPassword').value;
+  if(next.length<8){$('recoveryNewPasswordStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
+  if(next!==confirm){$('recoveryNewPasswordStatus').textContent='As palavras-passe não coincidem.';return}
+  const btn=$('saveRecoveryPasswordBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A guardar…';
+  try{
+    const {error}=await supabase.auth.updateUser({password:next});
+    if(error)throw error;
+    $('recoveryNewPasswordStatus').textContent='✓ Palavra-passe definida. A entrar…';
+    $('recoveryNewPasswordModal').classList.remove('open');
+    await enterApp()
+  }catch(e){
+    $('recoveryNewPasswordStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
 
 $('loginBtn').onclick=async()=>{
   const email=$('email').value.trim().toLowerCase();
