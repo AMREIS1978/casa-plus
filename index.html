@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.1 — registo público corrigido</title>
+<title>Bomba Certa v6.3 — login por username</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -203,10 +203,10 @@ header{
 <div id="authScreen" class="auth">
   <div class="auth-logo">Bomba Certa</div>
   <h1 id="authTitle">Combustível mais inteligente.</h1>
-  <p id="authLead">Entre para comparar preços, ajudar a comunidade e evoluir o seu nível.</p>
+  <p id="authLead">Entre com o seu username e palavra-passe para comparar preços e participar na comunidade.</p>
 
   <div id="loginPane" class="form">
-    <input id="email" class="input" type="email" autocomplete="email" placeholder="Email">
+    <input id="username" class="input" type="text" autocomplete="username" maxlength="20" placeholder="Username">
     <div style="position:relative">
       <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe" style="padding-right:54px">
       <button id="toggleLoginPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
@@ -226,7 +226,8 @@ header{
       </div>
     </div>
     <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
-    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email">
+    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email válido e permanente">
+<div class="tiny muted" style="margin-top:-4px">O domínio do email é validado e emails temporários/descartáveis são bloqueados.</div>
     <div style="position:relative">
       <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
       <button id="toggleSignupPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
@@ -234,7 +235,7 @@ header{
     <input id="signupWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
     <label class="tiny"><input id="signupAgree" type="checkbox"> Aceito participar de forma responsável e contribuir com informação verdadeira.</label>
     <button id="signupBtn" class="btn">Criar a minha conta</button>
-<div class="tiny muted" style="margin-top:-2px">Sem espera por email de confirmação — entra logo após criar a conta.</div>
+<div class="tiny muted" style="margin-top:-2px">Conta criada de imediato e entrada automática. Guarde bem o seu username.</div>
     <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta</button>
     <div class="signup-welcome" style="margin-top:4px">
       <div class="signup-icon">🎯</div>
@@ -536,7 +537,7 @@ header{
   <div class="modal-card">
     <div class="section-title"><h2>Recuperar palavra-passe</h2><button class="btn secondary" data-close="forgotPasswordModal">Fechar</button></div>
     <div class="form">
-      <p class="tiny muted">Introduza o email da conta. Receberá um link seguro para definir imediatamente uma nova palavra-passe.</p>
+      <p class="tiny muted">Introduza o email de recuperação associado à conta. O email serve apenas para recuperar o acesso.</p>
       <input id="recoveryEmail" class="input" type="email" autocomplete="email" placeholder="Email">
       <button id="sendRecoveryBtn" class="btn">Enviar link de recuperação</button>
       <div id="recoveryStatus" class="status"></div>
@@ -1184,7 +1185,7 @@ async function authCheck(){
   }
 }
 
-['email','password'].forEach(id=>{
+['username','password'].forEach(id=>{
   $(id).addEventListener('input',()=>{$('authStatus').textContent=''})
 });
 
@@ -1197,7 +1198,7 @@ $('toggleLoginPassword').onclick=()=>{
 };
 
 $('forgotPasswordBtn').onclick=()=>{
-  $('recoveryEmail').value=$('email').value.trim()||'a.miguel.reis@gmail.com';
+  $('recoveryEmail').value='';
   $('recoveryStatus').textContent='';
   $('forgotPasswordModal').classList.add('open')
 };
@@ -1289,11 +1290,11 @@ $('saveRecoveryPasswordBtn').onclick=async()=>{
 };
 
 $('loginBtn').onclick=async()=>{
-  const email=$('email').value.trim().toLowerCase();
+  const username=$('username').value.trim();
   const password=$('password').value;
 
-  if(!email||!password){
-    $('authStatus').textContent='Introduza email e palavra-passe.';
+  if(!username||!password){
+    $('authStatus').textContent='Introduza o username e a palavra-passe.';
     return
   }
 
@@ -1303,20 +1304,36 @@ $('loginBtn').onclick=async()=>{
   $('authStatus').textContent='';
 
   try{
-    const {data,error}=await supabase.auth.signInWithPassword({email,password});
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({username,password})
+    });
 
-    if(error){
-      const low=String(error.message||'').toLowerCase();
-      if(low.includes('email not confirmed'))throw new Error('Confirme primeiro o email de registo.');
-      if(low.includes('invalid login credentials'))throw new Error('Email ou palavra-passe incorretos.');
-      throw error
+    let payload={};
+    try{payload=await response.json()}catch{}
+
+    if(!response.ok || payload?.error){
+      const code=String(payload?.error||'').toLowerCase();
+      if(code.includes('too_many_attempts')){
+        throw new Error('Demasiadas tentativas. Aguarde alguns minutos e tente novamente.')
+      }
+      throw new Error('Username ou palavra-passe incorretos.')
     }
 
-    if(!data?.session){
+    if(!payload?.access_token || !payload?.refresh_token){
       throw new Error('Não foi possível iniciar a sessão.')
     }
 
-    // A autenticação já foi aceite: nunca voltar a mostrar erro de credenciais por causa do bootstrap da app.
+    const {data,error}=await supabase.auth.setSession({
+      access_token:payload.access_token,
+      refresh_token:payload.refresh_token
+    });
+    if(error || !data?.session)throw error||new Error('Não foi possível iniciar a sessão.');
+
     $('authStatus').textContent='✓ Sessão iniciada.';
     $('authScreen').classList.add('hidden');
     $('appShell').classList.remove('hidden');
@@ -1324,11 +1341,12 @@ $('loginBtn').onclick=async()=>{
     try{
       await enterApp()
     }catch(e){
-      console.error('Bootstrap após login:',e);
-      // Mantém a sessão iniciada e a app visível, sem culpar as credenciais.
+      console.error('Bootstrap após login:',e)
     }
   }catch(e){
-    $('authStatus').textContent=errPT(e);$('password').focus();$('password').select()
+    $('authStatus').textContent=errPT(e);
+    $('password').focus();
+    $('password').select()
   }finally{
     btn.disabled=false;
     btn.textContent=old
@@ -1341,14 +1359,14 @@ function showLoginPane(){
   $('signupPane').classList.add('hidden');
   $('loginPane').classList.remove('hidden');
   $('authTitle').textContent='Combustível mais inteligente.';
-  $('authLead').textContent='Entre para comparar preços, ajudar a comunidade e evoluir o seu nível.'
+  $('authLead').textContent='Entre com o seu username e palavra-passe para comparar preços e participar na comunidade.'
 }
 function showSignupPane(){
   $('loginPane').classList.add('hidden');
   $('signupPane').classList.remove('hidden');
   $('authTitle').textContent='Junte-se à comunidade.';
   $('authLead').textContent='Crie a conta em menos de um minuto e comece logo a participar.';
-  $('signupEmail').value=$('email').value.trim();
+  $('signupUsername').value=$('username').value.trim();
   $('signupName').focus()
 }
 $('openSignupBtn').onclick=showSignupPane;
@@ -1361,13 +1379,19 @@ $('toggleSignupPassword').onclick=()=>{
 
 $('signupBtn').onclick=async()=>{
   const name=$('signupName').value.trim();
+  const username=$('signupUsername').value.trim();
+  const usernameNorm=username.toLowerCase();
   const email=$('signupEmail').value.trim().toLowerCase();
   const password=$('signupPassword').value;
   const website=$('signupWebsite').value;
 
   if(website)return;
   if(name.length<2){$('signupStatus').textContent='Escolha um nome público com pelo menos 2 caracteres.';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('signupStatus').textContent='Introduza um email válido.';return}
+  if(usernameNorm.length<3||usernameNorm.length>20||!/^[a-z0-9_.-]+$/.test(usernameNorm)){
+    $('signupStatus').textContent='O username deve ter 3–20 caracteres e usar apenas letras, números, ponto, hífen ou underscore.';
+    return
+  }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('signupStatus').textContent='Introduza um email de recuperação válido.';return}
   if(password.length<8){$('signupStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
   if(!$('signupAgree').checked){$('signupStatus').textContent='Confirme a participação responsável na comunidade.';return}
 
@@ -1377,15 +1401,13 @@ $('signupBtn').onclick=async()=>{
   $('signupStatus').textContent='A criar a sua conta…';
 
   try{
-    // Registo público é feito no servidor para não depender do limite de emails
-    // de confirmação do serviço padrão do Supabase.
     const response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
       method:'POST',
       headers:{
         'Content-Type':'application/json',
         'apikey':SUPABASE_KEY
       },
-      body:JSON.stringify({name,email,password,website})
+      body:JSON.stringify({name,username,email,password,website})
     });
 
     let payload={};
@@ -1394,40 +1416,47 @@ $('signupBtn').onclick=async()=>{
     if(!response.ok || payload?.error){
       const code=String(payload?.error||'').toLowerCase();
 
-      if(code.includes('email_exists')){
-        throw new Error('Já existe uma conta com este email.')
-      }
-      if(code.includes('too_many_attempts')){
-        throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos e tente novamente.')
-      }
-      if(code.includes('weak_password')){
-        throw new Error('A palavra-passe deve ter pelo menos 8 caracteres.')
-      }
-      if(code.includes('invalid_email')){
-        throw new Error('Introduza um email válido.')
-      }
-      if(code.includes('invalid_name')){
-        throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
-      }
+      if(code.includes('username_exists'))throw new Error('Este username já está a ser utilizado. Escolha outro.')
+      if(code.includes('email_exists'))throw new Error('Este email de recuperação já está associado a uma conta.')
+      if(code.includes('invalid_username'))throw new Error('Username inválido. Use 3–20 caracteres: letras, números, ponto, hífen ou underscore.')
+      if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos e tente novamente.')
+      if(code.includes('weak_password'))throw new Error('A palavra-passe deve ter pelo menos 8 caracteres.')
+      if(code.includes('invalid_email'))throw new Error('Introduza um email de recuperação válido.')
+      if(code.includes('disposable_email'))throw new Error('Não são permitidos emails temporários ou descartáveis.')
+      if(code.includes('email_domain_unreachable'))throw new Error('O domínio deste email não parece receber correio.')
+      if(code.includes('invalid_name'))throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
 
       throw new Error(payload?.error||`Não foi possível criar a conta (${response.status}).`)
     }
 
-    // A conta é criada já confirmada; entrar logo de seguida.
-    $('signupStatus').textContent='✓ Conta criada. A iniciar sessão…';
+    $('signupStatus').textContent='✓ Conta criada com sucesso. A entrar na sua conta…';
 
-    const {data:loginData,error:loginError}=await supabase.auth.signInWithPassword({
-      email,
-      password
+    const loginResponse=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({username,password})
     });
 
-    if(loginError)throw loginError;
-    if(!loginData?.session)throw new Error('A conta foi criada, mas não foi possível iniciar sessão automaticamente.');
+    let loginPayload={};
+    try{loginPayload=await loginResponse.json()}catch{}
+
+    if(!loginResponse.ok || !loginPayload?.access_token || !loginPayload?.refresh_token){
+      throw new Error('Conta criada com sucesso, mas não foi possível entrar automaticamente. Entre com o username e a palavra-passe.')
+    }
+
+    const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
+      access_token:loginPayload.access_token,
+      refresh_token:loginPayload.refresh_token
+    });
+    if(sessionError || !sessionData?.session)throw sessionError||new Error('Não foi possível iniciar a sessão.');
 
     localStorage.setItem('bombaCerta:newUser','1');
-
     await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
-    $('signupStatus').textContent='✓ Conta criada. Bem-vindo à comunidade!';
+
+    $('signupStatus').textContent='✓ Conta criada com sucesso. Bem-vindo à Bomba Certa!';
     await enterApp();
     setTimeout(()=>showWelcomeMission(),250)
   }catch(e){
