@@ -1,50 +1,29 @@
-# Bomba Certa — preços, abastecimentos e estatísticas
+# Bomba Certa v3.1 — combustíveis correntes em Portugal
 
-A aplicação deixa de usar a marca CASA+ e passa a chamar-se **Bomba Certa**.
+A aplicação passa a suportar explicitamente:
 
-Slogan sugerido:
-**Preço certo. Posto certo. Rota certa.**
+- Gasóleo simples
+- Gasóleo aditivado / premium
+- Gasolina simples 95
+- Gasolina 95 aditivada / premium
+- Gasolina 98
+- Gasolina 98 aditivada / premium
+- GPL Auto
 
-## Postos
-- DGEG + OpenStreetMap + base permanente + comunidade;
-- preços oficiais nunca são substituídos por uma proposta comunitária não validada;
-- propostas comunitárias seguem a hierarquia de confiança;
-- mapa, distância, rota e GPS;
-- postos em falta podem ser acrescentados.
+## Designações comerciais
+O OCR e a correspondência de combustíveis aceitam também aliases, incluindo:
+- Diesel Ultimate
+- Ultimate Diesel
+- Gasolina Ultimate
+- Diesel premium
+- Gasóleo aditivado
+- GPL / Autogas
 
-## Abastecimentos
-Cada utilizador pode registar:
-- data;
-- posto;
-- combustível;
-- litros;
-- preço por litro;
-- total pago;
-- quilometragem opcional;
-- depósito cheio;
-- notas.
+## Fotografia
+Quando uma fotografia mostra várias linhas de preço, a aplicação tenta:
+1. reconhecer o nome do combustível;
+2. associar o preço à categoria correta;
+3. escolher primeiro o combustível que o utilizador tem selecionado;
+4. mostrar os restantes valores detetados para confirmação.
 
-O total é calculado automaticamente a partir de litros × preço/L e pode também ser introduzido para recalcular o preço/L.
-
-## Histórico
-- lista cronológica;
-- posto e combustível;
-- litros;
-- preço/L;
-- total pago;
-- quilometragem;
-- apagar registos.
-
-## Estatísticas
-- gasto do mês;
-- litros do mês;
-- preço médio ponderado/L;
-- número de abastecimentos;
-- total gasto;
-- total de litros;
-- posto mais utilizado;
-- gráfico de gasto mensal;
-- gráfico da evolução do preço por litro.
-
-## Publicidade
-Mantêm-se espaços discretos, claramente assinalados como publicidade, sem cobrir o mapa, preços ou botões principais.
+A imagem de referência usada no desenvolvimento apresenta Gasóleo Simples, Gasolina Simples 95, Diesel Ultimate e Gasolina Ultimate; GPL Auto foi acrescentado como opção obrigatória.

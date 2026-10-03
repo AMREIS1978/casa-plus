@@ -2,1391 +2,816 @@
 <html lang="pt-PT">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bomba Certa — preços, abastecimentos e comunidade</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Bomba Certa v3.1 — combustíveis Portugal</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root{--bg:#f4f6f2;--card:#fff;--ink:#17201c;--muted:#6d7771;--accent:#197a52;--accent2:#e7f4ed;--warn:#a96522;--warnbg:#fff5e8;--danger:#a94343;--line:#e1e7e2;--shadow:0 8px 28px rgba(28,50,39,.06)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}
-button{cursor:pointer}.hidden{display:none!important}.app{max-width:1220px;margin:auto;min-height:100vh;padding:20px 20px 104px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{font-weight:900;font-size:28px;letter-spacing:-1.1px}.brand span{color:var(--accent)}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:0;background:var(--accent);color:#fff;padding:12px 16px;border-radius:14px;font-weight:750}.btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.ghost{background:var(--accent2);color:var(--accent)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.hero{background:linear-gradient(135deg,#173b2d,#287657);color:#fff;border-radius:30px;padding:28px;margin-bottom:16px;box-shadow:var(--shadow)}.eyebrow{opacity:.75;font-size:13px}.amount{font-size:44px;font-weight:900;margin:6px 0}.sub{opacity:.82}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}.kpi small{color:var(--muted)}.kpi strong{display:block;font-size:24px;margin-top:7px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:24px 2px 10px}.section-title h2{font-size:19px;margin:0}.pill{background:var(--accent2);color:var(--accent);padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.muted{color:var(--muted)}.tiny{font-size:12px}.empty{padding:28px;text-align:center;color:var(--muted)}
-.bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;width:min(94%,780px);background:#17201c;color:#fff;border-radius:24px;padding:8px;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;box-shadow:0 12px 30px rgba(0,0,0,.18);z-index:6}.nav{padding:10px 6px;border-radius:16px;text-align:center;font-size:12px;cursor:pointer}.nav.active{background:#2b775a}.view{display:none}.view.active{display:block}
-.fab{position:fixed;right:24px;bottom:92px;width:60px;height:60px;border-radius:50%;background:var(--accent);color:#fff;border:0;font-size:30px;box-shadow:0 10px 26px rgba(25,122,82,.28);z-index:5}
-.drop{border:2px dashed #c4d2ca;border-radius:24px;background:#fff;padding:32px;text-align:center}.input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:#fff}.form{display:grid;gap:12px}.status{font-size:13px;color:var(--muted);min-height:20px}.progress{height:9px;background:#edf1ee;border-radius:999px;overflow:hidden}.progress>div{height:100%;background:var(--accent);width:0%;transition:width .25s}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.open{display:flex}.modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:26px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
-.auth{max-width:470px;margin:8vh auto;background:#fff;border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:var(--shadow)}.auth h1{margin:4px 0 6px;font-size:32px}.auth p{color:var(--muted)}
-.notice{background:var(--accent2);border-radius:18px;padding:14px}.warn{background:var(--warnbg);color:#6f4317;border-radius:18px;padding:14px}
-.chart-wrap{height:260px}.scanbox{display:grid;gap:10px}.scan-head{display:flex;justify-content:space-between;align-items:center}.tag{font-size:11px;padding:5px 8px;border-radius:999px;background:#eef1ef;color:#4d5b54}.tag.ok{background:var(--accent2);color:var(--accent)}
-.items-grid{display:grid;grid-template-columns:1.7fr .55fr .75fr .8fr;gap:8px;align-items:center}.danger-link{border:0;background:#fff1f1;color:var(--danger);padding:8px 11px;border-radius:12px;font-weight:750}.stock-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.stockqty{font-size:20px;font-weight:850;min-width:72px;text-align:right}.items-grid.header{font-size:12px;color:var(--muted);font-weight:700}.itemline{display:contents}
-@media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.amount{font-size:35px}.items-grid{grid-template-columns:1fr 70px 90px 90px}.chart-wrap{height:220px}}
-
-#fuelMap{height:390px;border-radius:22px;overflow:hidden;border:1px solid var(--line)}
-.fuel-controls{display:grid;grid-template-columns:1.2fr .7fr auto;gap:9px}
-.fuel-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
-.price-big{font-size:24px;font-weight:900;min-width:92px;text-align:right}
-.official-price{font-size:11px;font-weight:850;color:#176b4d}
-.community-note{font-size:11px;color:#667085}.pending-price{font-size:11px;font-weight:800;color:#a96522}.accepted-price{font-size:11px;font-weight:850;color:#197a52}.community-station{font-size:11px;font-weight:850;color:#6b5a17}
-.fuel-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
-.fuel-actions button{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:white;font-weight:750;cursor:pointer}
-.fuel-actions .go{background:#111827;color:#fff;border-color:#111827}
-.fuel-actions .price-edit{background:#eef6f1;color:#176b4d;border-color:#cde8da}
-.confidence{font-size:11px;font-weight:850}.confidence.high{color:#197a52}.confidence.mid{color:#a96522}.confidence.low{color:#8a4b4b}
-.price-modal-input{font-size:34px;font-weight:900;text-align:center;padding:18px}
-.route-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fafafa}
-.route-steps{max-height:190px;overflow:auto;margin-top:8px}.route-step{padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}.rank-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:12px;margin-top:12px}.rank-card{padding:16px}.rank-me{display:flex;gap:14px;align-items:center}.rank-avatar{width:62px;height:62px;border-radius:18px;object-fit:cover;border:1px solid var(--line);background:var(--soft)}.rank-badge{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:var(--soft);border:1px solid var(--line)}.rank-points{font-size:30px;font-weight:900}.progress-track{height:10px;border-radius:999px;background:#edf0f3;overflow:hidden}.progress-fill{height:100%;background:var(--ink);border-radius:999px}.leader-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.leader-pos{font-weight:900;text-align:center}.leader-you{background:#f6f8fa;border-radius:14px;padding-left:8px;padding-right:8px}.points-help{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.points-help>div{padding:10px;border:1px solid var(--line);border-radius:14px;text-align:center}@media(max-width:720px){.rank-grid{grid-template-columns:1fr}.points-help{grid-template-columns:1fr 1fr}}
-@media(max-width:720px){.fuel-controls{grid-template-columns:1fr 1fr}.fuel-controls .btn{grid-column:1/-1}}
-
-
-.app-focus-note{font-size:12px;color:var(--muted);margin-top:4px}
-.ad-slot{border:1px solid var(--line);border-radius:18px;padding:12px 14px;background:#fbfbfb;margin:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:68px}
-.ad-slot .ad-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
-.ad-slot .ad-copy{font-size:12px;color:var(--muted)}
-.ad-slot.compact{min-height:52px;padding:10px 12px}
-.focus-hero{padding:18px 0 6px}
-.focus-hero h1{margin:0;font-size:28px}
-.focus-hero p{margin:6px 0 0;color:var(--muted)}
-
-@media(max-width:520px){.app{padding:14px 12px 102px}.grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:19px}.card{padding:15px}.bottom{width:96%}.nav{font-size:11px}.items-grid{grid-template-columns:1fr 62px 75px 78px;gap:5px}}
-
-#inicio,#dinheiro,#compras,#casa,#assistente{display:none!important}
-.nav[data-view="inicio"],.nav[data-view="dinheiro"],.nav[data-view="compras"],.nav[data-view="casa"],.nav[data-view="assistente"]{display:none!important}
-.bottom{grid-template-columns:repeat(3,1fr)!important}
-
-
-.fillup-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat-big{font-size:28px;font-weight:900;margin-top:5px}
-.history-row{display:grid;grid-template-columns:1.2fr .8fr .8fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.history-row:last-child{border-bottom:0}
-.price-source{font-size:11px;font-weight:800}
-.price-source.official{color:#176b4d}.price-source.community{color:#8a5a18}
-@media(max-width:720px){.fillup-grid{grid-template-columns:1fr 1fr}.history-row{grid-template-columns:1fr auto}.history-row .h-detail{grid-column:1/-1}}
-
+:root{
+  --bg:#f6f7f9;--card:#fff;--ink:#111827;--muted:#667085;--line:#e5e7eb;
+  --soft:#f1f5f9;--accent:#111827;--ok:#18794e;--warn:#a15c00;--danger:#b42318;
+  --radius:18px;--shadow:0 8px 26px rgba(15,23,42,.06)
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding-bottom:84px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app{max-width:1120px;margin:auto;padding:0 14px 28px}
+header{
+  position:sticky;top:0;z-index:900;background:rgba(246,247,249,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(229,231,235,.8);padding:12px 0
+}
+.header-in{max-width:1120px;margin:auto;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:22px;font-weight:950;letter-spacing:-.04em}.brand span{font-weight:650;color:#475467}
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;background:var(--accent);color:white;min-height:44px}
+.btn.secondary{background:white;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:#fff1f0;color:var(--danger);border:1px solid #ffd4cf}
+.icon-btn{width:44px;height:44px;border-radius:13px;border:1px solid var(--line);background:white;display:grid;place-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.section{display:none;padding-top:14px}.section.active{display:block}
+.hero{padding:22px 2px 8px}.hero h1{font-size:34px;line-height:1.03;margin:0;letter-spacing:-.045em}.hero p{margin:9px 0 0;color:var(--muted);max-width:720px}
+.toolbar{display:grid;grid-template-columns:1.3fr .7fr auto;gap:10px;margin-top:14px}
+.input{width:100%;border:1px solid var(--line);background:white;color:var(--ink);border-radius:13px;padding:12px 13px;min-height:46px;outline:none}
+.input:focus{border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.14)}
+.status{font-size:13px;color:var(--muted);margin-top:9px;min-height:18px}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:12px}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 10px}
+.section-title h2{font-size:18px;margin:0;letter-spacing:-.02em}
+.pill{font-size:11px;font-weight:850;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:#475467}
+#fuelMap{height:430px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.station-list{display:grid;gap:10px}
+.station{
+  border:1px solid var(--line);border-radius:16px;padding:14px;background:white;
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start
+}
+.station-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.station h3{margin:0;font-size:16px}
+.station-meta{font-size:12px;color:var(--muted);margin-top:5px}
+.price{font-size:25px;font-weight:950;letter-spacing:-.04em;text-align:right;white-space:nowrap}
+.price small{display:block;font-size:10px;font-weight:800;color:var(--muted);letter-spacing:0}
+.source{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:850}
+.source.official{background:#ecfdf3;color:#166534}.source.community{background:#fff7ed;color:#9a3412}.source.none{background:#f2f4f7;color:#667085}
+.station-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.station-actions button{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 9px;font-size:12px;font-weight:800}
+.station-actions .go{background:#111827;color:#fff;border-color:#111827}
+.station-actions .photo{background:#eff8ff;color:#175cd3;border-color:#d1e9ff}
+.warn{color:var(--warn);font-size:11px;font-weight:800;margin-top:6px}
+.ok{color:var(--ok);font-size:11px;font-weight:800;margin-top:6px}
+.route{margin-top:10px;border:1px solid var(--line);background:#fafafa;border-radius:14px;padding:12px}
+.route-steps{max-height:170px;overflow:auto;margin-top:8px}.route-step{font-size:12px;border-bottom:1px solid var(--line);padding:7px 0}
+.ad{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border:1px solid #dde2e8;background:#fbfbfc;border-radius:16px;padding:12px 14px;min-height:72px;
+  margin:12px 0
+}
+.ad-badge{font-size:9px;text-transform:uppercase;letter-spacing:.12em;font-weight:900;color:#98a2b3}
+.ad-title{font-size:13px;font-weight:850;margin-top:3px}.ad-copy{font-size:11px;color:var(--muted);margin-top:2px}
+.ad-cta{font-size:11px;font-weight:850;border:1px solid var(--line);border-radius:999px;padding:7px 9px;background:white;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{padding:15px}.kpi small{color:var(--muted);font-size:11px}.kpi strong{display:block;font-size:24px;margin-top:5px;letter-spacing:-.04em}
+.history{display:grid;gap:8px}.history-row{display:grid;grid-template-columns:1.3fr .8fr .8fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:11px 0}
+.history-row:last-child{border-bottom:0}.muted{color:var(--muted)}.tiny{font-size:11px}
+.chart{height:280px}
+.rank-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px}
+.profile{display:flex;gap:13px;align-items:center}
+.avatar{width:64px;height:64px;border-radius:18px;object-fit:cover;background:var(--soft);border:1px solid var(--line)}
+.points{font-size:28px;font-weight:950}
+.progress{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:#111827}
+.leader{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.leader img{width:38px;height:38px;border-radius:11px;object-fit:cover;border:1px solid var(--line)}
+.bottom-nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  display:grid;grid-template-columns:repeat(4,1fr);gap:4px
+}
+.nav{border:0;background:transparent;border-radius:12px;padding:7px 3px;color:#667085;font-size:10px;font-weight:800;min-height:52px}
+.nav span{display:block;font-size:19px;margin-bottom:2px}.nav.active{background:#f2f4f7;color:#111827}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.48);z-index:2000;display:none;align-items:flex-end;justify-content:center;padding:12px}
+.modal.open{display:flex}
+.modal-card{width:min(620px,100%);max-height:92vh;overflow:auto;background:white;border-radius:22px;padding:16px;border:1px solid var(--line);box-shadow:0 28px 80px rgba(15,23,42,.24)}
+.form{display:grid;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.photo-box{border:1px dashed #cfd6df;background:#fafbfc;border-radius:15px;padding:12px}
+.auth{max-width:430px;margin:10vh auto;padding:20px}
+.auth-logo{font-size:30px;font-weight:950;letter-spacing:-.05em}.auth p{color:var(--muted)}
+.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:820px){
+  .grid2,.rank-grid{grid-template-columns:1fr}
+  #fuelMap{height:330px}
+  .toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{grid-column:1/-1}
+  .kpis{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .app{padding-left:10px;padding-right:10px}
+  .header-in{padding:0 10px}.brand{font-size:19px}
+  .hero{padding-top:16px}.hero h1{font-size:29px}
+  .card{padding:13px;border-radius:16px}
+  .ad{display:flex!important;min-height:76px;padding:11px 12px;margin:10px 0;width:100%}
+  .ad-title{font-size:12px}.ad-copy{font-size:10px}.ad-cta{padding:6px 8px}
+  .station{grid-template-columns:1fr}.price{text-align:left;font-size:23px}
+  .history-row{grid-template-columns:1fr auto}.history-row .detail{grid-column:1/-1}
+  .kpis{grid-template-columns:1fr 1fr}
+  .modal{padding:7px}.modal-card{border-radius:20px}
+}
 </style>
 </head>
 <body>
+
 <div id="authScreen" class="auth">
-  <div class="brand">CASA<span>+</span></div>
-  <h1>A sua casa, organizada.</h1>
-  <p>Começa tudo a zero. Só aparecem valores que existam realmente na sua conta.</p>
+  <div class="auth-logo">Bomba Certa</div>
+  <h1>Combustível mais inteligente.</h1>
+  <p>Compare preços, atualize por fotografia, registe abastecimentos e acompanhe os seus gastos.</p>
   <div class="form">
-    <input id="email" class="input" type="email" placeholder="Email">
-    <input id="password" class="input" type="password" placeholder="Palavra-passe (mín. 6 caracteres)">
-    <div class="actions"><button id="loginBtn" class="btn">Entrar</button><button id="signupBtn" class="btn secondary">Criar conta</button></div>
+    <input id="email" class="input" type="email" autocomplete="email" placeholder="Email">
+    <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe">
+    <div class="actions">
+      <button id="loginBtn" class="btn">Entrar</button>
+      <button id="signupBtn" class="btn secondary">Criar conta</button>
+    </div>
     <div id="authStatus" class="status"></div>
   </div>
 </div>
 
-<div id="mainApp" class="app hidden">
+<div id="appShell" class="hidden">
 <header>
-  <div class="brand">CASA<span>+</span></div>
-  <div class="actions"><span id="householdName" class="pill">Minha Casa</span><button id="logoutBtn" class="btn secondary">Sair</button></div>
+  <div class="header-in">
+    <div class="brand">Bomba <span>Certa</span></div>
+    <div class="header-actions">
+      <button id="profileTopBtn" class="icon-btn" aria-label="Abrir perfil">👤</button>
+      <button id="logoutBtn" class="btn secondary">Sair</button>
+    </div>
+  </div>
 </header>
 
-<section id="inicio" class="view active">
-  <div class="hero"><div class="eyebrow">Saldo líquido registado</div><div id="balanceHero" class="amount">0,00 €</div><div class="sub" id="heroSub">Dados reais da sua Bomba Certa</div></div>
-  <div class="grid">
-    <div class="card kpi"><small>Entrou este mês</small><strong id="incomeKpi">0,00 €</strong></div>
-    <div class="card kpi"><small>Saiu este mês</small><strong id="expenseKpi">0,00 €</strong></div>
-    <div class="card kpi"><small>Poupança mensal</small><strong id="savingKpi">0,00 €</strong></div>
-    <div class="card kpi"><small>Faturas</small><strong id="invoiceKpi">0</strong></div>
-  </div>
-  <div class="two">
-    <div class="card"><div class="section-title"><h2>Despesas por categoria</h2><span class="pill">Mês atual</span></div><div class="chart-wrap"><canvas id="categoryChart"></canvas></div></div>
-    <div class="card"><div class="section-title"><h2>Evolução mensal</h2><span class="pill">6 meses</span></div><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
-  </div>
-  <div class="two">
-    <div class="card"><div class="section-title"><h2>Últimos movimentos</h2><span class="pill">Dados reais</span></div><div id="recentTransactions" class="empty">Ainda não existem movimentos.</div></div>
-    <div class="card"><div class="section-title"><h2>A sua casa</h2></div><div class="row"><span>Produtos registados</span><b id="productsKpi">0</b></div><div class="row"><span>Produtos disponíveis</span><b id="stockKpi">0</b></div><div class="row"><span>Locais definidos</span><b id="locationsKpi">0</b></div></div>
-  </div>
-</section>
-
-<section id="dinheiro" class="view">
-  <div class="section-title"><h2>Dinheiro</h2><div class="actions"><button class="btn" onclick="openTransaction('income')">+ Dinheiro que entra</button><button class="btn secondary" onclick="openTransaction('expense')">+ Despesa</button></div></div>
-  <div class="grid">
-    <div class="card kpi"><small>Receitas</small><strong id="incomeAll">0,00 €</strong></div>
-    <div class="card kpi"><small>Despesas</small><strong id="expenseAll">0,00 €</strong></div>
-    <div class="card kpi"><small>Saldo</small><strong id="balanceAll">0,00 €</strong></div>
-    <div class="card kpi"><small>Movimentos</small><strong id="movementCount">0</strong></div>
-  </div>
-  <div class="card"><div id="allTransactions" class="empty">Ainda não existem movimentos.</div></div>
-</section>
-
-<section id="compras" class="view">
-  <div class="section-title"><h2>Compras e faturas</h2><span class="pill">OCR gratuito no dispositivo</span></div>
-  <div class="drop">
-    <div style="font-size:44px">📷</div><h2>Fotografe ou carregue uma fatura</h2>
-    <p class="muted">A Bomba Certa lê a fatura, identifica entidade, NIF, data, total e produtos. Antes de guardar, pode corrigir tudo.</p>
-    <div class="actions" style="justify-content:center">
-      <button class="btn" onclick="document.getElementById('invoiceFile').click()">Escolher fatura</button>
-      <button class="btn secondary" onclick="document.getElementById('cameraFile').click()">Tirar fotografia</button>
+<main class="app">
+  <section id="postos" class="section active">
+    <div class="hero">
+      <h1>Encontre o combustível certo.</h1>
+      <p>Preços por posto, validação da comunidade e navegação até ao melhor ponto para abastecer.</p>
     </div>
-    <input id="invoiceFile" type="file" accept=".pdf,image/*" hidden>
-    <input id="cameraFile" type="file" accept="image/*" capture="environment" hidden>
-    <div id="uploadStatus" class="status" style="margin-top:12px"></div>
-    <div id="ocrProgressWrap" class="progress hidden"><div id="ocrProgress"></div></div>
-  </div>
 
-  <div class="section-title"><h2>Faturas</h2></div>
-  <div class="card"><div id="invoiceList" class="empty">Ainda não existem faturas.</div></div>
-
-  <div class="section-title"><h2>Histórico de preços</h2><span class="pill">Por produto</span></div>
-  <div class="card"><div id="priceList" class="empty">O histórico será criado automaticamente quando analisar faturas.</div></div>
-</section>
-
-<section id="casa" class="view">
-  <div class="section-title"><h2>A minha casa</h2></div>
-  <div class="grid">
-    <div class="card kpi"><small>Produtos</small><strong id="productsCasa">0</strong></div>
-    <div class="card kpi"><small>Existências</small><strong id="stockCasa">0</strong></div>
-    <div class="card kpi"><small>Locais</small><strong id="locationsCasa">0</strong></div>
-    <div class="card kpi"><small>A terminar</small><strong id="lowExistênciasCasa">0</strong></div>
-  </div>
-  <div class="card"><div class="section-title" style="margin-top:0"><h2>Existências atuais</h2><span class="pill">Entrada / consumo</span></div><div id="stockList" class="empty">Ainda não existem produtos em existências.</div></div>
-</section>
-
-
-<section id="combustiveis" class="view active">
-  <div class="focus-hero">
-    <h1>Bomba Certa</h1>
-    <p>Encontre o melhor preço, registe os seus abastecimentos e acompanhe quanto gasta.</p>
-  </div>
-  <div class="ad-slot compact">
-    <div><div class="ad-label">Publicidade</div><div class="ad-copy">Espaço reservado para parceiro de mobilidade, combustível ou automóvel.</div></div>
-  </div>
-
-  <div class="section-title"><h2>Combustíveis perto de mim</h2><div class="actions"><span class="pill">DGEG + OSM + comunidade</span><button id="addStationBtn" class="btn secondary">+ Adicionar posto</button></div></div>
-  <div class="card">
-    <div class="fuel-controls">
-      <select id="fuelType" class="input">
-        <option>Gasóleo simples</option>
-        <option>Gasóleo especial</option>
-        <option>Gasolina simples 95</option>
-        <option>Gasolina especial 95</option>
-        <option>Gasolina 98</option>
-        <option>GPL Auto</option>
-      </select>
-      <select id="fuelRadius" class="input">
-        <option value="3000">3 km</option>
-        <option value="5000" selected>5 km</option>
-        <option value="10000">10 km</option>
-        <option value="20000">20 km</option><option value="30000">30 km</option><option value="50000">50 km</option>
-      </select>
-      <button id="locateFuelBtn" class="btn">📍 Localizar e procurar</button>
-    </div>
-    <div id="fuelStatus" class="status" style="margin-top:10px">Autorize a localização para procurar preços reais nos postos próximos.</div>
-  </div>
-
-  <div class="two" style="margin-top:12px">
-    <div class="card">
-      <div class="section-title" style="margin-top:0"><h2>Mapa e caminho</h2><button id="refreshFuelBtn" class="btn secondary">Atualizar</button></div>
-      <div id="fuelMap"></div>
-      <div id="routeBox" class="route-box hidden"></div>
-    </div>
-    <div class="card">
-      <div class="section-title" style="margin-top:0"><h2>Mais baratos perto de si</h2><span class="pill">Preço por litro</span></div>
-      <div id="fuelResults" class="empty">Ainda não foi feita nenhuma pesquisa.</div>
-    </div>
-  </div>
-
-
-  <div class="ad-slot">
+    <div class="ad" aria-label="Publicidade">
       <div>
-        <div class="ad-label">Publicidade</div>
-        <div class="ad-copy">Publicidade nativa e discreta, sem interferir com preços, mapa ou navegação.</div>
+        <div class="ad-badge">Publicidade</div>
+        <div class="ad-title">Espaço patrocinado</div>
+        <div class="ad-copy">Preparado para marcas de combustível, pneus, oficinas ou seguros.</div>
+      </div>
+      <div class="ad-cta">Patrocinado</div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <select id="fuelType" class="input">
+          <option value="Gasóleo simples">Gasóleo simples</option>
+          <option value="Gasóleo especial">Gasóleo aditivado / premium</option>
+          <option value="Gasolina simples 95">Gasolina simples 95</option>
+          <option value="Gasolina especial 95">Gasolina 95 aditivada / premium</option>
+          <option value="Gasolina 98">Gasolina 98</option>
+          <option value="Gasolina especial 98">Gasolina 98 aditivada / premium</option>
+          <option value="GPL Auto">GPL Auto</option>
+        </select>
+        <select id="fuelRadius" class="input">
+          <option value="3000">3 km</option>
+          <option value="5000" selected>5 km</option>
+          <option value="10000">10 km</option>
+          <option value="20000">20 km</option>
+          <option value="30000">30 km</option>
+          <option value="50000">50 km</option>
+        </select>
+        <button id="locateBtn" class="btn">📍 Procurar perto de mim</button>
+      </div>
+      <div id="fuelStatus" class="status">Autorize a localização para procurar postos próximos.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="section-title"><h2>Mapa</h2><button id="refreshBtn" class="btn secondary">Atualizar</button></div>
+        <div id="fuelMap"></div>
+        <div id="routeBox" class="route hidden"></div>
+      </div>
+      <div>
+        <div class="section-title">
+          <h2>Postos próximos</h2>
+          <button id="addStationBtn" class="btn secondary">+ Posto em falta</button>
+        </div>
+        <div id="stationList" class="station-list"><div class="empty">Faça uma pesquisa para ver os postos próximos.</div></div>
       </div>
     </div>
+
+    <div class="card" style="margin-top:12px">
+  <div class="section-title"><h2>Combustíveis suportados</h2><span class="pill">Portugal</span></div>
+  <div class="tiny muted">Gasóleo simples · Gasóleo aditivado/premium · Gasolina 95 simples · Gasolina 95 aditivada/premium · Gasolina 98 · Gasolina 98 aditivada/premium · GPL Auto. A app reconhece também designações comerciais como “Diesel Ultimate” e “Gasolina Ultimate”.</div>
+</div>
+<div class="ad" aria-label="Publicidade">
+      <div>
+        <div class="ad-badge">Publicidade</div>
+        <div class="ad-title">Formato nativo no fluxo da aplicação</div>
+        <div class="ad-copy">Visível também em telemóvel, sem tapar preços, mapa ou botões.</div>
+      </div>
+      <div class="ad-cta">Parceiro</div>
+    </div>
+  </section>
+
+  <section id="abastecimentos" class="section">
+    <div class="section-title"><h2>Abastecimentos</h2><button id="newFillupBtn" class="btn">+ Novo</button></div>
+    <div class="kpis">
+      <div class="card kpi"><small>Gasto este mês</small><strong id="monthSpend">0,00 €</strong></div>
+      <div class="card kpi"><small>Litros este mês</small><strong id="monthLiters">0,0 L</strong></div>
+      <div class="card kpi"><small>Preço médio/L</small><strong id="avgPrice">0,000 €</strong></div>
+      <div class="card kpi"><small>Registos</small><strong id="fillCount">0</strong></div>
+    </div>
+    <div class="ad">
+      <div><div class="ad-badge">Publicidade</div><div class="ad-title">Espaço discreto entre indicadores e histórico</div><div class="ad-copy">Pensado para publicidade relevante de mobilidade.</div></div>
+      <div class="ad-cta">Patrocinado</div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>Histórico</h2><span class="pill">Só seu</span></div>
+      <div id="fillHistory" class="empty">Ainda não existem abastecimentos registados.</div>
+    </div>
+  </section>
+
+  <section id="estatisticas" class="section">
+    <div class="section-title"><h2>Estatísticas</h2><span class="pill">Histórico pessoal</span></div>
+    <div class="kpis">
+      <div class="card kpi"><small>Total gasto</small><strong id="totalSpend">0,00 €</strong></div>
+      <div class="card kpi"><small>Total abastecido</small><strong id="totalLiters">0,0 L</strong></div>
+      <div class="card kpi"><small>Preço médio</small><strong id="statAvg">0,000 €/L</strong></div>
+      <div class="card kpi"><small>Posto mais usado</small><strong id="topStation" style="font-size:16px">—</strong></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="section-title"><h2>Gasto mensal</h2></div><div class="chart"><canvas id="monthlyChart"></canvas></div></div>
+      <div class="card"><div class="section-title"><h2>Evolução do preço/L</h2></div><div class="chart"><canvas id="priceChart"></canvas></div></div>
+    </div>
+  </section>
+
+  <section id="perfil" class="section">
     <div class="rank-grid">
-    <div class="card rank-card">
-      <div class="section-title" style="margin-top:0"><h2>A minha reputação</h2><span class="pill">Bomba Certa Comunidade</span></div>
-      <div class="rank-me">
-        <div style="position:relative"><img id="myRankAvatar" class="rank-avatar" alt="Fotografia de perfil"><div id="myRankBadge" class="rank-badge" style="position:absolute;right:-8px;bottom:-8px;width:28px;height:28px;border-radius:9px;font-size:15px">🚗</div></div>
-        <div style="min-width:0;flex:1">
-          <div id="myRankName" style="font-weight:900">Condutor</div>
-          <div id="myRankLevel" class="muted tiny">Novato</div>
-          <div id="myRankPoints" class="rank-points">0 pts</div>
+      <div class="card">
+        <div class="section-title"><h2>O meu perfil</h2><span class="pill">Comunidade</span></div>
+        <div class="profile">
+          <img id="myAvatar" class="avatar" alt="Fotografia de perfil">
+          <div>
+            <div id="myName" style="font-weight:900">Condutor</div>
+            <div id="myLevel" class="muted tiny">Novato</div>
+            <div id="myPoints" class="points">0 pts</div>
+          </div>
+        </div>
+        <div class="progress"><div id="rankProgress" style="width:0%"></div></div>
+        <div id="rankNext" class="status"></div>
+        <div class="form" style="margin-top:12px">
+          <input id="profileName" class="input" maxlength="28" placeholder="Nome público">
+          <button id="saveNameBtn" class="btn secondary">Guardar nome</button>
+          <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <button id="avatarBtn" class="btn secondary">Alterar fotografia</button>
+          <div id="profileStatus" class="status"></div>
         </div>
       </div>
-      <div class="progress-track" style="margin-top:10px"><div id="myRankProgress" class="progress-fill" style="width:0%"></div></div>
-      <div id="myRankNext" class="muted tiny" style="margin-top:6px">Comece a contribuir para subir no ranking.</div>
-      <div class="form" style="margin-top:12px">
-        <input id="contributorName" class="input" maxlength="28" placeholder="Nome público no ranking">
-        <button id="saveContributorName" class="btn secondary">Guardar nome</button><input id="contributorAvatar" type="file" accept="image/jpeg,image/png,image/webp" hidden><button id="chooseContributorAvatar" class="btn secondary" type="button">Alterar fotografia</button>
-        <div id="contributorNameStatus" class="status"></div>
+      <div class="card">
+        <div class="section-title"><h2>Ranking</h2><span class="pill">Top 20</span></div>
+        <div id="leaderboard" class="empty">Ainda não existem contribuições suficientes.</div>
       </div>
     </div>
 
-    <div class="card rank-card">
-      <div class="section-title" style="margin-top:0"><h2>Ranking da comunidade</h2><span class="pill">Top 20</span></div>
-      <div id="fuelLeaderboard" class="empty">Ainda não existem contribuições suficientes.</div>
+    <div class="card" style="margin-top:12px">
+      <div class="section-title"><h2>Como ganhar pontos</h2></div>
+      <div class="kpis">
+        <div class="kpi"><small>Novo preço</small><strong>+10</strong></div>
+        <div class="kpi"><small>Confirmar preço</small><strong>+2</strong></div>
+        <div class="kpi"><small>Preço incorreto</small><strong>+3</strong></div>
+        <div class="kpi"><small>Posto encerrado</small><strong>+4</strong></div>
+      </div>
     </div>
-  </div>
+  </section>
+</main>
 
-  <div class="card" style="margin-top:12px">
-    <div class="section-title" style="margin-top:0"><h2>Como ganhar pontos</h2><span class="pill">Qualidade acima de quantidade</span></div>
-    <div class="points-help">
-      <div><b>+10</b><div class="muted tiny">Novo preço</div></div>
-      <div><b>+2</b><div class="muted tiny">Confirmar preço</div></div>
-      <div><b>+3</b><div class="muted tiny">Assinalar preço incorreto</div></div>
-      <div><b>+4</b><div class="muted tiny">Posto fechado</div></div>
-      <div><b>+5</b><div class="muted tiny">Alguém confirma o seu preço</div></div>
-      <div><b>Anti-abuso</b><div class="muted tiny">Repetições rápidas no mesmo posto não dão pontos</div></div>
-    </div>
-  </div>
-
-
-  <div class="card" style="margin-top:12px">
-    <div class="section-title" style="margin-top:0"><h2>Hierarquia de confiança dos preços</h2><span class="pill">Anti-abuso</span></div>
-    <div class="tiny muted">Um preço introduzido por um utilizador não substitui logo o preço de referência. O número de apoios necessários diminui à medida que aumenta a reputação do melhor contribuidor que suporta esse preço.</div>
-    <div class="points-help">
-      <div><b>Novato</b><div class="muted tiny">5 utilizadores</div></div>
-      <div><b>Explorador</b><div class="muted tiny">4 utilizadores</div></div>
-      <div><b>Guia</b><div class="muted tiny">3 utilizadores</div></div>
-      <div><b>Especialista</b><div class="muted tiny">2 utilizadores</div></div>
-      <div><b>Embaixador</b><div class="muted tiny">1 utilizador</div></div>
-    </div>
-  </div>
-
-  <div class="ad-slot compact">
-      <div><div class="ad-label">Publicidade</div><div class="ad-copy">Espaço reservado para promoção contextual, por exemplo lavagem, pneus ou oficina.</div></div>
-    </div>
-    <div class="warn" style="margin-top:12px">
-    <b>Preços oficiais + validação comunitária</b>
-    <div class="tiny" style="margin-top:5px">A Bomba Certa procura o preço comunicado à DGEG. Pode confirmar esse valor ou corrigi-lo no momento. A correção fica visível aos restantes utilizadores.</div>
-  </div>
-</section>
-
-
-<section id="abastecimentos" class="view">
-  <div class="section-title"><h2>Abastecimentos</h2><button id="newFillupBtn" class="btn">+ Novo abastecimento</button></div>
-
-  <div class="fillup-grid">
-    <div class="card"><small class="muted">Gasto este mês</small><div id="fillMonthSpend" class="stat-big">0,00 €</div></div>
-    <div class="card"><small class="muted">Litros este mês</small><div id="fillMonthLiters" class="stat-big">0,0 L</div></div>
-    <div class="card"><small class="muted">Preço médio/L</small><div id="fillAvgPrice" class="stat-big">0,000 €</div></div>
-    <div class="card"><small class="muted">Abastecimentos</small><div id="fillCount" class="stat-big">0</div></div>
-  </div>
-
-  <div class="card" style="margin-top:12px">
-    <div class="section-title" style="margin-top:0"><h2>Histórico</h2><span class="pill">Dados pessoais</span></div>
-    <div id="fillupHistory" class="empty">Ainda não existem abastecimentos registados.</div>
-  </div>
-</section>
-
-<section id="estatisticas" class="view">
-  <div class="section-title"><h2>Estatísticas</h2><span class="pill">Os seus abastecimentos</span></div>
-  <div class="fillup-grid">
-    <div class="card"><small class="muted">Total gasto</small><div id="statTotalSpend" class="stat-big">0,00 €</div></div>
-    <div class="card"><small class="muted">Total abastecido</small><div id="statTotalLiters" class="stat-big">0,0 L</div></div>
-    <div class="card"><small class="muted">Preço médio</small><div id="statAvgPrice" class="stat-big">0,000 €/L</div></div>
-    <div class="card"><small class="muted">Posto mais usado</small><div id="statTopStation" class="stat-big" style="font-size:18px">—</div></div>
-  </div>
-  <div class="two" style="margin-top:12px">
-    <div class="card"><div class="section-title" style="margin-top:0"><h2>Gasto mensal</h2></div><div class="chart-wrap"><canvas id="monthlyFuelChart"></canvas></div></div>
-    <div class="card"><div class="section-title" style="margin-top:0"><h2>Evolução do preço/L</h2></div><div class="chart-wrap"><canvas id="priceFuelChart"></canvas></div></div>
-  </div>
-</section>
-
-<section id="assistente" class="view">
-  <div class="section-title"><h2>Ajuda Bomba Certa</h2><span class="pill">Dados da sua casa</span></div>
-  <div class="card">
-    <div class="notice"><b>Perguntas rápidas</b><div class="muted tiny" style="margin-top:5px">O assistente responde com base nos movimentos e produtos já guardados.</div></div>
-    <div class="actions" style="margin:14px 0"><button class="btn ghost ask" data-q="month">Quanto gastei este mês?</button><button class="btn ghost ask" data-q="top">Onde gasto mais?</button><button class="btn ghost ask" data-q="products">Quantos produtos tenho?</button></div>
-    <div id="assistantAnswer" class="muted">Escolha uma pergunta.</div>
-  </div>
-</section>
-<button class="fab" onclick="openTransaction('expense')">+</button>
+<nav class="bottom-nav" aria-label="Navegação principal">
+  <button class="nav active" data-section="postos"><span>⛽</span>Postos</button>
+  <button class="nav" data-section="abastecimentos"><span>🧾</span>Abastecimentos</button>
+  <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
+  <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
+</nav>
 </div>
 
-<div id="bottomNav" class="bottom hidden">
-  <div class="nav active" data-view="combustiveis">⛽<br>Postos</div>
-  <div class="nav" data-view="abastecimentos">🧾<br>Abastecimentos</div>
-  <div class="nav" data-view="estatisticas">📊<br>Estatísticas</div>
-</div>
-  <div class="nav" data-view="dinheiro">€<br>Dinheiro</div>
-  <div class="nav" data-view="compras">🛒<br>Compras</div>
-  <div class="nav" data-view="casa">🏠<br>Casa</div>
-  <div class="nav" data-view="combustiveis">⛽<br>Combustíveis</div>
-  <div class="nav" data-view="assistente">✦<br>Ajuda</div>
-</div>
-
-<div id="transactionModal" class="modal">
+<!-- Modal preço -->
+<div id="priceModal" class="modal">
   <div class="modal-card">
-    <div class="section-title"><h2>Novo movimento</h2><button class="btn secondary" onclick="closeTransaction()">Fechar</button></div>
+    <div class="section-title"><h2>Atualizar preço</h2><button class="btn secondary" data-close="priceModal">Fechar</button></div>
     <div class="form">
-      <select id="txKind" class="input"><option value="expense">Despesa</option><option value="income">Receita</option></select>
-      <input id="txAmount" class="input" type="number" step="0.01" min="0" placeholder="Valor €">
-      <input id="txDescription" class="input" placeholder="Descrição">
-      <input id="txDate" class="input" type="date">
-      <button id="saveTxBtn" class="btn">Guardar movimento</button><div id="txStatus" class="status"></div>
+      <div class="card" style="box-shadow:none;padding:12px">
+        <b id="priceStationName">Posto</b>
+        <div id="priceFuelLabel" class="tiny muted"></div>
+        <div id="priceReference" class="tiny muted" style="margin-top:3px"></div>
+      </div>
+      <div style="position:relative">
+        <input id="priceInput" class="input" type="text" inputmode="decimal" placeholder="1,799" style="font-size:34px;font-weight:950;text-align:center;padding:18px">
+        <span style="position:absolute;right:18px;top:24px;font-weight:900">€/L</span>
+      </div>
+      <div class="photo-box">
+        <b>Atualizar por fotografia</b>
+        <div class="ocr-tip" style="margin:5px 0 10px">Fotografe o painel do posto, expositor ou talão. A leitura é feita no dispositivo e o preço fica apenas como sugestão até confirmar.</div>
+        <div class="actions">
+          <button id="takePhotoBtn" class="btn secondary">📷 Tirar fotografia</button>
+          <button id="choosePhotoBtn" class="btn secondary">🖼️ Escolher imagem</button>
+        </div>
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+        <input id="photoInput" type="file" accept="image/*" hidden>
+        <div id="photoStatus" class="status"></div>
+      </div>
+      <button id="savePriceBtn" class="btn">Guardar proposta de preço</button>
+      <div id="priceStatus" class="status"></div>
     </div>
   </div>
 </div>
 
-
-<div id="stockModal" class="modal">
+<!-- Modal abastecimento -->
+<div id="fillModal" class="modal">
   <div class="modal-card">
-    <div class="section-title"><h2>Registar consumo de produto</h2><button class="btn secondary" onclick="closeExistênciasModal()">Fechar</button></div>
+    <div class="section-title"><h2>Registar abastecimento</h2><button class="btn secondary" data-close="fillModal">Fechar</button></div>
     <div class="form">
-      <div class="notice"><b id="stockProductName">Produto</b><div class="muted tiny" id="stockCurrentQty"></div></div>
-      <input id="stockOutQty" class="input" type="number" step="0.001" min="0.001" value="1" placeholder="Quantidade a retirar">
-      <select id="stockReason" class="input">
-        <option value="Consumido">Consumido</option>
-        <option value="Estragado">Estragado</option>
-        <option value="Oferecido">Oferecido</option>
-        <option value="Devolvido">Devolvido</option>
-        <option value="Eliminado">Eliminado</option>
-        <option value="Outro">Outro</option>
+      <select id="fillStation" class="input"><option value="">Outro posto</option></select>
+      <input id="fillStationName" class="input" placeholder="Nome do posto">
+      <select id="fillFuel" class="input">
+        <option value="Gasóleo simples">Gasóleo simples</option><option value="Gasóleo especial">Gasóleo aditivado / premium</option><option value="Gasolina simples 95">Gasolina simples 95</option><option value="Gasolina especial 95">Gasolina 95 aditivada / premium</option><option value="Gasolina 98">Gasolina 98</option><option value="Gasolina especial 98">Gasolina 98 aditivada / premium</option><option value="GPL Auto">GPL Auto</option>
       </select>
-      <button id="confirmExistênciasOutBtn" class="btn">Confirmar consumo</button>
-      <div id="stockStatus" class="status"></div>
-    </div>
-  </div>
-</div>
-
-
-
-
-<div id="fillupModal" class="modal">
-  <div class="modal-card">
-    <div class="section-title"><h2>Registar abastecimento</h2><button class="btn secondary" onclick="closeFillupModal()">Fechar</button></div>
-    <div class="form">
-      <select id="fillStation" class="input"><option value="">Outro posto / escrever manualmente</option></select>
-      <input id="fillStationManual" class="input" placeholder="Nome do posto">
-      <select id="fillFuelType" class="input">
-        <option>Gasóleo simples</option><option>Gasóleo especial</option><option>Gasolina simples 95</option><option>Gasolina especial 95</option><option>Gasolina 98</option><option>GPL Auto</option>
-      </select>
-      <div class="two">
+      <div class="grid2" style="margin-top:0">
         <input id="fillDate" class="input" type="date">
         <input id="fillLiters" class="input" type="number" step="0.001" min="0.001" placeholder="Litros">
       </div>
-      <div class="two">
+      <div class="grid2" style="margin-top:0">
         <input id="fillPrice" class="input" type="number" step="0.001" min="0.001" placeholder="Preço €/L">
         <input id="fillTotal" class="input" type="number" step="0.01" min="0.01" placeholder="Total pago €">
       </div>
       <input id="fillOdometer" class="input" type="number" step="0.1" min="0" placeholder="Quilometragem (opcional)">
-      <label class="tiny"><input id="fillFullTank" type="checkbox"> Depósito cheio</label>
+      <label class="tiny"><input id="fillFull" type="checkbox"> Depósito cheio</label>
       <textarea id="fillNotes" class="input" rows="2" placeholder="Nota (opcional)"></textarea>
-      <button id="saveFillupBtn" class="btn">Guardar abastecimento</button>
-      <div id="fillupStatus" class="status"></div>
+      <button id="saveFillBtn" class="btn">Guardar abastecimento</button>
+      <div id="fillStatus" class="status"></div>
     </div>
   </div>
 </div>
 
-<div id="addStationModal" class="modal">
+<!-- Modal posto em falta -->
+<div id="stationModal" class="modal">
   <div class="modal-card">
-    <div class="section-title"><h2>Adicionar posto em falta</h2><button class="btn secondary" onclick="closeAddStationModal()">Fechar</button></div>
+    <div class="section-title"><h2>Adicionar posto em falta</h2><button class="btn secondary" data-close="stationModal">Fechar</button></div>
     <div class="form">
-      <input id="newStationName" class="input" placeholder="Nome do posto, ex.: RStar Anta">
-      <input id="newStationAddress" class="input" placeholder="Morada, ex.: Rua Ponte de Anta, Espinho">
-      <div class="two">
+      <input id="newStationName" class="input" placeholder="Nome do posto">
+      <input id="newStationAddress" class="input" placeholder="Morada">
+      <div class="grid2" style="margin-top:0">
         <input id="newStationLat" class="input" type="number" step="0.000001" placeholder="Latitude">
         <input id="newStationLon" class="input" type="number" step="0.000001" placeholder="Longitude">
       </div>
       <div class="actions">
-        <button id="geocodeStationBtn" class="btn secondary" type="button">🔎 Encontrar pela morada</button>
-        <button id="useMyLocationStationBtn" class="btn secondary" type="button">📍 Usar a minha localização</button>
+        <button id="findAddressBtn" class="btn secondary">🔎 Encontrar morada</button>
+        <button id="useLocationBtn" class="btn secondary">📍 Usar localização</button>
       </div>
-      <div class="notice tiny">Também pode preencher latitude/longitude manualmente. O posto ficará identificado como “adicionado pela comunidade”.</div>
       <button id="saveStationBtn" class="btn">Guardar posto</button>
-      <div id="newStationStatus" class="status"></div>
-    </div>
-  </div>
-</div>
-
-<div id="fuelPriceModal" class="modal">
-  <div class="modal-card">
-    <div class="section-title"><h2>Atualizar preço por litro</h2><button class="btn secondary" onclick="closeFuelPriceModal()">Fechar</button></div>
-    <div class="form">
-      <div class="notice">
-        <b id="fuelPriceStationName">Posto</b>
-        <div id="fuelPriceTypeLabel" class="muted tiny"></div>
-        <div id="fuelPriceOfficialHint" class="muted tiny"></div>
-      </div>
-      <div style="position:relative">
-        <input id="fuelQuickPrice" class="input price-modal-input" type="text" inputmode="decimal" autocomplete="off" placeholder="1,799">
-        <span style="position:absolute;right:18px;top:26px;font-weight:850">€/L</span>
-      </div>
-      <button id="saveQuickFuelPrice" class="btn" style="font-size:18px;padding:14px">Guardar novo preço</button>
-      <div id="fuelQuickStatus" class="status"></div>
-    </div>
-  </div>
-</div>
-
-<div id="reviewModal" class="modal">
-  <div class="modal-card">
-    <div class="scan-head"><div><h2 style="margin:0">Rever leitura</h2><div class="muted tiny">Confirme antes de guardar os dados.</div></div><button class="btn secondary" onclick="closeReview()">Fechar</button></div>
-    <div id="confidenceBox" class="notice" style="margin:14px 0">Leitura concluída.</div>
-    <div class="form">
-      <input id="rvMerchant" class="input" placeholder="Entidade / loja">
-      <input id="rvNif" class="input" placeholder="NIF">
-      <div class="two"><input id="rvDate" class="input" type="date"><input id="rvTotal" class="input" type="number" step="0.01" min="0" placeholder="Total €"></div>
-      <input id="rvInvoiceNo" class="input" placeholder="N.º da fatura (opcional)">
-      <div class="section-title" style="margin-top:8px"><h2>Produtos detetados</h2><button class="btn secondary" id="addItemBtn">+ Produto</button></div>
-      <div class="items-grid header"><div>Produto</div><div>Qtd.</div><div>Preço/un.</div><div>Total</div></div>
-      <div id="reviewItems" class="scanbox"></div>
-      <button id="saveInvoiceBtn" class="btn">Guardar fatura e criar despesa</button>
-      <div id="reviewStatus" class="status"></div>
+      <div id="stationStatus" class="status"></div>
     </div>
   </div>
 </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm';
 
-const SUPABASE_URL="https://umyoydjigysnwweoyrot.supabase.co";
-const SUPABASE_KEY="sb_publishable_gXhUtu8LfYJlMlfIN3fLwA_xhZBuKGt";
+const SUPABASE_URL='https://umyoydjigysnwweoyrot.supabase.co';
+const SUPABASE_KEY='sb_publishable_gXhUtu8LfYJlMlfIN3fLwA_xhZBuKGt';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
-let householdId=null,currentInvoiceId=null,currentFilePath=null,currentRawText='',currentConfidence=0,currentItems=[],currentExistênciasItem=null;
-let categoryChart=null,trendChart=null,lastData={all:[],month:[],products:0,categories:[],invoices:[],stock:[]};
-
-const euro=n=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(n||0));
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-const el=id=>document.getElementById(id);
-function setAuthStatus(t){el('authStatus').textContent=t||''}
-
-function mensagemErroPT(error){
-  const m=String(error?.message||error||'').toLowerCase();
-  if(m.includes('email rate limit exceeded')) return 'Foram enviados demasiados emails de confirmação num curto espaço de tempo. Tente novamente mais tarde.';
-  if(m.includes('email address not authorized')) return 'O serviço de email atual ainda não permite enviar confirmações para este endereço.';
-  if(m.includes('invalid login credentials')) return 'Email ou palavra-passe incorretos.';
-  if(m.includes('email not confirmed')) return 'O endereço de email ainda não foi confirmado.';
-  if(m.includes('user already registered')) return 'Já existe uma conta com este endereço de email.';
-  if(m.includes('password should be at least') || m.includes('valid password')) return 'A palavra-passe tem de ter, pelo menos, 6 caracteres.';
-  if(m.includes('signup is disabled')) return 'A criação de novas contas está temporariamente indisponível.';
-  if(m.includes('network') || m.includes('fetch')) return 'Não foi possível ligar ao serviço. Verifique a ligação à Internet e tente novamente.';
-  if(m.includes('row-level security') || m.includes('infinite recursion')) return 'Ocorreu um erro de permissões. Atualize a página e tente novamente.';
-  return error?.message || String(error||'Ocorreu um erro inesperado.');
-}
-
-function normalizeAmount(v){if(v==null)return 0;let s=String(v).replace(/\s/g,'').replace(/[€]/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');const n=Number(s.replace(/[^\d.-]/g,''));return Number.isFinite(n)?n:0}
-function dateISO(s){if(!s)return'';const m=s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);if(!m)return'';let y=m[3];if(y.length===2)y='20'+y;return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`}
-function cleanLine(s){return s.replace(/\s+/g,' ').trim()}
-
-async function initSession(){const {data:{session}}=await supabase.auth.getSession();if(session)await enterApp()}
-async function enterApp(){
-  const {data,error}=await supabase.rpc('bootstrap_household',{p_name:'Minha Casa'});
-  if(error)return setAuthStatus(mensagemErroPT(error));
-  householdId=data;el('authScreen').classList.add('hidden');el('mainApp').classList.remove('hidden');el('bottomNav').classList.remove('hidden');await refreshAll()
-}
-el('loginBtn').onclick=async()=>{setAuthStatus('A entrar…');const email=el('email').value.trim(),password=el('password').value;const {error}=await supabase.auth.signInWithPassword({email,password});if(error)return setAuthStatus(mensagemErroPT(error));setAuthStatus('');await enterApp()}
-el('signupBtn').onclick=async()=>{setAuthStatus('A criar conta…');const email=el('email').value.trim(),password=el('password').value;const {data,error}=await supabase.auth.signUp({email,password});if(error)return setAuthStatus(mensagemErroPT(error));if(data.session){setAuthStatus('');await enterApp()}else setAuthStatus('Conta criada. Consulte o seu email, confirme o registo e depois entre.')}
-el('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()}
-
-async function refreshAll(){
-  const now=new Date(),start=new Date(now.getFullYear(),now.getMonth(),1).toISOString().slice(0,10),six=new Date(now.getFullYear(),now.getMonth()-5,1).toISOString().slice(0,10);
-  const [txAll,txMonth,txSix,invoices,products,stock,locations,house,categories,prices]=await Promise.all([
-    supabase.from('transactions').select('*,categories(name,icon),entities(name)').eq('household_id',householdId).order('transaction_date',{ascending:false}),
-    supabase.from('transactions').select('*,categories(name,icon)').eq('household_id',householdId).gte('transaction_date',start),
-    supabase.from('transactions').select('*').eq('household_id',householdId).gte('transaction_date',six),
-    supabase.from('invoices').select('*,entities(name)').eq('household_id',householdId).order('created_at',{ascending:false}),
-    supabase.from('products').select('id,name,brand',{count:'exact'}).eq('household_id',householdId),
-    supabase.from('stock_items').select('id,product_id,quantity,min_quantity,expiry_date,products(name,brand,unit),home_locations(name)',{count:'exact'}).eq('household_id',householdId).order('updated_at',{ascending:false}),
-    supabase.from('home_locations').select('id',{count:'exact'}).eq('household_id',householdId),
-    supabase.from('households').select('name').eq('id',householdId).single(),
-    supabase.from('categories').select('id,name,kind,icon').eq('household_id',householdId),
-    supabase.from('price_observations').select('*,products(name,brand),entities(name)').eq('household_id',householdId).order('observed_at',{ascending:false}).limit(80)
-  ]);
-  if(house.data)el('householdName').textContent=house.data.name;
-  const all=txAll.data||[],month=txMonth.data||[],sixTx=txSix.data||[];
-  const incMonth=month.filter(x=>x.kind==='income').reduce((s,x)=>s+Number(x.amount),0),expMonth=month.filter(x=>x.kind==='expense').reduce((s,x)=>s+Number(x.amount),0);
-  const incAll=all.filter(x=>x.kind==='income').reduce((s,x)=>s+Number(x.amount),0),expAll=all.filter(x=>x.kind==='expense').reduce((s,x)=>s+Number(x.amount),0);
-  el('balanceHero').textContent=euro(incAll-expAll);el('incomeKpi').textContent=euro(incMonth);el('expenseKpi').textContent=euro(expMonth);el('savingKpi').textContent=euro(incMonth-expMonth);el('invoiceKpi').textContent=(invoices.data||[]).length;
-  el('incomeAll').textContent=euro(incAll);el('expenseAll').textContent=euro(expAll);el('balanceAll').textContent=euro(incAll-expAll);el('movementCount').textContent=all.length;
-  const pc=products.count||0,sc=stock.count||0,lc=locations.count||0,low=(stock.data||[]).filter(x=>Number(x.quantity)<=Number(x.min_quantity)&&Number(x.min_quantity)>0).length;
-  el('productsKpi').textContent=pc;el('stockKpi').textContent=sc;el('locationsKpi').textContent=lc;el('productsCasa').textContent=pc;el('stockCasa').textContent=sc;el('locationsCasa').textContent=lc;el('lowExistênciasCasa').textContent=low;
-  renderTx(el('recentTransactions'),all.slice(0,5));renderTx(el('allTransactions'),all);renderInvoices(el('invoiceList'),invoices.data||[]);renderPrices(el('priceList'),prices.data||[]);renderExistências(el('stockList'),stock.data||[]);
-  renderCharts(month,sixTx);
-  lastData={all,month,products:pc,categories:categories.data||[],invoices:invoices.data||[],stock:stock.data||[]}
-}
-function renderTx(node,rows){
-  if(!rows.length){node.className='empty';node.textContent='Ainda não existem movimentos.';return}
-  node.className='';node.innerHTML=rows.map(x=>`<div class="row"><div><b>${esc(x.description||'Movimento')}</b><div class="muted tiny">${esc(x.transaction_date)}${x.categories?.name?' · '+esc(x.categories.name):''}</div></div><div class="actions"><b>${x.kind==='expense'?'-':'+'}${euro(x.amount)}</b><button class="danger-link" onclick="deleteTransaction('${x.id}','${x.kind}',${x.invoice_id?`'${x.invoice_id}'`:'null'})">Apagar</button></div></div>`).join('')
-}
-function renderInvoices(node,rows){
-  if(!rows.length){node.className='empty';node.textContent='Ainda não existem faturas.';return}
-  node.className='';node.innerHTML=rows.map(x=>`<div class="row"><div><b>${esc(x.entities?.name||x.detected_merchant||'Fatura')}</b><div class="muted tiny">${esc(x.invoice_date||x.created_at.slice(0,10))} · ${x.ocr_status==='processed'?'✓ analisada':x.ocr_status==='review'?'a rever':x.ocr_status==='reading'?'a ler':x.ocr_status==='pending'?'pendente':x.ocr_status==='error'?'erro':esc(x.ocr_status)}</div></div><div class="actions"><b>${euro(x.total)}</b><button class="danger-link" onclick="deleteInvoice('${x.id}')">Apagar</button></div></div>`).join('')
-}
-function renderPrices(node,rows){
-  if(!rows.length){node.className='empty';node.textContent='O histórico será criado automaticamente quando analisar faturas.';return}
-  const grouped={};for(const r of rows){const k=r.product_id;(grouped[k]??=[]).push(r)}
-  node.className='';node.innerHTML=Object.values(grouped).slice(0,10).map(g=>{const latest=g[0],vals=g.map(x=>Number(x.unit_price)).filter(x=>x>0),min=vals.length?Math.min(...vals):0;return `<div class="row"><div><b>${esc(latest.products?.name||'Produto')}</b><div class="muted tiny">${esc(latest.entities?.name||'')} · mínimo registado ${euro(min)}</div></div><b>${euro(latest.unit_price)}</b></div>`}).join('')
-}
-
-function renderExistências(node,rows){
-  if(!rows.length){node.className='empty';node.textContent='Ainda não existem produtos em existências.';return}
-  node.className='';node.innerHTML=rows.map(x=>{
-    const q=Number(x.quantity||0), min=Number(x.min_quantity||0), low=min>0&&q<=min;
-    const unit=x.products?.unit||'un.';
-    return `<div class="row"><div><b>${esc(x.products?.name||'Produto')}</b><div class="muted tiny">${x.home_locations?.name?esc(x.home_locations.name)+' · ':''}${low?'⚠ nível mínimo atingido':'Disponível'}</div></div><div class="stock-actions"><span class="stockqty">${q.toLocaleString('pt-PT')} ${esc(unit)}</span><button class="btn secondary" onclick="quickExistênciasOut('${x.id}',1)">−1</button><button class="btn ghost" onclick="openExistênciasModal('${x.id}')">Registar consumo</button></div></div>`
-  }).join('')
-}
-window.openExistênciasModal=(id)=>{
-  const item=lastData.stock.find(x=>x.id===id);if(!item)return;
-  currentExistênciasItem=item;el('stockProductName').textContent=item.products?.name||'Produto';
-  el('stockCurrentQty').textContent=`Quantidade atual: ${Number(item.quantity||0).toLocaleString('pt-PT')} ${item.products?.unit||'un.'}`;
-  el('stockOutQty').value=1;el('stockStatus').textContent='';el('stockModal').classList.add('open')
-}
-window.closeExistênciasModal=()=>{currentExistênciasItem=null;el('stockModal').classList.remove('open')}
-async function applyExistênciasOut(item,qty,reason){
-  qty=Number(qty);const current=Number(item.quantity||0);
-  if(!qty||qty<=0)throw new Error('Indique uma quantidade válida.');
-  if(qty>current)throw new Error(`Só existem ${current.toLocaleString('pt-PT')} em stock.`);
-  const next=current-qty;
-  const up=await supabase.from('stock_items').update({quantity:next,updated_at:new Date().toISOString()}).eq('id',item.id).eq('household_id',householdId);
-  if(up.error)throw up.error;
-  const mv=await supabase.from('stock_movements').insert({household_id:householdId,product_id:item.product_id,stock_item_id:item.id,movement_type:'out',quantity:qty,reason:reason||'Consumido'});
-  if(mv.error)throw mv.error;
-}
-window.quickExistênciasOut=async(id,qty)=>{
-  const item=lastData.stock.find(x=>x.id===id);if(!item)return;
-  try{await applyExistênciasOut(item,qty,'Consumo rápido');await refreshAll()}catch(e){alert(e.message||e)}
-}
-el('confirmExistênciasOutBtn').onclick=async()=>{
-  if(!currentExistênciasItem)return;el('stockStatus').textContent='A atualizar as existências…';
-  try{await applyExistênciasOut(currentExistênciasItem,el('stockOutQty').value,el('stockReason').value);window.closeExistênciasModal();await refreshAll()}catch(e){el('stockStatus').textContent=e.message||e}
-}
-window.deleteInvoice=async(id)=>{
-  const inv=lastData.invoices.find(x=>x.id===id);if(!inv)return;
-  const label=inv.entities?.name||inv.detected_merchant||'esta fatura';
-  if(!confirm(`Apagar ${label}? A despesa criada por esta fatura também será removida.`))return;
-  try{
-    const tx=await supabase.from('transactions').delete().eq('household_id',householdId).eq('invoice_id',id);if(tx.error)throw tx.error;
-    if(inv.file_path){const rm=await supabase.storage.from('invoices').remove([inv.file_path]);if(rm.error)console.warn('Ficheiro não removido:',rm.error)}
-    const del=await supabase.from('invoices').delete().eq('household_id',householdId).eq('id',id);if(del.error)throw del.error;
-    await refreshAll()
-  }catch(e){alert('Não foi possível apagar a fatura: '+mensagemErroPT(e))}
-}
-
-function renderCharts(month,sixTx){
-  const by={};month.filter(x=>x.kind==='expense').forEach(x=>{const n=x.categories?.name||'Sem categoria';by[n]=(by[n]||0)+Number(x.amount)});
-  const labels=Object.keys(by),values=labels.map(k=>by[k]);
-  if(categoryChart)categoryChart.destroy();
-  categoryChart=new Chart(el('categoryChart'),{type:'doughnut',data:{labels:labels.length?labels:['Sem despesas'],datasets:[{data:values.length?values:[1]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>labels.length?`${c.label}: ${euro(c.raw)}`:'Sem dados'}}}}});
-  const months=[];const now=new Date();for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('pt-PT',{month:'short'})})}
-  const totals=Object.fromEntries(months.map(m=>[m.key,0]));sixTx.filter(x=>x.kind==='expense').forEach(x=>{const k=x.transaction_date.slice(0,7);if(k in totals)totals[k]+=Number(x.amount)});
-  if(trendChart)trendChart.destroy();
-  trendChart=new Chart(el('trendChart'),{type:'line',data:{labels:months.map(m=>m.label),datasets:[{label:'Despesas',data:months.map(m=>totals[m.key]),tension:.32,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>euro(v)}}}}})
-}
-
-window.openTransaction=(kind='expense')=>{el('transactionModal').classList.add('open');el('txDate').value=new Date().toISOString().slice(0,10);el('txKind').value=kind;el('txDescription').placeholder=kind==='income'?'Ex.: Salário, transferência recebida, reembolso':'Descrição da despesa'}
-window.closeTransaction=()=>el('transactionModal').classList.remove('open')
-el('saveTxBtn').onclick=async()=>{
-  el('txStatus').textContent='A guardar…';const amount=Number(el('txAmount').value),description=el('txDescription').value.trim(),kind=el('txKind').value,date=el('txDate').value;if(!amount||amount<=0){el('txStatus').textContent='Introduza um valor válido.';return}
-  const {error}=await supabase.from('transactions').insert({household_id:householdId,amount,description,kind,transaction_date:date||new Date().toISOString().slice(0,10),source:'manual'});
-  if(error){el('txStatus').textContent=mensagemErroPT(error);return}
-  el('txAmount').value='';el('txDescription').value='';window.closeTransaction();await refreshAll()
-}
-
-function setOCRProgress(p,msg){el('ocrProgressWrap').classList.remove('hidden');el('ocrProgress').style.width=`${Math.max(0,Math.min(100,p))}%`;el('uploadStatus').textContent=msg||''}
-async function imageToText(source){
-  const result=await Tesseract.recognize(source,'por',{logger:m=>{if(m.status==='recognizing text')setOCRProgress(10+Math.round((m.progress||0)*80),`A ler a fatura… ${Math.round((m.progress||0)*100)}%`)}});return {text:result.data.text||'',confidence:Number(result.data.confidence||0)}
-}
-async function pdfToText(file){
-  const buf=await file.arrayBuffer(),pdf=await pdfjsLib.getDocument({data:buf}).promise;let text='',conf=[];const pages=Math.min(pdf.numPages,3);
-  for(let p=1;p<=pages;p++){setOCRProgress(5+Math.round((p-1)/pages*80),`A preparar página ${p}/${pages}…`);const page=await pdf.getPage(p),viewport=page.getViewport({scale:1.8}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=viewport.width;canvas.height=viewport.height;await page.render({canvasContext:ctx,viewport}).promise;const r=await imageToText(canvas);text+='\n'+r.text;conf.push(r.confidence)}
-  return {text,confidence:conf.length?conf.reduce((a,b)=>a+b,0)/conf.length:0}
-}
-function parseReceipt(text){
-  const lines=text.split(/\r?\n/).map(cleanLine).filter(Boolean);
-  const nifMatch=text.match(/(?:NIF|NIPC|Contribuinte|N\.?\s*Contribuinte)\s*[:#]?\s*(\d{9})/i)||text.match(/\b[125689]\d{8}\b/);
-  const dateMatch=text.match(/\b(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\b/);
-  const invMatch=text.match(/(?:Fatura|Factura|FT|FS|FR)\s*(?:n[.ºo]*|#)?\s*[:\-]?\s*([A-Z0-9\/\-]{3,})/i);
-  let merchant='';for(const l of lines.slice(0,8)){if(l.length>2&&!/fatura|factura|nif|contribuinte|tal[aã]o|cliente|duplicado/i.test(l)&&!/\d{9}/.test(l)){merchant=l.replace(/[^\p{L}\p{N}&'.\- ]/gu,'').trim();if(merchant.length>2)break}}
-  let total=0;const totalLines=lines.filter(l=>/\btotal\b/i.test(l)&&!/(subtotal|iva|total iva)/i.test(l));for(const l of totalLines.reverse()){const nums=l.match(/\d+[.,]\d{2}/g);if(nums?.length){total=normalizeAmount(nums[nums.length-1]);if(total>0)break}}
-  if(!total){const nums=text.match(/\d+[.,]\d{2}/g)||[];total=Math.max(0,...nums.map(normalizeAmount))}
-  const exclude=/total|subtotal|iva|taxa|pagamento|multibanco|visa|mastercard|troco|dinheiro|nif|contribuinte|data|hora|fatura|factura|operador|terminal/i;
-  const items=[];
-  for(const l of lines){if(exclude.test(l))continue;const m=l.match(/^(.{2,}?)\s+(\d+[.,]\d{2})\s*€?$/);if(m){const name=m[1].replace(/^\d+\s*[xX]\s*/,'').trim();const val=normalizeAmount(m[2]);if(name.length>1&&val>0&&val<=total*1.2+10)items.push({name,qty:1,unit:val,total:val})}}
-  return {merchant:merchant.slice(0,100),nif:nifMatch?(nifMatch[1]||nifMatch[0]):'',date:dateMatch?dateISO(dateMatch[1]):'',invoiceNo:invMatch?invMatch[1]:'',total,items:items.slice(0,40)}
-}
-async function processFile(file){
-  if(!householdId)return;setOCRProgress(2,'A guardar o documento…');
-  const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_'),path=`${householdId}/${Date.now()}_${safe}`;
-  const {error:upErr}=await supabase.storage.from('invoices').upload(path,file,{upsert:false});if(upErr){el('uploadStatus').textContent='Erro ao carregar a fatura: '+mensagemErroPT(upErr);return}
-  const {data:inv,error:dbErr}=await supabase.from('invoices').insert({household_id:householdId,file_path:path,ocr_status:'reading',total:0,vat_total:0}).select().single();if(dbErr){el('uploadStatus').textContent=mensagemErroPT(dbErr);return}
-  currentInvoiceId=inv.id;currentFilePath=path;
-  try{
-    const res=file.type==='application/pdf'?await pdfToText(file):await imageToText(file);currentRawText=res.text;currentConfidence=res.confidence;const parsed=parseReceipt(res.text);currentItems=parsed.items;
-    await supabase.from('invoices').update({ocr_status:'review',raw_ocr_text:res.text,ocr_confidence:res.confidence,detected_merchant:parsed.merchant||null,detected_tax_id:parsed.nif||null}).eq('id',currentInvoiceId);
-    openReview(parsed,res.confidence);setOCRProgress(100,'Leitura concluída. Reveja os dados.')
-  }catch(e){await supabase.from('invoices').update({ocr_status:'error'}).eq('id',currentInvoiceId);el('uploadStatus').textContent='Não consegui ler automaticamente. Pode tentar uma fotografia mais nítida.';console.error(e)}
-}
-el('invoiceFile').onchange=e=>{const f=e.target.files?.[0];if(f)processFile(f);e.target.value=''}
-el('cameraFile').onchange=e=>{const f=e.target.files?.[0];if(f)processFile(f);e.target.value=''}
-
-function openReview(p,confidence){
-  el('rvMerchant').value=p.merchant||'';el('rvNif').value=p.nif||'';el('rvDate').value=p.date||new Date().toISOString().slice(0,10);el('rvTotal').value=p.total||'';el('rvInvoiceNo').value=p.invoiceNo||'';
-  el('confidenceBox').innerHTML=`<b>Confiança da leitura: ${Math.round(confidence)}%</b><div class="muted tiny">Campos com erros podem ser corrigidos antes de guardar.</div>`;
-  renderReviewItems();el('reviewModal').classList.add('open')
-}
-window.closeReview=()=>el('reviewModal').classList.remove('open')
-function renderReviewItems(){
-  const box=el('reviewItems');box.innerHTML=currentItems.map((it,i)=>`<div class="itemline"><input class="input ri-name" data-i="${i}" value="${esc(it.name)}"><input class="input ri-qty" data-i="${i}" type="number" step="0.001" min="0" value="${it.qty||1}"><input class="input ri-unit" data-i="${i}" type="number" step="0.0001" min="0" value="${it.unit||0}"><input class="input ri-total" data-i="${i}" type="number" step="0.01" min="0" value="${it.total||0}"></div>`).join('');
-  box.querySelectorAll('input').forEach(inp=>inp.onchange=()=>{const i=Number(inp.dataset.i);currentItems[i]={name:box.querySelector(`.ri-name[data-i="${i}"]`).value.trim(),qty:Number(box.querySelector(`.ri-qty[data-i="${i}"]`).value)||1,unit:Number(box.querySelector(`.ri-unit[data-i="${i}"]`).value)||0,total:Number(box.querySelector(`.ri-total[data-i="${i}"]`).value)||0}})
-}
-el('addItemBtn').onclick=()=>{currentItems.push({name:'',qty:1,unit:0,total:0});renderReviewItems()}
-async function findOrCreateEntity(name,nif){
-  if(!name)return null;let {data}=await supabase.from('entities').select('id').eq('household_id',householdId).ilike('name',name).limit(1);if(data?.length)return data[0].id;
-  const ins=await supabase.from('entities').insert({household_id:householdId,name,tax_id:nif||null,entity_type:'merchant'}).select('id').single();if(!ins.error)return ins.data.id;
-  const again=await supabase.from('entities').select('id').eq('household_id',householdId).ilike('name',name).limit(1);return again.data?.[0]?.id||null
-}
-async function findOrCreateProduct(name){
-  if(!name)return null;let {data}=await supabase.from('products').select('id').eq('household_id',householdId).ilike('name',name).limit(1);if(data?.length)return data[0].id;
-  const ins=await supabase.from('products').insert({household_id:householdId,name}).select('id').single();if(!ins.error)return ins.data.id;
-  const again=await supabase.from('products').select('id').eq('household_id',householdId).ilike('name',name).limit(1);return again.data?.[0]?.id||null
-}
-async function chooseCategory(merchant){
-  const m=(merchant||'').toLowerCase();let target='Outros';
-  if(/continente|pingo|doce|lidl|aldi|auchan|mercadona|intermarch|minipreço|froiz|supermerc/.test(m))target='Supermercado';
-  else if(/galp|bp|repsol|cepsa|prio|combust|posto/.test(m))target='Combustível';
-  else if(/restaurante|cafe|café|burger|pizza|mcdonald|kfc/.test(m))target='Restauração';
-  const {data}=await supabase.from('categories').select('id').eq('household_id',householdId).eq('name',target).limit(1);return data?.[0]?.id||null
-}
-el('saveInvoiceBtn').onclick=async()=>{
-  el('reviewStatus').textContent='A guardar dados reais…';
-  const merchant=el('rvMerchant').value.trim()||'Entidade não identificada',nif=el('rvNif').value.trim(),date=el('rvDate').value||new Date().toISOString().slice(0,10),total=Number(el('rvTotal').value)||0,invoiceNo=el('rvInvoiceNo').value.trim();
-  try{
-    const entityId=await findOrCreateEntity(merchant,nif);
-    const up=await supabase.from('invoices').update({entity_id:entityId,invoice_date:date,total,invoice_number:invoiceNo||null,detected_merchant:merchant,detected_tax_id:nif||null,raw_ocr_text:currentRawText,ocr_confidence:currentConfidence,ocr_status:'processed',processed_at:new Date().toISOString()}).eq('id',currentInvoiceId);if(up.error)throw up.error;
-    await supabase.from('invoice_items').delete().eq('invoice_id',currentInvoiceId);await supabase.from('price_observations').delete().eq('invoice_id',currentInvoiceId);
-    for(const it of currentItems.filter(x=>x.name)){
-      const pid=await findOrCreateProduct(it.name);const qty=Number(it.qty)||1,unit=Number(it.unit)||0,lineTotal=Number(it.total)||unit*qty;
-      const ii=await supabase.from('invoice_items').insert({invoice_id:currentInvoiceId,product_id:pid,description:it.name,quantity:qty,unit_price:unit,total_price:lineTotal});if(ii.error)throw ii.error;
-      const po=await supabase.from('price_observations').insert({household_id:householdId,product_id:pid,entity_id:entityId,invoice_id:currentInvoiceId,observed_at:date,quantity:qty,unit_price:unit||((lineTotal&&qty)?lineTotal/qty:0),total_price:lineTotal});if(po.error)throw po.error
-      const existingExistências=await supabase.from('stock_items').select('id,quantity').eq('household_id',householdId).eq('product_id',pid).is('location_id',null).limit(1);
-      let stockId=null;
-      if(existingExistências.data?.length){
-        stockId=existingExistências.data[0].id;
-        const su=await supabase.from('stock_items').update({quantity:Number(existingExistências.data[0].quantity||0)+qty,updated_at:new Date().toISOString()}).eq('id',stockId);
-        if(su.error)throw su.error
-      }else{
-        const si=await supabase.from('stock_items').insert({household_id:householdId,product_id:pid,quantity:qty,min_quantity:0}).select('id').single();
-        if(si.error)throw si.error;stockId=si.data.id
-      }
-      const sm=await supabase.from('stock_movements').insert({household_id:householdId,product_id:pid,stock_item_id:stockId,movement_type:'in',quantity:qty,reason:'Compra por fatura'});
-      if(sm.error)throw sm.error
-    }
-    const existing=await supabase.from('transactions').select('id').eq('invoice_id',currentInvoiceId).limit(1);
-    if(!existing.data?.length&&total>0){const categoryId=await chooseCategory(merchant);const tx=await supabase.from('transactions').insert({household_id:householdId,category_id:categoryId,entity_id:entityId,invoice_id:currentInvoiceId,transaction_date:date,description:merchant,amount:total,kind:'expense',source:'invoice'});if(tx.error)throw tx.error}
-    el('reviewStatus').textContent='Guardado.';window.closeReview();el('ocrProgressWrap').classList.add('hidden');el('uploadStatus').textContent='Fatura analisada e adicionada às despesas.';await refreshAll()
-  }catch(e){el('reviewStatus').textContent='Erro: '+mensagemErroPT(e);console.error(e)}
-}
-
-
-window.deleteTransaction=async(id,kind,invoiceId)=>{
-  const nome=kind==='income'?'receita':'despesa';
-  const extra=invoiceId?' A fatura associada será mantida.':'';
-  if(!confirm(`Apagar esta ${nome}?${extra}`))return;
-  const {error}=await supabase.from('transactions').delete().eq('household_id',householdId).eq('id',id);
-  if(error){alert('Não foi possível apagar: '+mensagemErroPT(error));return}
-  await refreshAll()
-}
-
-let fuelMap=null,userMarker=null,fuelMarkers=[],nearbyStations=[],fuelLat=null,fuelLon=null,fuelChannel=null,routeLayer=null,navWatch=null,currentFuelStation=null,dgegFuelTypes=[];
-
-let fuelFillups=[],monthlyFuelChart=null,priceFuelChart=null;
-
-function money(v){return Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}
-function litersFmt(v){return Number(v||0).toLocaleString('pt-PT',{minimumFractionDigits:1,maximumFractionDigits:1})+' L'}
-
-function populateFillStations(){
-  const sel=el('fillStation'); if(!sel)return;
-  const current=sel.value;
-  sel.innerHTML='<option value="">Outro posto / escrever manualmente</option>'+
-    (nearbyStations||[]).map((s,i)=>`<option value="${i}">${esc(s.name)}${s.displayPrice?' · '+Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':''}</option>`).join('');
-  if([...sel.options].some(o=>o.value===current))sel.value=current
-}
-window.openFillupForStation=(key)=>{
-  openFillupModal();
-  const idx=nearbyStations.findIndex(s=>s.key===key);
-  if(idx>=0){
-    el('fillStation').value=String(idx);
-    const s=nearbyStations[idx];
-    el('fillStationManual').value=s.name;
-    if(s.displayPrice)el('fillPrice').value=Number(s.displayPrice).toFixed(3);
-  }
-}
-window.openFillupModal=()=>{
-  populateFillStations();
-  el('fillupModal').classList.add('open');
-  el('fillDate').value=new Date().toISOString().slice(0,10);
-  el('fillFuelType').value=el('fuelType')?.value||'Gasóleo simples';
-  el('fillupStatus').textContent=''
-}
-window.closeFillupModal=()=>el('fillupModal').classList.remove('open');
-el('newFillupBtn').onclick=window.openFillupModal;
-
-el('fillStation').onchange=()=>{
-  const idx=Number(el('fillStation').value);
-  if(Number.isInteger(idx)&&nearbyStations[idx]){
-    const s=nearbyStations[idx];
-    el('fillStationManual').value=s.name;
-    if(s.displayPrice)el('fillPrice').value=Number(s.displayPrice).toFixed(3)
-  }
-}
-function recalcFillTotal(source){
-  const liters=Number(el('fillLiters').value),price=Number(el('fillPrice').value),total=Number(el('fillTotal').value);
-  if(source!=='total'&&liters>0&&price>0)el('fillTotal').value=(liters*price).toFixed(2);
-  else if(source==='total'&&liters>0&&total>0)el('fillPrice').value=(total/liters).toFixed(3)
-}
-el('fillLiters').oninput=()=>recalcFillTotal('liters');
-el('fillPrice').oninput=()=>recalcFillTotal('price');
-el('fillTotal').oninput=()=>recalcFillTotal('total');
-
-el('saveFillupBtn').onclick=async()=>{
-  const liters=Number(el('fillLiters').value),price=Number(el('fillPrice').value),total=Number(el('fillTotal').value);
-  if(!(liters>0)){el('fillupStatus').textContent='Indique os litros abastecidos.';return}
-  if(!(price>0)){el('fillupStatus').textContent='Indique o preço por litro.';return}
-  if(!(total>0)){el('fillupStatus').textContent='Indique o total pago.';return}
-  const {data:{user}}=await supabase.auth.getUser(); if(!user)return;
-  const idx=Number(el('fillStation').value),s=Number.isInteger(idx)?nearbyStations[idx]:null;
-  const stationName=(el('fillStationManual').value.trim()||s?.name||'Posto não identificado');
-  el('fillupStatus').textContent='A guardar…';
-  const {error}=await supabase.from('fuel_fillups').insert({
-    user_id:user.id,station_key:s?.key||null,station_name:stationName,fuel_type:el('fillFuelType').value,
-    fillup_date:el('fillDate').value||new Date().toISOString().slice(0,10),
-    liters,price_per_liter:price,total_amount:total,
-    odometer_km:el('fillOdometer').value?Number(el('fillOdometer').value):null,
-    full_tank:el('fillFullTank').checked,notes:el('fillNotes').value.trim()||null
-  });
-  if(error){el('fillupStatus').textContent=mensagemErroPT(error);return}
-  window.closeFillupModal(); await loadFuelFillups()
-}
-
-window.deleteFillup=async(id)=>{
-  if(!confirm('Apagar este abastecimento?'))return;
-  const {error}=await supabase.from('fuel_fillups').delete().eq('id',id);
-  if(error){alert(mensagemErroPT(error));return}
-  await loadFuelFillups()
-}
-
-async function loadFuelFillups(){
-  const {data:{user}}=await supabase.auth.getUser(); if(!user)return;
-  const {data,error}=await supabase.from('fuel_fillups').select('*').eq('user_id',user.id).order('fillup_date',{ascending:false}).order('created_at',{ascending:false});
-  if(error){console.warn(error);return}
-  fuelFillups=data||[];
-  renderFuelFillups()
-}
-function renderFuelFillups(){
-  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const month=fuelFillups.filter(x=>String(x.fillup_date).startsWith(ym));
-  const mSpend=month.reduce((s,x)=>s+Number(x.total_amount),0),mLiters=month.reduce((s,x)=>s+Number(x.liters),0);
-  const totalSpend=fuelFillups.reduce((s,x)=>s+Number(x.total_amount),0),totalLiters=fuelFillups.reduce((s,x)=>s+Number(x.liters),0);
-  const avg=totalLiters>0?totalSpend/totalLiters:0;
-
-  el('fillMonthSpend').textContent=money(mSpend);el('fillMonthLiters').textContent=litersFmt(mLiters);
-  el('fillAvgPrice').textContent=avg.toLocaleString('pt-PT',{minimumFractionDigits:3,maximumFractionDigits:3})+' €';
-  el('fillCount').textContent=fuelFillups.length;
-  el('statTotalSpend').textContent=money(totalSpend);el('statTotalLiters').textContent=litersFmt(totalLiters);
-  el('statAvgPrice').textContent=avg.toLocaleString('pt-PT',{minimumFractionDigits:3,maximumFractionDigits:3})+' €/L';
-
-  const byStation={};fuelFillups.forEach(x=>byStation[x.station_name]=(byStation[x.station_name]||0)+1);
-  const top=Object.entries(byStation).sort((a,b)=>b[1]-a[1])[0];el('statTopStation').textContent=top?top[0]:'—';
-
-  const box=el('fillupHistory');
-  if(!fuelFillups.length){box.className='empty';box.textContent='Ainda não existem abastecimentos registados.'}
-  else{
-    box.className='';
-    box.innerHTML=fuelFillups.map(x=>`<div class="history-row">
-      <div><b>${esc(x.station_name)}</b><div class="muted tiny">${esc(x.fillup_date)} · ${esc(x.fuel_type)}</div></div>
-      <div class="h-detail"><b>${Number(x.liters).toLocaleString('pt-PT',{maximumFractionDigits:2})} L</b><div class="muted tiny">${Number(x.price_per_liter).toFixed(3).replace('.',',')} €/L</div></div>
-      <div class="h-detail"><b>${money(x.total_amount)}</b>${x.odometer_km?`<div class="muted tiny">${Number(x.odometer_km).toLocaleString('pt-PT')} km</div>`:''}</div>
-      <button class="danger-link" onclick="deleteFillup('${x.id}')">Apagar</button>
-    </div>`).join('')
-  }
-  renderFuelStatsCharts()
-}
-function renderFuelStatsCharts(){
-  const monthly={};
-  [...fuelFillups].reverse().forEach(x=>{const k=String(x.fillup_date).slice(0,7);monthly[k]=(monthly[k]||0)+Number(x.total_amount)});
-  const keys=Object.keys(monthly).sort().slice(-12);
-  if(monthlyFuelChart)monthlyFuelChart.destroy();
-  monthlyFuelChart=new Chart(el('monthlyFuelChart'),{type:'bar',data:{labels:keys.map(k=>{const [y,m]=k.split('-');return `${m}/${y.slice(2)}`}),datasets:[{label:'Gasto €',data:keys.map(k=>monthly[k])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-
-  const rows=[...fuelFillups].reverse().slice(-30);
-  if(priceFuelChart)priceFuelChart.destroy();
-  priceFuelChart=new Chart(el('priceFuelChart'),{type:'line',data:{labels:rows.map(x=>x.fillup_date),datasets:[{label:'€/L',data:rows.map(x=>Number(x.price_per_liter)),tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})
-}
-
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
 
-function haversineKm(a,b,c,d){
-  const R=6371,toRad=x=>x*Math.PI/180,dLat=toRad(c-a),dLon=toRad(d-b);
-  const q=Math.sin(dLat/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dLon/2)**2;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const money=v=>Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
+const kmFmt=v=>Number(v||0).toLocaleString('pt-PT',{maximumFractionDigits:1});
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+
+const FUEL_ALIASES={
+  'Gasóleo simples':['gasoleo simples','gasóleo simples','diesel simples','diesel'],
+  'Gasóleo especial':['gasoleo especial','gasóleo especial','gasoleo aditivado','gasóleo aditivado','diesel ultimate','ultimate diesel','diesel premium','gasoleo premium','gasóleo premium'],
+  'Gasolina simples 95':['gasolina simples 95','gasolina 95 simples','gasolina 95','eurosuper 95'],
+  'Gasolina especial 95':['gasolina especial 95','gasolina 95 especial','gasolina 95 aditivada','gasolina 95 premium'],
+  'Gasolina 98':['gasolina 98','gasolina simples 98','super 98'],
+  'Gasolina especial 98':['gasolina especial 98','gasolina 98 especial','gasolina 98 aditivada','gasolina 98 premium','gasolina ultimate','ultimate gasolina','ultimate'],
+  'GPL Auto':['gpl auto','gpl','autogas','auto gas']
+};
+function fuelAliases(name){return FUEL_ALIASES[name]||[String(name||'')]}
+function fuelMatchesLabel(apiLabel,selected){
+  const n=norm(apiLabel);
+  return fuelAliases(selected).some(a=>n===norm(a)||n.includes(norm(a))||norm(a).includes(n))
+}
+
+
+let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[];
+let currentStation=null,currentPriceStation=null,fillups=[],monthlyChart=null,priceChart=null,fuelChannel=null,dgegFuelTypes=[];
+
+function errPT(e){
+  const m=String(e?.message||e||'').toLowerCase();
+  if(m.includes('invalid login credentials'))return 'Email ou palavra-passe incorretos.';
+  if(m.includes('email not confirmed'))return 'Confirme primeiro o email recebido.';
+  if(m.includes('rate limit'))return 'Demasiadas tentativas. Tente novamente mais tarde.';
+  if(m.includes('network')||m.includes('fetch'))return 'Não foi possível ligar ao serviço.';
+  return e?.message||String(e||'Ocorreu um erro.')
+}
+function showSection(id){
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+  $(id)?.classList.add('active');
+  document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
+  if(id==='abastecimentos'||id==='estatisticas')loadFillups();
+  if(id==='perfil')loadLeaderboard();
+  if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
+}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
+$('profileTopBtn').onclick=()=>showSection('perfil');
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
+
+async function enterApp(){
+  $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');
+  await supabase.rpc('ensure_my_fuel_profile');
+  await Promise.all([loadFillups(),loadLeaderboard()]);
+}
+async function authCheck(){
+  const {data:{session}}=await supabase.auth.getSession();
+  if(session)await enterApp()
+}
+$('loginBtn').onclick=async()=>{
+  $('authStatus').textContent='A entrar…';
+  const {error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error){$('authStatus').textContent=errPT(error);return}
+  $('authStatus').textContent='';await enterApp()
+};
+$('signupBtn').onclick=async()=>{
+  $('authStatus').textContent='A criar conta…';
+  const {error}=await supabase.auth.signUp({email:$('email').value.trim(),password:$('password').value,options:{emailRedirectTo:window.location.origin}});
+  $('authStatus').textContent=error?errPT(error):'Conta criada. Consulte o email e confirme o registo.'
+};
+$('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()};
+
+function ensureMap(){
+  if(map)return;
+  map=L.map('fuelMap').setView([39.5,-8],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map)
+}
+function haversine(a,b,c,d){
+  const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
+  const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
   return 2*R*Math.asin(Math.sqrt(q))
 }
-function fuelAgeLabel(ts){
-  const mins=Math.max(0,Math.round((Date.now()-new Date(ts).getTime())/60000));
-  if(mins<2)return 'agora';if(mins<60)return `há ${mins} min`;
-  const h=Math.round(mins/60);if(h<24)return `há ${h} h`;return `há ${Math.round(h/24)} d`
-}
-function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
-async function dgegApi(path){
+async function dgeg(path){
   const r=await fetch(DGEG_BASE+path);
-  if(!r.ok)throw new Error('A fonte oficial de preços não respondeu.');
+  if(!r.ok)throw new Error('A DGEG não respondeu.');
   const j=await r.json();
-  if(!j||j.status===false||typeof j.resultado==='undefined'||j.resultado===null)throw new Error(j?.mensagem||'Resposta inválida da DGEG.');
-  return j.resultado
+  if(j?.status===false)throw new Error(j.mensagem||'Erro DGEG');
+  return j?.resultado??j
 }
-async function reverseMunicipality(lat,lon){
-  const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=10&addressdetails=1&accept-language=pt`;
-  const r=await fetch(u,{headers:{'Accept':'application/json'}});
-  if(!r.ok)throw new Error('Não foi possível identificar o município.');
-  const j=await r.json(),a=j.address||{};
-  return (a.municipality||a.city||a.town||a.village||a.county||'').trim()
-}
-async function fetchDgegNearbyStations(lat,lon,radius){
-  const [types,distritos,municipios]=await Promise.all([
-    dgegFuelTypes.length?Promise.resolve(dgegFuelTypes):dgegApi('/GetTiposCombustiveis'),
-    dgegApi('/GetDistritos'),dgegApi('/GetMunicipios')
-  ]);
-  dgegFuelTypes=types;
-  const fuel=types.find(x=>norm(x.Descritivo)===norm(el('fuelType').value));
-  if(!fuel)throw new Error('Combustível não encontrado na DGEG.');
-  const munName=await reverseMunicipality(lat,lon);
-  let mun=municipios.find(x=>norm(x.Descritivo)===norm(munName));
-  if(!mun)mun=municipios.find(x=>norm(munName).includes(norm(x.Descritivo))||norm(x.Descritivo).includes(norm(munName)));
-  if(!mun)throw new Error(`Não consegui associar a sua localização ao município (${munName||'desconhecido'}).`);
-  const dist=distritos.find(x=>String(x.Id)===String(mun.IdDistrito));
-  const path=`/PesquisarPostos?idsTiposComb=${fuel.Id}&idMarca=&idTipoPosto=&idDistrito=${dist?.Id||mun.IdDistrito||''}&idsMunicipios=${mun.Id}&qtdPorPagina=100&pagina=1`;
-  const postos=await dgegApi(path);
-  return (postos||[]).map(p=>{
-    const plat=Number(String(p.Latitude??'').replace(',','.')),plon=Number(String(p.Longitude??'').replace(',','.'));
-    if(!Number.isFinite(plat)||!Number.isFinite(plon))return null;
-    const price=Number(String(p.Preco??'').replace(',','.').replace(/[^\d.]/g,''));
-    return {key:`dgeg:${p.Id}`,dgegId:p.Id,name:p.Nome||'Posto de combustível',brand:p.Marca||p.MarcaDescritivo||'',
-      lat:plat,lon:plon,address:[p.Morada,p.Localidade,p.CodPostal].filter(Boolean).join(', '),
-      distance:haversineKm(lat,lon,plat,plon),officialPrice:Number.isFinite(price)&&price>0?price:null,
-      officialUpdated:p.DataAtualizacao||'',source:'DGEG'}
-  }).filter(Boolean).filter(s=>s.distance<=Number(radius)/1000).sort((a,b)=>a.distance-b.distance)
-}
-async function fetchOsmStations(lat,lon,radius){
-  const q=`[out:json][timeout:18];(node["amenity"="fuel"](around:${radius},${lat},${lon});way["amenity"="fuel"](around:${radius},${lat},${lon});relation["amenity"="fuel"](around:${radius},${lat},${lon}););out center tags;`;
-  const r=await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q));
-  if(!r.ok)throw new Error('Não foi possível obter os postos próximos.');
-  const data=await r.json();
-  return (data.elements||[]).map(x=>{
-    const c={lat:x.lat??x.center?.lat,lon:x.lon??x.center?.lon};if(!c.lat||!c.lon)return null;
-    return {key:`osm:${x.type}:${x.id}`,name:x.tags?.name||x.tags?.brand||'Posto de combustível',brand:x.tags?.brand||'',
-      lat:c.lat,lon:c.lon,address:[x.tags?.['addr:street'],x.tags?.['addr:housenumber'],x.tags?.['addr:city']].filter(Boolean).join(' '),
-      distance:haversineKm(lat,lon,c.lat,c.lon),officialPrice:null,officialUpdated:'',source:'OpenStreetMap'}
-  }).filter(Boolean).sort((a,b)=>a.distance-b.distance)
-}
-
-
-async function fetchCommunityStations(lat,lon,radius){
-  const radiusKm=Number(radius)/1000;
-  const latDelta=radiusKm/111;
-  const lonDelta=radiusKm/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
-  const {data,error}=await supabase.from('community_fuel_stations')
-    .select('*')
-    .gte('latitude',lat-latDelta).lte('latitude',lat+latDelta)
-    .gte('longitude',lon-lonDelta).lte('longitude',lon+lonDelta);
-  if(error)throw error;
-  return (data||[]).map(s=>({
-    key:`community:${s.id}`,communityId:s.id,name:s.name,brand:'',lat:Number(s.latitude),lon:Number(s.longitude),
-    address:s.address||'',distance:haversineKm(lat,lon,Number(s.latitude),Number(s.longitude)),
-    officialPrice:null,officialUpdated:'',source:'Comunidade'
-  })).filter(s=>s.distance<=radiusKm)
-}
-
-async function fetchRegistryStations(lat,lon,radius){
-  const radiusKm=Number(radius)/1000;
-  const latDelta=radiusKm/111;
-  const lonDelta=radiusKm/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
-  const {data,error}=await supabase.from('fuel_station_registry')
-    .select('*')
-    .gte('latitude',lat-latDelta).lte('latitude',lat+latDelta)
-    .gte('longitude',lon-lonDelta).lte('longitude',lon+lonDelta);
-  if(error)throw error;
-  return (data||[]).map(s=>({
-    key:s.source_key,registryId:s.id,name:s.name,brand:s.brand||'',lat:Number(s.latitude),lon:Number(s.longitude),
-    address:s.address||'',distance:haversineKm(lat,lon,Number(s.latitude),Number(s.longitude)),
-    officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base Bomba Certa':s.source,
-    registrySource:s.source,dgegId:s.dgeg_id||null
-  })).filter(s=>s.distance<=radiusKm)
-}
-
-async function rememberStations(stations){
-  const payload=(stations||[]).filter(s=>s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon))).slice(0,120).map(s=>({
-    source_key:String(s.key||'').slice(0,220),
-    source:s.source==='Base Bomba Certa'?'Verificado':s.source,
-    name:s.name||'Posto de combustível',
-    brand:s.brand||'',
-    address:s.address||'',
-    latitude:Number(s.lat),
-    longitude:Number(s.lon),
-    dgeg_id:s.dgegId||null
-  })).filter(s=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(s.source) && s.source_key.length>2);
-  if(!payload.length)return;
-  const {error}=await supabase.rpc('remember_fuel_stations',{p_stations:payload});
-  if(error)console.warn('Não foi possível memorizar alguns postos:',error)
-}
-
-function mergeFuelStations(lists){
-  const all=lists.flat().filter(Boolean).sort((a,b)=>{
-    const priority={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
-    return (priority[a.source]??9)-(priority[b.source]??9)
-  });
-  const out=[];
-  for(const s of all){
-    const distanceDuplicate=out.find(x=>haversineKm(x.lat,x.lon,s.lat,s.lon)<0.16);
-    const nameDuplicate=out.find(x=>{
-      const an=norm(x.name),bn=norm(s.name);
-      if(!an||!bn)return false;
-      const sameish=an===bn||an.includes(bn)||bn.includes(an)||
-        (an.includes('rstar')&&bn.includes('rstar'))||
-        (an.includes('rstarenergy')&&bn.includes('rstarenergy'));
-      return sameish && haversineKm(x.lat,x.lon,s.lat,s.lon)<0.8
-    });
-    const dup=distanceDuplicate||nameDuplicate;
-
-    if(!dup){
-      out.push({...s});
-      continue
-    }
-
-    if(!dup.officialPrice && s.officialPrice)dup.officialPrice=s.officialPrice;
-    if(!dup.officialUpdated && s.officialUpdated)dup.officialUpdated=s.officialUpdated;
-    if((!dup.address || dup.address.length<5) && s.address)dup.address=s.address;
-    if(!dup.brand && s.brand)dup.brand=s.brand;
-
-    const priority={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
-    if((priority[s.source]??9)<(priority[dup.source]??9)){
-      dup.key=s.key;
-      dup.source=s.source;
-      if(s.dgegId)dup.dgegId=s.dgegId;
-      if(s.communityId)dup.communityId=s.communityId;
-      if(s.registryId)dup.registryId=s.registryId
-    }
-  }
-  return out
-}
-
-
-function parseDgegPrice(v){
+function parsePrice(v){
   if(v==null)return null;
   const m=String(v).replace(/\s/g,'').match(/(\d+),(\d+)/);
   const n=m?Number(`${m[1]}.${m[2]}`):Number(String(v).replace(',','.').replace(/[^\d.]/g,''));
-  return Number.isFinite(n)&&n>0?n:null
+  return Number.isFinite(n)&&n>.5&&n<5?n:null
 }
-async function enrichStationFromDgegDetail(station){
-  if(!station?.dgegId || station.officialPrice)return station;
+async function reverseMunicipality(lat,lon){
+  const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=pt`);
+  const j=await r.json(),a=j.address||{};
+  return (a.municipality||a.city||a.town||a.village||a.county||'').trim()
+}
+async function dgegStations(lat,lon,radius){
+  const [types,districts,municipalities]=await Promise.all([
+    dgegFuelTypes.length?Promise.resolve(dgegFuelTypes):dgeg('/GetTiposCombustiveis'),
+    dgeg('/GetDistritos'),
+    dgeg('/GetMunicipios')
+  ]);
+  dgegFuelTypes=types;
+  const selectedFuel=$('fuelType').value;
+  let fuel=types.find(x=>fuelMatchesLabel(x.Descritivo,selectedFuel));
+  if(!fuel && selectedFuel==='Gasolina especial 98'){
+    fuel=types.find(x=>norm(x.Descritivo).includes('gasolina98') || norm(x.Descritivo).includes('gasolinaespecial'));
+  }
+  if(!fuel)return [];
+  const munName=await reverseMunicipality(lat,lon);
+  let mun=municipalities.find(x=>norm(x.Descritivo)===norm(munName));
+  if(!mun)mun=municipalities.find(x=>norm(munName).includes(norm(x.Descritivo))||norm(x.Descritivo).includes(norm(munName)));
+  if(!mun)return [];
+  const dist=districts.find(x=>String(x.Id)===String(mun.IdDistrito));
+  const rows=await dgeg(`/PesquisarPostos?idsTiposComb=${fuel.Id}&idMarca=&idTipoPosto=&idDistrito=${dist?.Id||mun.IdDistrito||''}&idsMunicipios=${mun.Id}&qtdPorPagina=100&pagina=1`);
+  const km=Number(radius)/1000;
+  return (rows||[]).map(p=>({
+    key:`dgeg:${p.Id}`,dgegId:p.Id,name:p.Nome||'Posto',brand:p.Marca||'',address:[p.Morada,p.Localidade,p.CodPostal].filter(Boolean).join(', '),
+    lat:Number(String(p.Latitude).replace(',','.')),lon:Number(String(p.Longitude).replace(',','.')),
+    officialPrice:parsePrice(p.Preco),officialUpdated:p.DataAtualizacao||'',source:'DGEG'
+  })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)).map(s=>({...s,distance:haversine(lat,lon,s.lat,s.lon)})).filter(s=>s.distance<=km)
+}
+async function osmStations(lat,lon,radius){
+  const q=`[out:json][timeout:18];(node["amenity"="fuel"](around:${radius},${lat},${lon});way["amenity"="fuel"](around:${radius},${lat},${lon});relation["amenity"="fuel"](around:${radius},${lat},${lon}););out center tags;`;
+  const r=await fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q));
+  if(!r.ok)return [];
+  const j=await r.json();
+  return (j.elements||[]).map(x=>{
+    const la=x.lat??x.center?.lat,lo=x.lon??x.center?.lon;if(!la||!lo)return null;
+    return {key:`osm:${x.type}:${x.id}`,name:x.tags?.name||x.tags?.brand||'Posto',brand:x.tags?.brand||'',address:[x.tags?.['addr:street'],x.tags?.['addr:housenumber'],x.tags?.['addr:city']].filter(Boolean).join(' '),lat:la,lon:lo,officialPrice:null,officialUpdated:'',source:'OpenStreetMap',distance:haversine(lat,lon,la,lo)}
+  }).filter(Boolean)
+}
+async function registryStations(lat,lon,radius){
+  const km=Number(radius)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const {data}=await supabase.from('fuel_station_registry').select('*').gte('latitude',lat-dy).lte('latitude',lat+dy).gte('longitude',lon-dx).lte('longitude',lon+dx);
+  return (data||[]).map(s=>({key:s.source_key,dgegId:s.dgeg_id||null,name:s.name,brand:s.brand||'',address:s.address||'',lat:Number(s.latitude),lon:Number(s.longitude),officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base Bomba Certa':s.source,distance:haversine(lat,lon,Number(s.latitude),Number(s.longitude))})).filter(s=>s.distance<=km)
+}
+async function communityStations(lat,lon,radius){
+  const km=Number(radius)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const {data}=await supabase.from('community_fuel_stations').select('*').gte('latitude',lat-dy).lte('latitude',lat+dy).gte('longitude',lon-dx).lte('longitude',lon+dx);
+  return (data||[]).map(s=>({key:`community:${s.id}`,name:s.name,brand:'',address:s.address||'',lat:Number(s.latitude),lon:Number(s.longitude),officialPrice:null,officialUpdated:'',source:'Comunidade',distance:haversine(lat,lon,Number(s.latitude),Number(s.longitude))})).filter(s=>s.distance<=km)
+}
+function mergeStations(lists){
+  const pri={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
+  const all=lists.flat().sort((a,b)=>(pri[a.source]??9)-(pri[b.source]??9)),out=[];
+  for(const s of all){
+    const dup=out.find(x=>haversine(x.lat,x.lon,s.lat,s.lon)<.16 || ((norm(x.name).includes(norm(s.name))||norm(s.name).includes(norm(x.name)))&&haversine(x.lat,x.lon,s.lat,s.lon)<.7));
+    if(!dup){out.push({...s});continue}
+    if(!dup.officialPrice&&s.officialPrice)dup.officialPrice=s.officialPrice;
+    if(!dup.officialUpdated&&s.officialUpdated)dup.officialUpdated=s.officialUpdated;
+    if(!dup.address&&s.address)dup.address=s.address;
+    if(!dup.dgegId&&s.dgegId)dup.dgegId=s.dgegId;
+    if((pri[s.source]??9)<(pri[dup.source]??9)){dup.source=s.source;dup.key=s.key}
+  }
+  return out
+}
+async function enrichDetail(s){
+  if(!s.dgegId||s.officialPrice)return;
   try{
-    const detail=await dgegApi(`/GetDadosPosto?id=${encodeURIComponent(station.dgegId)}`);
-    const target=norm(el('fuelType').value);
-    const fuels=Array.isArray(detail?.Combustiveis)?detail.Combustiveis:[];
-    const row=fuels.find(x=>norm(x.TipoCombustivel)===target)
-      || fuels.find(x=>norm(x.TipoCombustivel).includes(target)||target.includes(norm(x.TipoCombustivel)));
-    const p=parseDgegPrice(row?.Preco);
-    if(p){
-      station.officialPrice=p;
-      station.officialUpdated=detail.DataAtualizacao||station.officialUpdated||'';
-      station.source='DGEG'
-    }
-    if(detail?.Marca&&!station.brand)station.brand=detail.Marca;
-    if(detail?.Morada){
-      const a=detail.Morada;
-      const addr=[a.Morada,a.Localidade,a.CodPostal].filter(Boolean).join(', ');
-      if(addr)station.address=addr
-    }
-  }catch(e){
-    console.warn('Não foi possível obter a ficha DGEG do posto',station.name,e)
-  }
-  return station
+    const d=await dgeg(`/GetDadosPosto?id=${s.dgegId}`);
+    const selected=$('fuelType').value;
+    const row=(d.Combustiveis||[]).find(x=>fuelMatchesLabel(x.TipoCombustivel,selected))
+      || (selected==='Gasolina especial 98' ? (d.Combustiveis||[]).find(x=>norm(x.TipoCombustivel).includes('gasolina98')) : null);
+    const p=parsePrice(row?.Preco);if(p){s.officialPrice=p;s.officialUpdated=d.DataAtualizacao||''}
+  }catch{}
 }
-async function enrichMissingOfficialPrices(stations){
-  const targets=(stations||[]).filter(s=>s.dgegId&&!s.officialPrice).slice(0,25);
-  await Promise.allSettled(targets.map(enrichStationFromDgegDetail));
-  return stations
+async function remember(stations){
+  const payload=stations.slice(0,120).map(s=>({source_key:s.key,source:s.source==='Base Bomba Certa'?'Verificado':s.source,name:s.name,brand:s.brand||'',address:s.address||'',latitude:s.lat,longitude:s.lon,dgeg_id:s.dgegId||null})).filter(x=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(x.source));
+  if(payload.length)await supabase.rpc('remember_fuel_stations',{p_stations:payload})
 }
-
-async function fetchNearbyStations(lat,lon,radius){
-  const remoteResults=await Promise.allSettled([
-    fetchDgegNearbyStations(lat,lon,radius),
-    fetchOsmStations(lat,lon,radius),
-    fetchCommunityStations(lat,lon,radius)
+async function searchStations(){
+  if(currentLat==null)return;
+  $('fuelStatus').textContent='A procurar postos e preços…';
+  const r=Number($('fuelRadius').value);
+  const settled=await Promise.allSettled([dgegStations(currentLat,currentLon,r),osmStations(currentLat,currentLon,r),registryStations(currentLat,currentLon,r),communityStations(currentLat,currentLon,r)]);
+  nearbyStations=mergeStations(settled.filter(x=>x.status==='fulfilled').map(x=>x.value||[])).filter(s=>s.distance<=r/1000);
+  await Promise.allSettled(nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,30).map(enrichDetail));
+  await remember(nearbyStations);
+  await renderStations();
+  $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`
+}
+async function communityData(){
+  if(currentLat==null)return {reports:[],validations:[],contributors:[],statuses:[]};
+  const km=Number($('fuelRadius').value)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(currentLat*Math.PI/180)));
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  const {data:reports}=await supabase.from('fuel_price_reports').select('*').eq('fuel_type',$('fuelType').value).gte('observed_at',since).gte('latitude',currentLat-dy).lte('latitude',currentLat+dy).gte('longitude',currentLon-dx).lte('longitude',currentLon+dx);
+  const ids=(reports||[]).map(x=>x.id);
+  const [{data:validations},{data:contributors},{data:statuses}]=await Promise.all([
+    ids.length?supabase.from('fuel_price_validations').select('*').in('report_id',ids):Promise.resolve({data:[]}),
+    supabase.from('fuel_contributor_stats').select('user_id,points'),
+    supabase.from('fuel_station_status_reports').select('*').gte('created_at',new Date(Date.now()-6*3600000).toISOString())
   ]);
-
-  const remoteLists=remoteResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
-  const discovered=mergeFuelStations(remoteLists);
-
-  // Guardar tudo o que foi descoberto para nunca desaparecer em pesquisas futuras.
-  await rememberStations(discovered);
-
-  const registryResult=await Promise.allSettled([fetchRegistryStations(lat,lon,radius)]);
-  const registryLists=registryResult.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
-
-  const combined=mergeFuelStations([...remoteLists,...registryLists])
-    .filter(s=>s.distance<=Number(radius)/1000)
-    .sort((a,b)=>a.distance-b.distance);
-
-  await enrichMissingOfficialPrices(combined);
-  await rememberStations(combined);
-
-  if(!combined.length)throw new Error('Não foram encontrados postos neste raio.');
-  return combined
+  return {reports:reports||[],validations:validations||[],contributors:contributors||[],statuses:statuses||[]}
 }
-async function fetchCommunityPrices(){
-  if(fuelLat==null||fuelLon==null)return [];
-  const radiusKm=Number(el('fuelRadius').value)/1000,latDelta=radiusKm/111,lonDelta=radiusKm/(111*Math.max(.2,Math.cos(fuelLat*Math.PI/180)));
-  const since=new Date(Date.now()-7*24*3600*1000).toISOString();
-  const {data,error}=await supabase.from('fuel_price_reports').select('*').eq('fuel_type',el('fuelType').value).gte('observed_at',since)
-    .gte('latitude',fuelLat-latDelta).lte('latitude',fuelLat+latDelta).gte('longitude',fuelLon-lonDelta).lte('longitude',fuelLon+lonDelta).order('observed_at',{ascending:false});
-  if(error)throw error;return (data||[]).filter(r=>haversineKm(fuelLat,fuelLon,r.latitude,r.longitude)<=radiusKm)
-}
-function latestPriceByStation(reports){const map={};for(const r of reports){if(!map[r.station_key]||new Date(r.observed_at)>new Date(map[r.station_key].observed_at))map[r.station_key]=r}return map}
-async function fetchFuelValidations(ids){
-  if(!ids.length)return [];
-  const {data,error}=await supabase.from('fuel_price_validations').select('*').in('report_id',ids);
-  if(error)throw error;
-  return data||[]
-}
-async function fetchStationStatuses(keys){if(!keys.length)return [];const since=new Date(Date.now()-6*3600*1000).toISOString();const {data,error}=await supabase.from('fuel_station_status_reports').select('*').in('station_key',keys).gte('created_at',since);if(error)throw error;return data||[]}
-function validationStats(rows,id){const v=rows.filter(x=>x.report_id===id);return {yes:v.filter(x=>x.is_confirmed).length,no:v.filter(x=>!x.is_confirmed).length}}
-
-function requiredSupportForPoints(points){
-  points=Number(points||0);
-  if(points>=800)return 1;
-  if(points>=400)return 2;
-  if(points>=150)return 3;
-  if(points>=50)return 4;
-  return 5
-}
-function communityCandidateForStation(stationKey,reports,validations,contributors){
-  const stationReports=reports.filter(r=>r.station_key===stationKey);
-  if(!stationReports.length)return null;
-
-  const pointsByUser=Object.fromEntries((contributors||[]).map(x=>[x.user_id,Number(x.points||0)]));
-  const groups={};
-
-  for(const r of stationReports){
-    const key=Number(r.price).toFixed(3);
-    if(!groups[key])groups[key]={price:Number(r.price),reports:[],latest:r.observed_at,supporters:new Set(),maxPoints:0};
-    const g=groups[key];
-    g.reports.push(r);
-    g.supporters.add(r.user_id);
-    g.maxPoints=Math.max(g.maxPoints,pointsByUser[r.user_id]||0);
-    if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
+function reqSupport(points){return points>=800?1:points>=400?2:points>=150?3:points>=50?4:5}
+function candidateFor(key,reports,validations,contributors){
+  const rs=reports.filter(r=>r.station_key===key);if(!rs.length)return null;
+  const pts=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.points||0)])),groups={};
+  for(const r of rs){
+    const k=Number(r.price).toFixed(3);groups[k]??={price:Number(r.price),reports:[],support:new Set(),max:0,latest:r.observed_at};
+    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.max=Math.max(g.max,pts[r.user_id]||0);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
   }
-
   for(const g of Object.values(groups)){
-    const ids=new Set(g.reports.map(r=>r.id));
-    for(const v of validations){
-      if(ids.has(v.report_id) && v.is_confirmed){
-        g.supporters.add(v.user_id);
-        g.maxPoints=Math.max(g.maxPoints,pointsByUser[v.user_id]||0)
-      }
-    }
-    g.supportCount=g.supporters.size;
-    g.required=requiredSupportForPoints(g.maxPoints);
-    g.accepted=g.supportCount>=g.required
+    const ids=new Set(g.reports.map(x=>x.id));
+    validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.max=Math.max(g.max,pts[v.user_id]||0)});
+    g.count=g.support.size;g.required=reqSupport(g.max);g.accepted=g.count>=g.required
   }
-
-  const all=Object.values(groups).sort((a,b)=>{
-    if(a.accepted!==b.accepted)return a.accepted?-1:1;
-    if(a.supportCount!==b.supportCount)return b.supportCount-a.supportCount;
-    return new Date(b.latest)-new Date(a.latest)
-  });
-  return all[0]||null
+  return Object.values(groups).sort((a,b)=>Number(b.accepted)-Number(a.accepted)||b.count-a.count||new Date(b.latest)-new Date(a.latest))[0]
 }
-
-function confidenceLabel(report,stats){if(!report)return {text:'Preço oficial',cls:'mid'};const h=(Date.now()-new Date(report.observed_at))/3600000,score=stats.yes-stats.no;if(h<=2&&score>=2)return {text:'Muito fiável',cls:'high'};if(h<=6&&score>=1)return {text:'Fiável',cls:'high'};if(h<=12)return {text:'A confirmar',cls:'mid'};return {text:'Desatualizado',cls:'low'}}
-function stationStatusSummary(statuses,key){
-  const r=statuses.filter(x=>x.station_key===key && x.status==='closed');
-  const users=new Set(r.map(x=>x.user_id));
-  if(users.size>=3)return '⛔ Possivelmente encerrado · 3+ utilizadores reportaram';
-  if(users.size===2)return '⚠️ Possivelmente encerrado · 2 utilizadores reportaram';
-  if(users.size===1)return '⚠️ 1 utilizador reportou possível encerramento';
-  return ''
+function closedText(key,statuses){
+  const n=new Set(statuses.filter(x=>x.station_key===key&&x.status==='closed').map(x=>x.user_id)).size;
+  return n>=3?'⛔ Possivelmente encerrado · 3+ reportes':n===2?'⚠️ Possivelmente encerrado · 2 reportes':n===1?'⚠️ 1 reporte de possível encerramento':''
 }
-function ensureFuelMap(){if(fuelMap)return;fuelMap=L.map('fuelMap').setView([39.5,-8],6);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(fuelMap)}
-
-async function renderFuelData(){
-  const reports=await fetchCommunityPrices();
-  const reportIds=reports.map(r=>r.id);
-  const [validations,statuses,contributorsRes]=await Promise.all([
-    fetchFuelValidations(reportIds),
-    fetchStationStatuses(nearbyStations.map(s=>s.key)),
-    supabase.from('fuel_contributor_stats').select('user_id,points,display_name,avatar_path')
-  ]);
-  const contributors=contributorsRes.data||[];
-
-  const enriched=nearbyStations.map(s=>{
-    const candidate=communityCandidateForStation(s.key,reports,validations,contributors);
-    const official=s.officialPrice||null;
-    const acceptedCommunity=candidate?.accepted?candidate.price:null;
-    const displayPrice=acceptedCommunity||official||null;
-    return {...s,candidate,displayPrice,statusText:stationStatusSummary(statuses,s.key)}
+async function renderStations(){
+  const cd=await communityData();
+  nearbyStations=nearbyStations.map(s=>{
+    const c=candidateFor(s.key,cd.reports,cd.validations,cd.contributors),community=c?.accepted?c.price:null,displayPrice=community||s.officialPrice||null;
+    return {...s,candidate:c,displayPrice,priceSource:community?'community':(s.officialPrice?'official':null),closed:closedText(s.key,cd.statuses)}
   }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
-  el('fuelResults').className=enriched.length?'':'empty';
-  el('fuelResults').innerHTML=enriched.length?enriched.slice(0,25).map((s,i)=>{
-    const c=s.candidate;
-    const price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):'Sem preço';
-    const officialLine=s.officialPrice?`<div class="official-price">DGEG: ${Number(s.officialPrice).toFixed(3).replace('.',',')} €/L${s.officialUpdated?' · '+esc(s.officialUpdated):''}</div>`:'';
-    let communityLine='<div class="community-note">Ainda sem proposta comunitária.</div>';
-    if(c){
-      communityLine=c.accepted
-        ? `<div class="accepted-price">✓ Comunidade validou ${c.price.toFixed(3).replace('.',',')} €/L · ${c.supportCount} apoio${c.supportCount===1?'':'s'}</div>`
-        : `<div class="pending-price">⏳ Novo preço proposto: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.supportCount}/${c.required} apoios</div>`;
+  $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
+    const c=s.candidate,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):null;
+    const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade validada</span>':'<span class="source none">Sem preço confirmado</span>';
+    const proposal=c&&!c.accepted?`<div class="warn">Proposta: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.count}/${c.required} apoios</div>`:'';
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="startRoute('${s.key}')">🧭 Ir</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+  }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
+
+  ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
+  if(userMarker)map.removeLayer(userMarker);
+  userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+  for(const s of nearbyStations){
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="startRoute('${s.key}')">Ir para aqui</button>`);
+    stationMarkers.push(m)
+  }
+  const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
+  populateFillStations()
+}
+
+$('locateBtn').onclick=()=>{
+  if(!navigator.geolocation){$('fuelStatus').textContent='Este dispositivo não permite localização.';return}
+  $('fuelStatus').textContent='A obter a sua localização…';
+  navigator.geolocation.getCurrentPosition(async p=>{currentLat=p.coords.latitude;currentLon=p.coords.longitude;await searchStations();subscribeRealtime()},()=>{$('fuelStatus').textContent='Não foi possível obter a localização. Autorize-a no navegador.'},{enableHighAccuracy:false,timeout:10000,maximumAge:120000})
+};
+$('refreshBtn').onclick=searchStations;
+$('fuelType').onchange=()=>currentLat!=null&&searchStations();
+$('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
+
+window.openPrice=key=>{
+  currentPriceStation=nearbyStations.find(x=>x.key===key);if(!currentPriceStation)return;
+  $('priceStationName').textContent=currentPriceStation.name;$('priceFuelLabel').textContent=$('fuelType').value;
+  $('priceReference').textContent=currentPriceStation.officialPrice?`Referência DGEG: ${currentPriceStation.officialPrice.toFixed(3).replace('.',',')} €/L`:'Sem referência DGEG disponível.';
+  $('priceInput').value=currentPriceStation.displayPrice?Number(currentPriceStation.displayPrice).toFixed(3).replace('.',','):'';
+  $('photoStatus').textContent='';$('priceStatus').textContent='';$('priceModal').classList.add('open')
+};
+function detectFuelRowsFromPhoto(text){
+  const raw=String(text||'').replace(/\r/g,'\n');
+  const lines=raw.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const found=[];
+  const patterns=[
+    {fuel:'Gasóleo simples',rx:/(gas[oó]leo\s+simples|diesel\s+simples)/i},
+    {fuel:'Gasóleo especial',rx:/(diesel\s+ultimate|ultimate\s+diesel|gas[oó]leo\s+(especial|aditivado|premium))/i},
+    {fuel:'Gasolina simples 95',rx:/(gasolina\s+(simples\s*)?95|95\s+simples)/i},
+    {fuel:'Gasolina especial 95',rx:/(gasolina\s+95\s+(especial|aditivada|premium))/i},
+    {fuel:'Gasolina 98',rx:/(gasolina\s+(simples\s*)?98|98\s+simples)/i},
+    {fuel:'Gasolina especial 98',rx:/(gasolina\s+(ultimate|98\s+(especial|aditivada|premium))|ultimate\s+gasolina)/i},
+    {fuel:'GPL Auto',rx:/(gpl(\s+auto)?|autogas)/i}
+  ];
+  for(let i=0;i<lines.length;i++){
+    const context=[lines[i],lines[i+1]||'',lines[i+2]||''].join(' ');
+    for(const p of patterns){
+      if(p.rx.test(context)){
+        const m=context.match(/\b(\d[\.,]\d{3})\b/);
+        if(m){
+          const price=Number(m[1].replace(',','.'));
+          if(price>.5&&price<5)found.push({fuel:p.fuel,price})
+        }
+      }
     }
-    return `<div class="row fuel-card"><div><b>${i===0&&s.displayPrice?'🏆 ':''}${esc(s.name)}</b>
-      <div class="muted tiny">${s.distance.toFixed(1)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':s.source==='Base Bomba Certa'?'<div class="community-station">✓ Posto guardado na base Bomba Certa</div>':''}${communityLine}
-      ${s.statusText?`<div class="tiny stale">${esc(s.statusText)}</div>`:''}
-      <div class="fuel-actions">
-        <button class="go" onclick="startFuelNavigation('${s.key}')">🧭 Ir para aqui</button>
-        <button class="price-edit" onclick="openFuelPriceModal('${s.key}')">✏️ Introduzir preço</button>
-        ${c&&c.reports?.length?`<button onclick="confirmFuelPrice('${c.reports[0].id}',true)">✓ Confirmar proposta</button><button onclick="confirmFuelPrice('${c.reports[0].id}',false)">Preço incorreto</button>`:''}
-        <button onclick="reportStationClosed('${s.key}')">⚠ Reportar encerrado</button>
-      </div></div>
-      <div class="price-big">${s.displayPrice?price+'<div class="muted tiny">€/L</div>':'<span class="muted" style="font-size:13px">Sem preço oficial</span>'}</div></div>`
-  }).join(''):'Não foram encontrados postos neste raio.';
-
-  ensureFuelMap();fuelMarkers.forEach(m=>fuelMap.removeLayer(m));fuelMarkers=[];
-  if(userMarker)fuelMap.removeLayer(userMarker);userMarker=L.marker([fuelLat,fuelLon]).addTo(fuelMap).bindPopup('A sua localização');
-  for(const s of enriched){
-    const c=s.candidate;
-    const extra=c&&!c.accepted?`<br>Proposta: ${c.price.toFixed(3).replace('.',',')} €/L (${c.supportCount}/${c.required})`:'';
-    fuelMarkers.push(L.marker([s.lat,s.lon]).addTo(fuelMap).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${extra}<br><button onclick="startFuelNavigation('${s.key}')">Ir para aqui</button>`))
   }
-  const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14});
-  await loadFuelLeaderboard();populateFillStations()
+  return found
 }
-window.openFuelPriceModal=(key)=>{
-  const s=nearbyStations.find(x=>x.key===key);if(!s)return;currentFuelStation=s;
-  el('fuelPriceStationName').textContent=s.name;el('fuelPriceTypeLabel').textContent=el('fuelType').value;
-  el('fuelPriceOfficialHint').textContent=s.officialPrice?`Preço DGEG: ${Number(s.officialPrice).toFixed(3).replace('.',',')} €/L`:'Sem preço DGEG disponível.';
-  el('fuelQuickPrice').value=s.officialPrice?Number(s.officialPrice).toFixed(3).replace('.',','):'';
-  el('fuelQuickStatus').textContent='';el('fuelPriceModal').classList.add('open');setTimeout(()=>{el('fuelQuickPrice').focus();el('fuelQuickPrice').select()},100)
+function priceCandidates(text){
+  const rows=detectFuelRowsFromPhoto(text);
+  const selected=$('fuelType')?.value;
+  const exact=rows.find(r=>r.fuel===selected);
+  if(exact)return [exact.price];
+  const t=String(text||'').replace(/\s+/g,' '),vals=[];
+  const rx=[/(?:gas[oó]leo|diesel|gasolina|gpl|ultimate)\D{0,28}(\d[\.,]\d{3})/gi,/(\d[\.,]\d{3})\s*€?\s*(?:\/\s*l|litro|l\b)/gi,/\b(\d[\.,]\d{3})\b/g];
+  for(const r of rx){let m;while((m=r.exec(t))!==null){const n=Number(m[1].replace(',','.'));if(n>.5&&n<5)vals.push(n)}if(vals.length)break}
+  return vals
 }
-window.closeFuelPriceModal=()=>{currentFuelStation=null;el('fuelPriceModal').classList.remove('open')}
-el('saveQuickFuelPrice').onclick=async()=>{
-  if(!currentFuelStation)return;const price=Number(el('fuelQuickPrice').value.trim().replace(',','.'));
-  if(!Number.isFinite(price)||price<0.5||price>5){el('fuelQuickStatus').textContent='Introduza um preço por litro, por exemplo 1,799.';return}
-  const {data:{user}}=await supabase.auth.getUser();if(!user){el('fuelQuickStatus').textContent='É necessário iniciar sessão.';return}
-  const s=currentFuelStation;const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:el('fuelType').value,price,observed_at:new Date().toISOString()});
-  if(error){el('fuelQuickStatus').textContent=mensagemErroPT(error);return}window.closeFuelPriceModal();await renderFuelData();await loadFuelLeaderboard()
-}
-window.confirmFuelPrice=async(id,ok)=>{
-  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
-  const {error}=await supabase.from('fuel_price_validations').upsert({report_id:id,user_id:user.id,is_confirmed:ok,created_at:new Date().toISOString()},{onConflict:'report_id,user_id'});
-  if(error){alert(mensagemErroPT(error));return}await renderFuelData()
-}
-window.reportStationClosed=async(key)=>{
-  const s=nearbyStations.find(x=>x.key===key);if(!s)return;
-  if(!confirm(`Reportar que ${s.name} parece estar encerrado? Isto não marca automaticamente o posto como fechado.`))return;
-  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
-  const recent=await supabase.from('fuel_station_status_reports').select('id').eq('user_id',user.id).eq('station_key',s.key).eq('status','closed').gte('created_at',new Date(Date.now()-2*3600*1000).toISOString()).limit(1);
-  if(recent.data?.length){alert('Já reportou recentemente o estado deste posto.');return}
-  const {error}=await supabase.from('fuel_station_status_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,status:'closed',fuel_type:null});
-  if(error){alert(mensagemErroPT(error));return}
-  await renderFuelData()
-}
-function routeInstruction(step){
-  const t=step.maneuver?.type||'',m=step.maneuver?.modifier||'',name=step.name||'',d={'left':'à esquerda','right':'à direita','straight':'em frente','slight left':'ligeiramente à esquerda','slight right':'ligeiramente à direita','sharp left':'acentuadamente à esquerda','sharp right':'acentuadamente à direita','uturn':'faça inversão de marcha'}[m]||'';
-  if(t==='depart')return `Comece ${d||'em frente'}${name?' em '+name:''}`;if(t==='arrive')return 'Chegou ao posto';if(t==='roundabout'||t==='rotary')return `Entre na rotunda${step.maneuver?.exit?` e saia na ${step.maneuver.exit}.ª saída`:''}${name?' para '+name:''}`;if(t==='turn')return `Vire ${d}${name?' para '+name:''}`;if(t==='continue')return `Continue ${d||'em frente'}${name?' em '+name:''}`;return `Siga${name?' por '+name:''}`
-}
-async function drawRouteToStation(s){
-  ensureFuelMap();el('routeBox').classList.remove('hidden');el('routeBox').innerHTML='<b>A calcular caminho…</b>';
-  const u=`https://router.project-osrm.org/route/v1/driving/${fuelLon},${fuelLat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`;
+async function scanPhoto(file){
+  $('photoStatus').textContent='A analisar fotografia…';
   try{
-    const r=await fetch(u);if(!r.ok)throw new Error();const j=await r.json(),route=j.routes?.[0];if(!route)throw new Error();
-    if(routeLayer)fuelMap.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.8}).addTo(fuelMap);fuelMap.fitBounds(routeLayer.getBounds().pad(.15));
-    const km=route.distance/1000,mins=Math.round(route.duration/60),steps=(route.legs?.[0]?.steps||[]).filter(x=>x.distance>5).slice(0,14),gmaps=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.lat+','+s.lon)}&travelmode=driving`;
-    el('routeBox').innerHTML=`<div class="section-title" style="margin-top:0"><div><b>🧭 ${esc(s.name)}</b><div class="muted tiny">${km.toFixed(1)} km · cerca de ${mins} min</div></div><button class="btn secondary" onclick="window.open('${gmaps}','_blank')">Abrir GPS</button></div><div class="route-steps">${steps.map(st=>`<div class="route-step">${esc(routeInstruction(st))}<span class="muted"> · ${st.distance<1000?Math.round(st.distance)+' m':(st.distance/1000).toFixed(1)+' km'}</span></div>`).join('')}</div>`
-  }catch(e){
-    const gmaps=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.lat+','+s.lon)}&travelmode=driving`;
-    el('routeBox').innerHTML=`<b>Não consegui desenhar a rota aqui.</b><div class="muted tiny">Abra a navegação do dispositivo.</div><button class="btn" style="margin-top:8px" onclick="window.open('${gmaps}','_blank')">Abrir GPS</button>`
-  }
+    const result=await Tesseract.recognize(file,'por',{logger:m=>{if(m.status==='recognizing text')$('photoStatus').textContent=`A ler fotografia… ${Math.round((m.progress||0)*100)}%`}});
+    const text=result.data.text||'',rows=detectFuelRowsFromPhoto(text),vals=priceCandidates(text);
+    if(vals.length){
+      $('priceInput').value=vals[0].toFixed(3).replace('.',',');
+      const extras=rows.length>1?' · '+rows.map(r=>`${r.fuel}: ${r.price.toFixed(3).replace('.',',')} €`).join(' · '):'';
+      $('photoStatus').textContent=`Preço sugerido: ${vals[0].toFixed(3).replace('.',',')} €/L. Confirme antes de guardar${extras}`;
+    } else $('photoStatus').textContent='Não consegui identificar o preço. Pode introduzi-lo manualmente.'
+  }catch(e){$('photoStatus').textContent='Não foi possível analisar a fotografia.'}
 }
-window.startFuelNavigation=async(key)=>{
-  const s=nearbyStations.find(x=>x.key===key);if(!s)return;await drawRouteToStation(s);el('fuelMap').scrollIntoView({behavior:'smooth',block:'center'});
-  if(navigator.geolocation){if(navWatch)navigator.geolocation.clearWatch(navWatch);navWatch=navigator.geolocation.watchPosition(pos=>{fuelLat=pos.coords.latitude;fuelLon=pos.coords.longitude;if(userMarker)userMarker.setLatLng([fuelLat,fuelLon])},()=>{},{enableHighAccuracy:true,maximumAge:3000,timeout:10000})}
+$('takePhotoBtn').onclick=()=>$('cameraInput').click();$('choosePhotoBtn').onclick=()=>$('photoInput').click();
+$('cameraInput').onchange=async e=>{const f=e.target.files?.[0];if(f)await scanPhoto(f);e.target.value=''};
+$('photoInput').onchange=async e=>{const f=e.target.files?.[0];if(f)await scanPhoto(f);e.target.value=''};
+$('savePriceBtn').onclick=async()=>{
+  if(!currentPriceStation)return;
+  const price=Number($('priceInput').value.replace(',','.'));if(!(price>.5&&price<5)){$('priceStatus').textContent='Introduza um preço válido, por exemplo 1,799.';return}
+  const {data:{user}}=await supabase.auth.getUser();const s=currentPriceStation;
+  const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
+  if(error){$('priceStatus').textContent=errPT(error);return}
+  $('priceModal').classList.remove('open');await Promise.all([renderStations(),loadLeaderboard()])
+};
+window.confirmPrice=async(id,ok)=>{
+  const {data:{user}}=await supabase.auth.getUser();
+  await supabase.from('fuel_price_validations').upsert({report_id:id,user_id:user.id,is_confirmed:ok,created_at:new Date().toISOString()},{onConflict:'report_id,user_id'});
+  await renderStations()
+};
+window.reportClosed=async key=>{
+  const s=nearbyStations.find(x=>x.key===key);if(!s||!confirm(`Reportar que ${s.name} parece estar encerrado?`))return;
+  const {data:{user}}=await supabase.auth.getUser();
+  const {data:recent}=await supabase.from('fuel_station_status_reports').select('id').eq('user_id',user.id).eq('station_key',s.key).eq('status','closed').gte('created_at',new Date(Date.now()-2*3600000).toISOString()).limit(1);
+  if(recent?.length){alert('Já reportou recentemente este posto.');return}
+  await supabase.from('fuel_station_status_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,status:'closed',fuel_type:null});await renderStations()
+};
+
+function direction(step){
+  const t=step.maneuver?.type||'',m=step.maneuver?.modifier||'',n=step.name||'',d={'left':'à esquerda','right':'à direita','straight':'em frente','slight left':'ligeiramente à esquerda','slight right':'ligeiramente à direita'}[m]||'';
+  if(t==='arrive')return 'Chegou ao destino';if(t==='turn')return `Vire ${d}${n?' para '+n:''}`;if(t==='roundabout')return `Entre na rotunda${step.maneuver?.exit?' e use a '+step.maneuver.exit+'.ª saída':''}`;return `Siga${n?' por '+n:''}`
+}
+window.startRoute=async key=>{
+  const s=nearbyStations.find(x=>x.key===key);if(!s)return;ensureMap();$('routeBox').classList.remove('hidden');$('routeBox').innerHTML='<b>A calcular caminho…</b>';
+  try{
+    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${currentLon},${currentLat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`),j=await r.json(),route=j.routes?.[0];if(!route)throw 0;
+    if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.78}).addTo(map);map.fitBounds(routeLayer.getBounds().pad(.12));
+    const google=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=driving`;
+    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><button class="btn secondary" onclick="window.open('${google}','_blank')">Abrir GPS</button></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
+  }catch{$('routeBox').innerHTML='<b>Não foi possível desenhar a rota agora.</b>'}
+};
+
+$('addStationBtn').onclick=()=>{$('stationModal').classList.add('open');$('stationStatus').textContent=''};
+$('findAddressBtn').onclick=async()=>{
+  const q=$('newStationAddress').value.trim();if(q.length<4){$('stationStatus').textContent='Escreva uma morada.';return}
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&q=${encodeURIComponent(q)}`),j=await r.json();
+  if(!j.length){$('stationStatus').textContent='Morada não encontrada.';return}
+  $('newStationLat').value=Number(j[0].lat).toFixed(6);$('newStationLon').value=Number(j[0].lon).toFixed(6);$('stationStatus').textContent='Localização encontrada.'
+};
+$('useLocationBtn').onclick=()=>navigator.geolocation?.getCurrentPosition(p=>{$('newStationLat').value=p.coords.latitude.toFixed(6);$('newStationLon').value=p.coords.longitude.toFixed(6)});
+$('saveStationBtn').onclick=async()=>{
+  const name=$('newStationName').value.trim(),lat=Number($('newStationLat').value),lon=Number($('newStationLon').value);
+  if(name.length<2||!Number.isFinite(lat)||!Number.isFinite(lon)){$('stationStatus').textContent='Preencha nome e localização.';return}
+  const {data:{user}}=await supabase.auth.getUser();
+  const {error}=await supabase.from('community_fuel_stations').insert({created_by:user.id,name,address:$('newStationAddress').value.trim()||null,latitude:lat,longitude:lon});
+  if(error){$('stationStatus').textContent=errPT(error);return}
+  $('stationModal').classList.remove('open');if(currentLat!=null)await searchStations()
+};
+
+function populateFillStations(){
+  const sel=$('fillStation'),old=sel.value;
+  sel.innerHTML='<option value="">Outro posto</option>'+nearbyStations.map((s,i)=>`<option value="${i}">${esc(s.name)}${s.displayPrice?' · '+Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':''}</option>`).join('');
+  if([...sel.options].some(x=>x.value===old))sel.value=old
+}
+window.openFill=key=>{
+  $('fillModal').classList.add('open');$('fillDate').value=new Date().toISOString().slice(0,10);$('fillFuel').value=$('fuelType').value;populateFillStations();$('fillStatus').textContent='';
+  if(key){const i=nearbyStations.findIndex(x=>x.key===key);if(i>=0){$('fillStation').value=String(i);$('fillStationName').value=nearbyStations[i].name;if(nearbyStations[i].displayPrice)$('fillPrice').value=Number(nearbyStations[i].displayPrice).toFixed(3)}}
+};
+$('newFillupBtn').onclick=()=>openFill();
+$('fillStation').onchange=()=>{const i=Number($('fillStation').value),s=nearbyStations[i];if(s){$('fillStationName').value=s.name;if(s.displayPrice)$('fillPrice').value=Number(s.displayPrice).toFixed(3)}};
+function calcFill(src){const l=Number($('fillLiters').value),p=Number($('fillPrice').value),t=Number($('fillTotal').value);if(src!=='total'&&l>0&&p>0)$('fillTotal').value=(l*p).toFixed(2);else if(src==='total'&&l>0&&t>0)$('fillPrice').value=(t/l).toFixed(3)}
+$('fillLiters').oninput=()=>calcFill('liters');$('fillPrice').oninput=()=>calcFill('price');$('fillTotal').oninput=()=>calcFill('total');
+$('saveFillBtn').onclick=async()=>{
+  const l=Number($('fillLiters').value),p=Number($('fillPrice').value),t=Number($('fillTotal').value);if(!(l>0&&p>0&&t>0)){$('fillStatus').textContent='Preencha litros, preço/L e total.';return}
+  const {data:{user}}=await supabase.auth.getUser();const i=Number($('fillStation').value),s=nearbyStations[i];
+  const {error}=await supabase.from('fuel_fillups').insert({user_id:user.id,station_key:s?.key||null,station_name:$('fillStationName').value.trim()||s?.name||'Posto não identificado',fuel_type:$('fillFuel').value,fillup_date:$('fillDate').value,liters:l,price_per_liter:p,total_amount:t,odometer_km:$('fillOdometer').value?Number($('fillOdometer').value):null,full_tank:$('fillFull').checked,notes:$('fillNotes').value.trim()||null});
+  if(error){$('fillStatus').textContent=errPT(error);return}
+  $('fillModal').classList.remove('open');await loadFillups()
+};
+window.deleteFill=async id=>{if(!confirm('Apagar este abastecimento?'))return;await supabase.from('fuel_fillups').delete().eq('id',id);await loadFillups()};
+async function loadFillups(){
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
+  const {data}=await supabase.from('fuel_fillups').select('*').eq('user_id',user.id).order('fillup_date',{ascending:false}).order('created_at',{ascending:false});fillups=data||[];
+  const now=new Date(),ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,month=fillups.filter(x=>String(x.fillup_date).startsWith(ym));
+  const ms=month.reduce((a,x)=>a+Number(x.total_amount),0),ml=month.reduce((a,x)=>a+Number(x.liters),0),ts=fillups.reduce((a,x)=>a+Number(x.total_amount),0),tl=fillups.reduce((a,x)=>a+Number(x.liters),0),avg=tl?ts/tl:0;
+  $('monthSpend').textContent=money(ms);$('monthLiters').textContent=kmFmt(ml)+' L';$('avgPrice').textContent=avg.toFixed(3).replace('.',',')+' €';$('fillCount').textContent=fillups.length;
+  $('totalSpend').textContent=money(ts);$('totalLiters').textContent=kmFmt(tl)+' L';$('statAvg').textContent=avg.toFixed(3).replace('.',',')+' €/L';
+  const use={};fillups.forEach(x=>use[x.station_name]=(use[x.station_name]||0)+1);$('topStation').textContent=Object.entries(use).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  $('fillHistory').innerHTML=fillups.length?fillups.map(x=>`<div class="history-row"><div><b>${esc(x.station_name)}</b><div class="tiny muted">${esc(x.fillup_date)} · ${esc(x.fuel_type)}</div></div><div class="detail"><b>${Number(x.liters).toLocaleString('pt-PT',{maximumFractionDigits:2})} L</b><div class="tiny muted">${Number(x.price_per_liter).toFixed(3).replace('.',',')} €/L</div></div><div class="detail"><b>${money(x.total_amount)}</b>${x.odometer_km?`<div class="tiny muted">${Number(x.odometer_km).toLocaleString('pt-PT')} km</div>`:''}</div><button class="btn danger" onclick="deleteFill('${x.id}')">Apagar</button></div>`).join(''):'<div class="empty">Ainda não existem abastecimentos registados.</div>';
+  drawCharts()
+}
+function drawCharts(){
+  const monthly={};[...fillups].reverse().forEach(x=>{const k=String(x.fillup_date).slice(0,7);monthly[k]=(monthly[k]||0)+Number(x.total_amount)});
+  const keys=Object.keys(monthly).sort().slice(-12);
+  monthlyChart?.destroy();monthlyChart=new Chart($('monthlyChart'),{type:'bar',data:{labels:keys.map(k=>k.slice(5)+'/'+k.slice(2,4)),datasets:[{data:keys.map(k=>monthly[k])}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  const rows=[...fillups].reverse().slice(-30);priceChart?.destroy();priceChart=new Chart($('priceChart'),{type:'line',data:{labels:rows.map(x=>x.fillup_date),datasets:[{data:rows.map(x=>Number(x.price_per_liter)),tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}})
 }
 
-function contributorLevel(points){
-  points=Number(points||0);
-  if(points>=800)return {name:'Embaixador',icon:'🏆',min:800,next:null};
-  if(points>=400)return {name:'Especialista',icon:'⭐',min:400,next:800};
-  if(points>=150)return {name:'Guia',icon:'🧭',min:150,next:400};
-  if(points>=50)return {name:'Explorador',icon:'🗺️',min:50,next:150};
-  return {name:'Novato',icon:'🚗',min:0,next:50}
-}
-async function loadFuelLeaderboard(){
+function level(points){return points>=800?{n:'Embaixador',i:'🏆',m:800,x:null}:points>=400?{n:'Especialista',i:'⭐',m:400,x:800}:points>=150?{n:'Guia',i:'🧭',m:150,x:400}:points>=50?{n:'Explorador',i:'🗺️',m:50,x:150}:{n:'Novato',i:'🚗',m:0,x:50}}
+function fallbackAvatar(){return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="22" fill="#eef2f6"/><text x="50" y="62" text-anchor="middle" font-size="38">🚗</text></svg>')}`}
+async function loadLeaderboard(){
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
   await supabase.rpc('ensure_my_fuel_profile');
-  const {data,error}=await supabase.from('fuel_contributor_stats')
-    .select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports')
-    .order('points',{ascending:false}).order('updated_at',{ascending:true}).limit(20);
-  if(error){console.warn(error);return}
-
-  const rows=data||[],mine=rows.find(x=>x.user_id===user.id);
-  let my=mine;
-  if(!my){
-    const r=await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle();
-    my=r.data||null
+  const {data:rows}=await supabase.from('fuel_contributor_stats').select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports').order('points',{ascending:false}).limit(20);
+  const mine=(rows||[]).find(x=>x.user_id===user.id)||(await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle()).data;
+  if(mine){
+    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=l.i+' '+l.n;$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
+    const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl:fallbackAvatar();$('myAvatar').src=src;
+    if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
   }
-  if(my){
-    const lvl=contributorLevel(my.points);
-    el('myRankBadge').textContent=lvl.icon;
-    el('myRankName').textContent=my.display_name||'Condutor';
-    const avatar=el('myRankAvatar');
-    if(my.avatar_path){
-      const {data:pub}=supabase.storage.from('avatars').getPublicUrl(my.avatar_path);
-      avatar.src=pub.publicUrl
-    }else{
-      avatar.src=`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="24" fill="#eef1f4"/><text x="60" y="72" text-anchor="middle" font-size="42">🚗</text></svg>`)}`
-    }
-    el('myRankLevel').textContent=lvl.name;
-    el('myRankPoints').textContent=`${Number(my.points||0)} pts`;
-    el('contributorName').value=my.display_name||'';
-    if(lvl.next){
-      const pct=Math.max(0,Math.min(100,((my.points-lvl.min)/(lvl.next-lvl.min))*100));
-      el('myRankProgress').style.width=`${pct}%`;
-      el('myRankNext').textContent=`Faltam ${lvl.next-my.points} pontos para ${contributorLevel(lvl.next).name}.`
-    }else{
-      el('myRankProgress').style.width='100%';
-      el('myRankNext').textContent='Nível máximo atingido.'
-    }
-  }
+  $('leaderboard').innerHTML=(rows||[]).length?(rows||[]).map((r,i)=>{const av=r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl:fallbackAvatar(),l=level(r.points);return `<div class="leader"><div style="font-weight:900;text-align:center">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div><div style="display:flex;gap:9px;align-items:center"><img src="${av}" alt=""><div><b>${esc(r.display_name)}</b><div class="tiny muted">${l.i} ${l.n}</div></div></div><b>${r.points} pts</b></div>`}).join(''):'<div class="empty">Ainda não existem contribuições.</div>'
+}
+$('saveNameBtn').onclick=async()=>{const n=$('profileName').value.trim();if(n.length<2)return;const {data:{user}}=await supabase.auth.getUser();const {error}=await supabase.from('fuel_contributor_stats').update({display_name:n}).eq('user_id',user.id);$('profileStatus').textContent=error?errPT(error):'Nome atualizado.';if(!error)loadLeaderboard()};
+$('avatarBtn').onclick=()=>$('avatarFile').click();
+$('avatarFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>3*1024*1024){$('profileStatus').textContent='A imagem não pode ultrapassar 3 MB.';return}const {data:{user}}=await supabase.auth.getUser(),ext=(f.name.split('.').pop()||'jpg').toLowerCase(),path=`${user.id}/perfil.${ext}`;const {error}=await supabase.storage.from('avatars').upload(path,f,{upsert:true,contentType:f.type});if(error){$('profileStatus').textContent=errPT(error);return}await supabase.from('fuel_contributor_stats').update({avatar_path:path}).eq('user_id',user.id);$('profileStatus').textContent='Fotografia atualizada.';loadLeaderboard()};
 
-  const box=el('fuelLeaderboard');
-  if(!rows.length){box.className='empty';box.textContent='Ainda não existem contribuições suficientes.';return}
-  box.className='';
-  box.innerHTML=rows.map((r,i)=>{
-    const lvl=contributorLevel(r.points),you=r.user_id===user.id;
-    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
-    return `<div class="leader-row ${you?'leader-you':''}">
-      <div class="leader-pos">${medal}</div>
-      <div style="display:flex;gap:9px;align-items:center"><img class="rank-avatar" style="width:38px;height:38px;border-radius:11px" src="${r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl:`data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="18" fill="#eef1f4"/><text x="40" y="50" text-anchor="middle" font-size="30">🚗</text></svg>')}`}" alt=""><div><b>${esc(r.display_name||'Condutor')}</b>${you?' <span class="pill">Você</span>':''}<div class="muted tiny">${lvl.icon} ${lvl.name} · ${r.price_reports} preços · ${r.validations} validações</div></div></div>
-      <div style="font-weight:900">${r.points} pts</div>
-    </div>`
-  }).join('')
-}
-
-el('chooseContributorAvatar').onclick=()=>el('contributorAvatar').click();
-el('contributorAvatar').onchange=async e=>{
-  const file=e.target.files?.[0];e.target.value='';if(!file)return;
-  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){el('contributorNameStatus').textContent='Escolha uma imagem JPG, PNG ou WEBP.';return}
-  if(file.size>3*1024*1024){el('contributorNameStatus').textContent='A fotografia não pode exceder 3 MB.';return}
-  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
-  el('contributorNameStatus').textContent='A carregar fotografia…';
-  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-  const path=`${user.id}/perfil.${ext}`;
-  const {error:upErr}=await supabase.storage.from('avatars').upload(path,file,{upsert:true,contentType:file.type});
-  if(upErr){el('contributorNameStatus').textContent=mensagemErroPT(upErr);return}
-  const {error}=await supabase.from('fuel_contributor_stats').update({avatar_path:path}).eq('user_id',user.id);
-  if(error){el('contributorNameStatus').textContent=mensagemErroPT(error);return}
-  el('contributorNameStatus').textContent='Fotografia atualizada.';
-  await loadFuelLeaderboard()
-}
-
-el('saveContributorName').onclick=async()=>{
-  const name=el('contributorName').value.trim();
-  if(name.length<2){el('contributorNameStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}
-  if(name.length>28){el('contributorNameStatus').textContent='O nome é demasiado longo.';return}
-  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
-  el('contributorNameStatus').textContent='A guardar…';
-  const {error}=await supabase.from('fuel_contributor_stats').update({display_name:name}).eq('user_id',user.id);
-  if(error){el('contributorNameStatus').textContent=mensagemErroPT(error);return}
-  el('contributorNameStatus').textContent='Nome atualizado.';
-  await loadFuelLeaderboard()
-}
-
-
-window.openAddStationModal=()=>{
-  el('newStationName').value='';el('newStationAddress').value='';
-  el('newStationLat').value='';el('newStationLon').value='';
-  el('newStationStatus').textContent='';
-  el('addStationModal').classList.add('open')
-}
-window.closeAddStationModal=()=>el('addStationModal').classList.remove('open');
-el('addStationBtn').onclick=window.openAddStationModal;
-
-el('geocodeStationBtn').onclick=async()=>{
-  const address=el('newStationAddress').value.trim();
-  if(address.length<4){el('newStationStatus').textContent='Escreva uma morada para procurar.';return}
-  el('newStationStatus').textContent='A procurar a morada…';
-  try{
-    const u=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&q=${encodeURIComponent(address)}`;
-    const r=await fetch(u,{headers:{'Accept':'application/json'}});
-    if(!r.ok)throw new Error();
-    const rows=await r.json();
-    if(!rows.length){el('newStationStatus').textContent='Não encontrei essa morada. Pode usar a localização atual ou indicar as coordenadas.';return}
-    el('newStationLat').value=Number(rows[0].lat).toFixed(6);
-    el('newStationLon').value=Number(rows[0].lon).toFixed(6);
-    el('newStationStatus').textContent='Localização encontrada. Confirme e guarde o posto.'
-  }catch(e){el('newStationStatus').textContent='Não foi possível procurar a morada agora.'}
-}
-el('useMyLocationStationBtn').onclick=()=>{
-  if(!navigator.geolocation){el('newStationStatus').textContent='Este dispositivo não disponibiliza localização.';return}
-  el('newStationStatus').textContent='A obter a localização…';
-  navigator.geolocation.getCurrentPosition(pos=>{
-    el('newStationLat').value=pos.coords.latitude.toFixed(6);
-    el('newStationLon').value=pos.coords.longitude.toFixed(6);
-    el('newStationStatus').textContent='Localização preenchida.'
-  },()=>{el('newStationStatus').textContent='Não foi possível obter a localização.'},{enableHighAccuracy:true,timeout:10000})
-}
-el('saveStationBtn').onclick=async()=>{
-  const name=el('newStationName').value.trim(),address=el('newStationAddress').value.trim();
-  const lat=Number(el('newStationLat').value),lon=Number(el('newStationLon').value);
-  if(name.length<2){el('newStationStatus').textContent='Indique o nome do posto.';return}
-  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180){el('newStationStatus').textContent='Indique uma localização válida.';return}
-  const {data:{user}}=await supabase.auth.getUser();if(!user){el('newStationStatus').textContent='É necessário iniciar sessão.';return}
-  if(fuelLat!=null && haversineKm(fuelLat,fuelLon,lat,lon)>50){
-    if(!confirm('Este posto está a mais de 50 km da sua localização atual. Guardar na mesma?'))return
-  }
-  el('newStationStatus').textContent='A guardar posto…';
-  const {error}=await supabase.from('community_fuel_stations').insert({created_by:user.id,name,address:address||null,latitude:lat,longitude:lon});
-  if(error){el('newStationStatus').textContent=mensagemErroPT(error);return}
-  window.closeAddStationModal();
-  if(fuelLat!=null){
-    nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));
-    await renderFuelData()
-  }
-}
-
-async function locateAndSearchFuel(){
-  if(!navigator.geolocation){el('fuelStatus').textContent='Este dispositivo não disponibiliza localização.';return}
-  el('fuelStatus').textContent='A obter a sua localização…';
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    fuelLat=pos.coords.latitude;fuelLon=pos.coords.longitude;
-    try{el('fuelStatus').textContent='A procurar preços reais nos postos próximos…';nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Encontrados ${nearbyStations.length} postos no raio selecionado. A Bomba Certa juntou DGEG, OpenStreetMap, base permanente e comunidade.`;subscribeFuelRealtime()}
-    catch(e){el('fuelStatus').textContent=mensagemErroPT(e)}
-  },err=>{el('fuelStatus').textContent=err.code===1?'A localização foi recusada. Autorize-a nas definições do navegador.':'Não foi possível obter a localização.'},{enableHighAccuracy:false,timeout:10000,maximumAge:120000})
-}
-function subscribeFuelRealtime(){
+function subscribeRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
-  fuelChannel=supabase.channel('fuel-community').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_registry'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_fillups'},async()=>{await loadFuelFillups()}).subscribe()
+  fuelChannel=supabase.channel('bomba-certa').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},()=>renderStations())
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},()=>renderStations())
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},()=>renderStations())
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_fillups'},()=>loadFillups())
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},()=>loadLeaderboard()).subscribe()
 }
-el('locateFuelBtn').onclick=locateAndSearchFuel;
-el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent=`Pesquisa atualizada: ${nearbyStations.length} postos encontrados.`};
-el('fuelType').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
-el('fuelRadius').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
 
-document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); if(el('combustiveis')) el('combustiveis').classList.add('active'); document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active')); const fuelNav=document.querySelector('.nav[data-view="combustiveis"]'); if(fuelNav) fuelNav.classList.add('active');
-
-document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));n.classList.add('active');el(n.dataset.view).classList.add('active');if(n.dataset.view==='combustiveis')loadFuelLeaderboard();if(n.dataset.view==='abastecimentos'||n.dataset.view==='estatisticas')loadFuelFillups()})
-document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>{
-  const q=b.dataset.q;let ans='';if(q==='month'){const v=lastData.month.filter(x=>x.kind==='expense').reduce((s,x)=>s+Number(x.amount),0);ans=`Este mês gastou ${euro(v)}.`}
-  if(q==='top'){const by={};lastData.month.filter(x=>x.kind==='expense').forEach(x=>{const k=x.categories?.name||'Sem categoria';by[k]=(by[k]||0)+Number(x.amount)});const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];ans=top?`A maior categoria este mês é ${top[0]}, com ${euro(top[1])}.`:'Ainda não há despesas este mês.'}
-  if(q==='products')ans=`Tem ${lastData.products} produto${lastData.products===1?'':'s'} registado${lastData.products===1?'':'s'}.`;el('assistantAnswer').textContent=ans
-})
-initSession()
+authCheck();
 </script>
 </body>
 </html>
