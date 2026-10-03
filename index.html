@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v3.3 — GPS e confiança</title>
+<title>Bomba Certa v3.5 — administração</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -64,7 +64,7 @@ header{
 .station-actions button{border:1px solid var(--line);background:white;border-radius:10px;padding:8px 9px;font-size:12px;font-weight:800}
 .station-actions .go{background:#111827;color:#fff;border-color:#111827}
 .station-actions .photo{background:#eff8ff;color:#175cd3;border-color:#d1e9ff}
-.warn{color:var(--warn);font-size:11px;font-weight:800;margin-top:6px}
+.warn{color:var(--warn);font-size:11px;font-weight:800;margin-top:6px}.price-update{font-size:10px;color:#667085;margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.price-update .dot{width:6px;height:6px;border-radius:50%;background:#98a2b3;display:inline-block}.price-update.community .dot{background:#f79009}.price-update.official .dot{background:#12b76a}
 .ok{color:var(--ok);font-size:11px;font-weight:800;margin-top:6px}
 .route{margin-top:10px;border:1px solid var(--line);background:#fafafa;border-radius:14px;padding:12px}
 .route-steps{max-height:170px;overflow:auto;margin-top:8px}.route-step{font-size:12px;border-bottom:1px solid var(--line);padding:7px 0}
@@ -88,7 +88,7 @@ header{
 .progress{height:10px;background:#eef2f6;border-radius:999px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:#111827}
 .leader{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .leader img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
-.bottom-nav{
+.admin-user{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.admin-user:last-child{border-bottom:0}.admin-email{font-size:12px;color:var(--muted);word-break:break-all}.admin-badge{display:inline-flex;background:#111827;color:#fff;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:850;margin-left:6px}.admin-warning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;margin-bottom:12px}.bottom-nav{
   position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);
   border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
   display:grid;grid-template-columns:repeat(4,1fr);gap:4px
@@ -109,6 +109,7 @@ header{
   .toolbar{grid-template-columns:1fr 1fr}.toolbar .btn{grid-column:1/-1}
   .kpis{grid-template-columns:1fr 1fr}
 }
+.bottom-nav.admin-enabled{grid-template-columns:repeat(5,1fr)}
 @media(max-width:560px){
   .app{padding-left:10px;padding-right:10px}
   .header-in{padding:0 10px}.brand{font-size:19px}
@@ -309,6 +310,24 @@ header{
       </div>
     </div>
   </section>
+
+  <section id="admin" class="section">
+    <div class="section-title"><h2>Administração</h2><span class="pill">Acesso reservado</span></div>
+    <div class="admin-warning">
+      Esta área permite gerir contas da Bomba Certa. A eliminação de uma conta é permanente. A conta proprietária fica protegida de eliminação acidental enquanto for o único administrador.
+    </div>
+    <div class="kpis">
+      <div class="card kpi"><small>Utilizadores</small><strong id="adminUserCount">0</strong></div>
+      <div class="card kpi"><small>Estado</small><strong style="font-size:17px">Administrador</strong></div>
+      <div class="card kpi"><small>Preços</small><strong style="font-size:17px">Acesso total</strong></div>
+      <div class="card kpi"><small>Contas</small><strong style="font-size:17px">Gestão total</strong></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="section-title"><h2>Contas registadas</h2><button id="refreshAdminBtn" class="btn secondary">Atualizar</button></div>
+      <div id="adminUsers" class="empty">A carregar utilizadores…</div>
+    </div>
+  </section>
+
 </main>
 
 <nav class="bottom-nav" aria-label="Navegação principal">
@@ -316,6 +335,7 @@ header{
   <button class="nav" data-section="abastecimentos"><span>🧾</span>Os meus gastos</button>
   <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
   <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
+  <button id="adminNav" class="nav hidden" data-section="admin"><span>⚙️</span>Admin</button>
 </nav>
 </div>
 
@@ -468,16 +488,65 @@ function showSection(id){
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
   if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
+  if(id==='admin'&&isAdminUser)loadAdminUsers();
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 $('profileTopBtn').onclick=()=>showSection('perfil');
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
 
+
+let isAdminUser=false;
+async function checkAdmin(){
+  const {data,error}=await supabase.rpc('is_app_admin');
+  isAdminUser=Boolean(!error&&data===true);
+  if(isAdminUser){
+    $('adminNav').classList.remove('hidden');
+    document.querySelector('.bottom-nav')?.classList.add('admin-enabled')
+  }else{
+    $('adminNav').classList.add('hidden');
+    document.querySelector('.bottom-nav')?.classList.remove('admin-enabled')
+  }
+  return isAdminUser
+}
+async function loadAdminUsers(){
+  if(!isAdminUser)return;
+  $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
+  const {data,error}=await supabase.rpc('admin_list_users');
+  if(error){$('adminUsers').textContent=errPT(error);return}
+  const rows=data||[];
+  $('adminUserCount').textContent=rows.length;
+  const {data:{user}}=await supabase.auth.getUser();
+  $('adminUsers').className='';
+  $('adminUsers').innerHTML=rows.map(u=>{
+    const self=u.user_id===user?.id;
+    const name=esc(u.display_name||'Utilizador');
+    return `<div class="admin-user">
+      <div><b>${name}${self?'<span class="admin-badge">A sua conta</span>':''}</b>
+      <div class="admin-email">${esc(u.email||'')}</div>
+      <div class="tiny muted">Criada: ${u.created_at?new Date(u.created_at).toLocaleDateString('pt-PT'):'—'} · Último acesso: ${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-PT'):'—'} · ${Number(u.points||0)} pts</div></div>
+      <div>${self?'<span class="pill">Proprietário</span>':`<button class="btn danger" onclick="adminDeleteUser('${u.user_id}','${esc((u.email||'').replace(/'/g,''))}')">Apagar conta</button>`}</div>
+    </div>`
+  }).join('')
+}
+window.adminDeleteUser=async(userId,email)=>{
+  const phrase='APAGAR';
+  const confirmation=prompt(`Eliminar permanentemente a conta ${email}?\n\nEscreva ${phrase} para confirmar.`);
+  if(confirmation!==phrase)return;
+  if(!confirm(`Última confirmação: apagar definitivamente ${email}?`))return;
+  const {data,error}=await supabase.rpc('admin_delete_user',{p_user_id:userId});
+  if(error){alert('Não foi possível apagar a conta: '+errPT(error));return}
+  if(!data){alert('A conta não foi encontrada ou já tinha sido eliminada.')}
+  await loadAdminUsers()
+}
+$('refreshAdminBtn').onclick=loadAdminUsers;
+
 async function enterApp(){
   $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');
   await supabase.rpc('ensure_my_fuel_profile');
+  await checkAdmin();
   await Promise.all([loadFillups(),loadLeaderboard()]);
+  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')) await loadAdminUsers();
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
@@ -609,6 +678,26 @@ async function searchStations(){
   await renderStations();
   $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`
 }
+
+function fmtDateTime(ts){
+  if(!ts)return '';
+  const d=new Date(ts);
+  if(Number.isNaN(d.getTime()))return String(ts);
+  return d.toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})
+}
+function relativeTime(ts){
+  if(!ts)return '';
+  const d=new Date(ts); if(Number.isNaN(d.getTime()))return '';
+  const mins=Math.max(0,Math.round((Date.now()-d.getTime())/60000));
+  if(mins<1)return 'agora';
+  if(mins<60)return `há ${mins} min`;
+  const h=Math.round(mins/60);
+  if(h<24)return `há ${h} h`;
+  const days=Math.round(h/24);
+  if(days<7)return `há ${days} d`;
+  return fmtDateTime(ts)
+}
+
 async function communityData(){
   if(currentLat==null)return {reports:[],validations:[],contributors:[],statuses:[]};
   const km=Number($('fuelRadius').value)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(currentLat*Math.PI/180)));
@@ -635,7 +724,7 @@ function candidateFor(key,reports,validations,contributors){
   for(const g of Object.values(groups)){
     const ids=new Set(g.reports.map(x=>x.id));
     validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.max=Math.max(g.max,pts[v.user_id]||0)});
-    g.count=g.support.size;g.required=g.trusted?1:reqSupport(g.max);g.accepted=g.trusted||g.count>=g.required
+    g.count=g.support.size;g.required=g.trusted?1:reqSupport(g.max);g.accepted=g.trusted||g.count>=g.required;g.updatedAt=g.latest
   }
   return Object.values(groups).sort((a,b)=>Number(b.accepted)-Number(a.accepted)||b.count-a.count||new Date(b.latest)-new Date(a.latest))[0]
 }
@@ -647,21 +736,27 @@ async function renderStations(){
   const cd=await communityData();
   nearbyStations=nearbyStations.map(s=>{
     const c=candidateFor(s.key,cd.reports,cd.validations,cd.contributors),community=c?.accepted?c.price:null,displayPrice=community||s.officialPrice||null;
-    return {...s,candidate:c,displayPrice,priceSource:community?'community':(s.officialPrice?'official':null),closed:closedText(s.key,cd.statuses)}
+    const priceSource=community?'community':(s.officialPrice?'official':null);
+    const lastUpdated=priceSource==='community' ? c?.updatedAt : (s.officialUpdated||null);
+    return {...s,candidate:c,displayPrice,priceSource,lastUpdated,closed:closedText(s.key,cd.statuses)}
   }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
   $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
     const c=s.candidate,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):null;
     const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade validada</span>':'<span class="source none">Sem preço confirmado</span>';
     const proposal=c&&!c.accepted?`<div class="warn">Proposta: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.count}/${c.required} apoios</div>`:'';
-    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+    const updateLine=s.lastUpdated
+      ? `<div class="price-update ${s.priceSource==='community'?'community':'official'}"><span class="dot"></span>${s.priceSource==='community'?'Preço atualizado pela comunidade':'Última atualização DGEG'} · ${relativeTime(s.lastUpdated)} <span>(${fmtDateTime(s.lastUpdated)})</span></div>`
+      : '';
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
 
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
   for(const s of nearbyStations){
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+    const upd=s.lastUpdated?`<br><span style="font-size:11px;color:#667085">${s.priceSource==='community'?'Atualizado pela comunidade':'Atualização DGEG'} · ${relativeTime(s.lastUpdated)}</span>`:'';
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${upd}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
@@ -744,7 +839,9 @@ $('savePriceBtn').onclick=async()=>{
   const {data:{user}}=await supabase.auth.getUser();const s=currentPriceStation;
   const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
   if(error){$('priceStatus').textContent=errPT(error);return}
-  $('priceModal').classList.remove('open');await Promise.all([renderStations(),loadLeaderboard()])
+  $('priceStatus').textContent='Preço atualizado agora.';
+  setTimeout(()=>{$('priceModal').classList.remove('open')},250);
+  await Promise.all([renderStations(),loadLeaderboard()])
 };
 window.confirmPrice=async(id,ok)=>{
   const {data:{user}}=await supabase.auth.getUser();
@@ -852,7 +949,7 @@ async function loadLeaderboard(){
   const {data:rows}=await supabase.from('fuel_contributor_stats').select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports,trusted_publisher').order('points',{ascending:false}).limit(20);
   const mine=(rows||[]).find(x=>x.user_id===user.id)||(await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle()).data;
   if(mine){
-    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n;$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
+    const l=level(mine.points);$('myName').textContent=mine.display_name;$('myLevel').textContent=isAdminUser?'👑 Proprietário / Administrador':(mine.trusted_publisher?'✓ Editor de confiança':l.i+' '+l.n);$('myPoints').textContent=mine.points+' pts';$('profileName').value=mine.display_name;
     const src=mine.avatar_path?supabase.storage.from('avatars').getPublicUrl(mine.avatar_path).data.publicUrl+'?v='+encodeURIComponent(mine.avatar_path):fallbackAvatar();$('myAvatar').src=src;$('topAvatar').src=src;
     if(l.x){const pct=Math.max(0,Math.min(100,(mine.points-l.m)/(l.x-l.m)*100));$('rankProgress').style.width=pct+'%';$('rankNext').textContent=`Faltam ${l.x-mine.points} pontos para o nível seguinte.`}else{$('rankProgress').style.width='100%';$('rankNext').textContent='Nível máximo atingido.'}
   }

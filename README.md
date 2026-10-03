@@ -1,27 +1,30 @@
-# Bomba Certa v3.3 — GPS robusto + editor de confiança
+# Bomba Certa v3.5 — administração segura
 
-## GPS
-A navegação deixa de depender da rota interna.
+## Conta proprietária
+A conta associada ao email configurado no projeto recebeu o papel de **owner/admin** no backend.
 
-Cada posto passa a ter:
-- **GPS** — abre imediatamente a aplicação de navegação do dispositivo;
-- **Ver rota** — mantém a rota dentro da Bomba Certa.
+## Poderes
+O administrador tem acesso de leitura/escrita/eliminação às tabelas principais da Bomba Certa através de políticas RLS específicas de administrador.
 
-Comportamento:
-- iPhone/iPad: Apple Maps;
-- Android: app de mapas/navegação através do esquema `geo:`;
-- computador: Google Maps;
-- dentro da rota continuam disponíveis botões para GPS do telemóvel e Google Maps.
+Também dispõe de:
+- lista das contas registadas;
+- email;
+- data de criação;
+- último acesso;
+- nome público;
+- pontos;
+- eliminação permanente de outras contas.
 
-## Editor de confiança
-A aplicação passa a suportar o campo `trusted_publisher` na tabela `fuel_contributor_stats`.
+## Eliminar contas
+A eliminação exige duas confirmações:
+1. escrever `APAGAR`;
+2. confirmar novamente.
 
-Quando esse campo está ativo:
-- um preço publicado por esse utilizador é aceite imediatamente;
-- não precisa de 5, 4, 3 ou 2 confirmações;
-- aparece no perfil/ranking como **Editor de confiança**.
+Ao eliminar um utilizador, os objetos de Storage que lhe pertenciam são transferidos para o administrador antes da eliminação, evitando bloqueios por propriedade de ficheiros.
 
-O privilégio não é controlado por uma palavra-passe escrita no código. Isso evita expor credenciais no HTML público.
+A última conta administradora não pode ser eliminada através desta função, evitando que a aplicação fique sem proprietário.
 
 ## Segurança
-Nunca colocar a palavra-passe de uma conta de administração dentro de `index.html`, JavaScript público ou README.
+O estatuto de administrador é guardado no backend, numa tabela privada. Não é decidido por email, palavra-passe ou JavaScript do browser.
+
+A palavra-passe nunca é guardada no código público.
