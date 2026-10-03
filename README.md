@@ -1,28 +1,23 @@
-# Bomba Certa v4.7 — perfil imediato + desbloqueios
+# Bomba Certa v4.8 — criação de contas corrigida
 
-## Correção da página inicial
-O topo já não depende do carregamento completo da secção Perfil.
+## Diagnóstico
+A Edge Function de criação estava ativa e o backend recebia pedidos com sucesso, mas a interface podia não refletir corretamente a criação da conta.
 
-Agora:
-1. usa imediatamente o último perfil guardado em cache;
-2. atualiza em paralelo com uma leitura leve do utilizador autenticado;
-3. mostra fotografia e nível na página inicial sem obrigar a abrir o Perfil;
-4. atualiza o cache sempre que o perfil/fotografia muda.
+## Correções
+Na Administração, antes de criar uma conta a aplicação agora:
+1. verifica se existe sessão;
+2. renova a sessão se estiver perto de expirar;
+3. confirma que o utilizador continua a ser administrador;
+4. envia explicitamente o JWT do utilizador + publishable key para a Edge Function;
+5. lê sempre a resposta real da função;
+6. mostra erros claros;
+7. atualiza imediatamente a lista de utilizadores após sucesso.
 
-## Progressão
-Foi acrescentado um sistema visual de progressão:
+## Interface
+- botão mostra `A criar conta…`;
+- fica temporariamente bloqueado para evitar duplo clique;
+- opção para ver/esconder a palavra-passe;
+- mensagem verde de confirmação;
+- tratamento claro de email duplicado, sessão expirada ou falta de permissões.
 
-- 50 pts — Explorador — Alertas pessoais
-- 150 pts — Guia — Análise avançada
-- 400 pts — Especialista — Rotas de poupança
-- 800 pts — Embaixador — Área Embaixador
-
-Os pontos continuam privados: só o próprio utilizador vê a sua pontuação e progresso.
-
-Os cartões de desbloqueio representam níveis de acesso/benefícios preparados para a evolução do produto; não prometem serviços externos ainda não implementados.
-
-## Home
-A primeira página passa a mostrar um teaser:
-`Ganhe pontos. Suba de nível. Desbloqueie benefícios.`
-
-O botão leva diretamente à progressão do perfil.
+A `service_role` continua exclusivamente no backend e nunca é exposta no browser.

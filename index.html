@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.7 — perfil imediato e desbloqueios</title>
+<title>Bomba Certa v4.8 — criação de contas corrigida</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -173,6 +173,13 @@ header{
 .unlock-item .u-state{font-size:9px;font-weight:900;margin-top:8px}
 .unlock-item.unlocked .u-state{color:#18794e}.unlock-item.locked .u-state{color:#98a2b3}
 @media(max-width:720px){.unlock-grid{grid-template-columns:1fr 1fr}.unlock-teaser{align-items:flex-start}.unlock-teaser .btn{white-space:nowrap}}
+
+
+.admin-create-success{background:#ecfdf3;border:1px solid #abefc6;color:#166534;border-radius:12px;padding:11px 12px;font-size:12px;font-weight:800}
+.admin-create-error{background:#fff1f0;border:1px solid #fecdca;color:#b42318;border-radius:12px;padding:11px 12px;font-size:12px;font-weight:800}
+.admin-create-info{background:#eff8ff;border:1px solid #b2ddff;color:#175cd3;border-radius:12px;padding:11px 12px;font-size:12px;font-weight:800}
+.admin-create-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:620px){.admin-create-row{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -402,18 +409,23 @@ header{
     <div class="card" style="margin-top:12px">
       <div class="section-title"><h2>Criar utilizador</h2><span class="pill">Admin</span></div>
       <div class="form">
-        <input id="adminNewEmail" class="input" type="email" autocomplete="off" placeholder="Email">
-        <input id="adminNewPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)">
-        <select id="adminNewLevel" class="input">
-          <option value="novato">Novato</option>
-          <option value="explorador">Explorador</option>
-          <option value="guia">Guia</option>
-          <option value="especialista">Especialista</option>
-          <option value="embaixador">Embaixador</option>
-          <option value="editor">Editor de confiança</option>
-          <option value="administrador">Administrador</option>
-        </select>
-        <button id="adminCreateUserBtn" class="btn">Criar utilizador</button>
+        <input id="adminNewEmail" class="input" type="email" autocomplete="off" placeholder="Email do novo utilizador">
+        <div class="admin-create-row">
+          <div style="position:relative">
+            <input id="adminNewPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
+            <button id="toggleAdminPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
+          </div>
+          <select id="adminNewLevel" class="input">
+            <option value="novato">Novato</option>
+            <option value="explorador">Explorador</option>
+            <option value="guia">Guia</option>
+            <option value="especialista">Especialista</option>
+            <option value="embaixador">Embaixador</option>
+            <option value="editor">Editor de confiança</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+        <button id="adminCreateUserBtn" class="btn">+ Criar utilizador</button>
         <div id="adminCreateStatus" class="status"></div>
       </div>
     </div>
@@ -720,6 +732,34 @@ window.setAdminReportStatus=async(id,status)=>{
   await loadAdminReports()
 }
 
+
+function setAdminCreateStatus(message,type='info'){
+  const el=$('adminCreateStatus');
+  el.className=type==='success'?'admin-create-success':type==='error'?'admin-create-error':'admin-create-info';
+  el.textContent=message
+}
+function adminLevelLabel(level){
+  return ({
+    novato:'Novato',explorador:'Explorador',guia:'Guia',especialista:'Especialista',
+    embaixador:'Embaixador',editor:'Editor de confiança',administrador:'Administrador'
+  })[level]||level
+}
+async function ensureFreshAdminSession(){
+  let {data:{session}}=await supabase.auth.getSession();
+  if(!session)throw new Error('Sessão terminada. Entre novamente.');
+
+  const expiresAt=Number(session.expires_at||0)*1000;
+  if(expiresAt && expiresAt-Date.now()<90_000){
+    const refreshed=await supabase.auth.refreshSession();
+    if(refreshed.error||!refreshed.data.session)throw new Error('Não foi possível renovar a sessão.');
+    session=refreshed.data.session
+  }
+
+  const {data:isAdmin,error}=await supabase.rpc('is_app_admin');
+  if(error||isAdmin!==true)throw new Error('Esta conta não tem permissões de administrador.');
+  return session
+}
+
 async function loadAdminUsers(){
   if(!isAdminUser)return;
   $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
@@ -778,22 +818,78 @@ window.adminDeleteUser=async(userId,email)=>{
   await loadAdminUsers()
 }
 
+$('toggleAdminPassword').onclick=()=>{
+  const p=$('adminNewPassword');
+  p.type=p.type==='password'?'text':'password';
+  $('toggleAdminPassword').textContent=p.type==='password'?'👁':'🙈'
+};
+
 $('adminCreateUserBtn').onclick=async()=>{
   const email=$('adminNewEmail').value.trim().toLowerCase();
   const password=$('adminNewPassword').value;
   const level=$('adminNewLevel').value;
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('adminCreateStatus').textContent='Introduza um email válido.';return}
-  if(password.length<8){$('adminCreateStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
-  $('adminCreateStatus').textContent='A criar utilizador…';
-  const {data,error}=await supabase.functions.invoke('admin-create-user',{body:{email,password,level}});
-  if(error){$('adminCreateStatus').textContent=errPT(error);return}
-  if(data?.error){$('adminCreateStatus').textContent=data.error;return}
-  $('adminNewEmail').value='';$('adminNewPassword').value='';$('adminNewLevel').value='novato';
-  $('adminCreateStatus').textContent=`Utilizador criado com nível ${level}.`;
-  await loadAdminUsers()
+  const btn=$('adminCreateUserBtn');
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    setAdminCreateStatus('Introduza um email válido.','error');return
+  }
+  if(password.length<8){
+    setAdminCreateStatus('A palavra-passe deve ter pelo menos 8 caracteres.','error');return
+  }
+
+  btn.disabled=true;
+  const oldText=btn.textContent;
+  btn.textContent='A criar conta…';
+  setAdminCreateStatus('A validar permissões e criar a conta…','info');
+
+  try{
+    const session=await ensureFreshAdminSession();
+
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/admin-create-user`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${session.access_token}`,
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({email,password,level})
+    });
+
+    let payload={};
+    try{payload=await response.json()}catch{}
+
+    if(!response.ok || payload?.error){
+      const raw=String(payload?.error||`Erro ${response.status}`);
+      const low=raw.toLowerCase();
+      if(low.includes('already')||low.includes('registered')||low.includes('exists')){
+        throw new Error('Já existe uma conta com este email.')
+      }
+      if(response.status===401)throw new Error('A sessão expirou. Saia e volte a entrar.')
+      if(response.status===403)throw new Error('Esta conta não tem permissões para criar utilizadores.')
+      throw new Error(raw)
+    }
+
+    $('adminNewEmail').value='';
+    $('adminNewPassword').value='';
+    $('adminNewLevel').value='novato';
+
+    setAdminCreateStatus(`✓ Conta ${email} criada com sucesso · ${adminLevelLabel(level)}.`,'success');
+
+    // Dar tempo ao Auth/database para refletir a criação e atualizar a lista imediatamente.
+    await new Promise(r=>setTimeout(r,220));
+    await loadAdminUsers();
+
+    const list=$('adminUsers');
+    list?.scrollIntoView({behavior:'smooth',block:'nearest'})
+  }catch(e){
+    setAdminCreateStatus(errPT(e),'error')
+  }finally{
+    btn.disabled=false;
+    btn.textContent=oldText
+  }
 }
 
-$('refreshAdminBtn').onclick=loadAdminUsers;
+$('refreshAdminBtn').onclick=async()=>{await loadAdminUsers()};
 $('refreshReportsBtn').onclick=loadAdminReports;
 
 async function enterApp(){
