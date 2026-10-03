@@ -1,26 +1,27 @@
-# CASA+ v1.1 — base permanente de postos
+# CASA+ Combustíveis — versão focada
 
-## Objetivo
-Fazer com que os postos encontrados não desapareçam apenas porque uma fonte externa falhou ou devolveu uma lista incompleta.
+Esta versão separa o módulo de combustíveis da antiga aplicação de gestão doméstica.
 
-## Pesquisa de postos
-A CASA+ passa a cruzar sempre quatro fontes:
-- DGEG;
-- OpenStreetMap;
-- postos acrescentados pela comunidade;
-- base permanente CASA+.
+## Foco principal
+- preços por posto;
+- DGEG + OpenStreetMap + base permanente CASA+ + comunidade;
+- mapa e localização;
+- rota e abertura em GPS;
+- propostas de novos preços;
+- validação comunitária;
+- reputação, pontos e ranking;
+- perfil público com nome e fotografia;
+- possibilidade de adicionar postos em falta.
 
-Sempre que a DGEG, OpenStreetMap ou comunidade descobre um posto, esse posto é gravado na base permanente. Nas pesquisas seguintes, volta a aparecer mesmo que a fonte externa esteja temporariamente indisponível.
+## Publicidade
+Foram reservados espaços discretos e integrados:
+1. pequeno espaço após o cabeçalho da pesquisa;
+2. espaço entre pesquisa/resultados e ranking;
+3. pequeno espaço contextual antes da informação complementar.
 
-## Duplicados
-A fusão considera proximidade geográfica e normalização do nome. A DGEG tem prioridade, depois a base permanente CASA+, OpenStreetMap e comunidade.
+Os espaços não tapam o mapa, não interrompem a navegação e não impedem o acesso a preços ou ações principais.
 
-## RStar Espinho
-A R STAR ENERGY de Anta/Espinho fica pré-registada na base CASA+:
-Rua Ponte D'Anta, 4500-088 Espinho
-Coordenadas: 41.015322, -8.633272
+Nesta fase são apenas placeholders visuais. A rede de publicidade pode ser ligada mais tarde (Google AdSense, parceiros diretos, campanhas locais, etc.).
 
-## Raios
-3 km, 5 km, 10 km, 20 km, 30 km e 50 km.
-
-Mantém preços, propostas comunitárias, hierarquia, pontos, ranking, fotografia de perfil, mapa e navegação.
+## Gestão doméstica
+A parte de despesas, faturas, stock e orçamento deve seguir numa aplicação separada, reutilizando a base já desenvolvida sem misturar a experiência com combustíveis.
