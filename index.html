@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CASA+ v0.8 — comunidade, pontos e ranking</title>
+<title>CASA+ v1.0 — postos completos e comunidade</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -33,7 +33,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 .fuel-card{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
 .price-big{font-size:24px;font-weight:900;min-width:92px;text-align:right}
 .official-price{font-size:11px;font-weight:850;color:#176b4d}
-.community-note{font-size:11px;color:#667085}
+.community-note{font-size:11px;color:#667085}.pending-price{font-size:11px;font-weight:800;color:#a96522}.accepted-price{font-size:11px;font-weight:850;color:#197a52}.community-station{font-size:11px;font-weight:850;color:#6b5a17}
 .fuel-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 .fuel-actions button{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:white;font-weight:750;cursor:pointer}
 .fuel-actions .go{background:#111827;color:#fff;border-color:#111827}
@@ -41,7 +41,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 .confidence{font-size:11px;font-weight:850}.confidence.high{color:#197a52}.confidence.mid{color:#a96522}.confidence.low{color:#8a4b4b}
 .price-modal-input{font-size:34px;font-weight:900;text-align:center;padding:18px}
 .route-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fafafa}
-.route-steps{max-height:190px;overflow:auto;margin-top:8px}.route-step{padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}.rank-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:12px;margin-top:12px}.rank-card{padding:16px}.rank-me{display:flex;gap:14px;align-items:center}.rank-badge{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:var(--soft);border:1px solid var(--line)}.rank-points{font-size:30px;font-weight:900}.progress-track{height:10px;border-radius:999px;background:#edf0f3;overflow:hidden}.progress-fill{height:100%;background:var(--ink);border-radius:999px}.leader-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.leader-pos{font-weight:900;text-align:center}.leader-you{background:#f6f8fa;border-radius:14px;padding-left:8px;padding-right:8px}.points-help{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.points-help>div{padding:10px;border:1px solid var(--line);border-radius:14px;text-align:center}@media(max-width:720px){.rank-grid{grid-template-columns:1fr}.points-help{grid-template-columns:1fr 1fr}}
+.route-steps{max-height:190px;overflow:auto;margin-top:8px}.route-step{padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}.rank-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:12px;margin-top:12px}.rank-card{padding:16px}.rank-me{display:flex;gap:14px;align-items:center}.rank-avatar{width:62px;height:62px;border-radius:18px;object-fit:cover;border:1px solid var(--line);background:var(--soft)}.rank-badge{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:var(--soft);border:1px solid var(--line)}.rank-points{font-size:30px;font-weight:900}.progress-track{height:10px;border-radius:999px;background:#edf0f3;overflow:hidden}.progress-fill{height:100%;background:var(--ink);border-radius:999px}.leader-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.leader-pos{font-weight:900;text-align:center}.leader-you{background:#f6f8fa;border-radius:14px;padding-left:8px;padding-right:8px}.points-help{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.points-help>div{padding:10px;border:1px solid var(--line);border-radius:14px;text-align:center}@media(max-width:720px){.rank-grid{grid-template-columns:1fr}.points-help{grid-template-columns:1fr 1fr}}
 @media(max-width:720px){.fuel-controls{grid-template-columns:1fr 1fr}.fuel-controls .btn{grid-column:1/-1}}
 
 @media(max-width:520px){.app{padding:14px 12px 102px}.grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:19px}.card{padding:15px}.bottom{width:96%}.nav{font-size:11px}.items-grid{grid-template-columns:1fr 62px 75px 78px;gap:5px}}
@@ -130,7 +130,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 
 
 <section id="combustiveis" class="view">
-  <div class="section-title"><h2>Combustíveis perto de mim</h2><span class="pill">DGEG + comunidade</span></div>
+  <div class="section-title"><h2>Combustíveis perto de mim</h2><div class="actions"><span class="pill">DGEG + OSM + comunidade</span><button id="addStationBtn" class="btn secondary">+ Adicionar posto</button></div></div>
   <div class="card">
     <div class="fuel-controls">
       <select id="fuelType" class="input">
@@ -169,7 +169,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
     <div class="card rank-card">
       <div class="section-title" style="margin-top:0"><h2>A minha reputação</h2><span class="pill">CASA+ Comunidade</span></div>
       <div class="rank-me">
-        <div id="myRankBadge" class="rank-badge">🚗</div>
+        <div style="position:relative"><img id="myRankAvatar" class="rank-avatar" alt="Fotografia de perfil"><div id="myRankBadge" class="rank-badge" style="position:absolute;right:-8px;bottom:-8px;width:28px;height:28px;border-radius:9px;font-size:15px">🚗</div></div>
         <div style="min-width:0;flex:1">
           <div id="myRankName" style="font-weight:900">Condutor</div>
           <div id="myRankLevel" class="muted tiny">Novato</div>
@@ -180,7 +180,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
       <div id="myRankNext" class="muted tiny" style="margin-top:6px">Comece a contribuir para subir no ranking.</div>
       <div class="form" style="margin-top:12px">
         <input id="contributorName" class="input" maxlength="28" placeholder="Nome público no ranking">
-        <button id="saveContributorName" class="btn secondary">Guardar nome</button>
+        <button id="saveContributorName" class="btn secondary">Guardar nome</button><input id="contributorAvatar" type="file" accept="image/jpeg,image/png,image/webp" hidden><button id="chooseContributorAvatar" class="btn secondary" type="button">Alterar fotografia</button>
         <div id="contributorNameStatus" class="status"></div>
       </div>
     </div>
@@ -200,6 +200,19 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
       <div><b>+4</b><div class="muted tiny">Posto fechado</div></div>
       <div><b>+5</b><div class="muted tiny">Alguém confirma o seu preço</div></div>
       <div><b>Anti-abuso</b><div class="muted tiny">Repetições rápidas no mesmo posto não dão pontos</div></div>
+    </div>
+  </div>
+
+
+  <div class="card" style="margin-top:12px">
+    <div class="section-title" style="margin-top:0"><h2>Hierarquia de confiança dos preços</h2><span class="pill">Anti-abuso</span></div>
+    <div class="tiny muted">Um preço introduzido por um utilizador não substitui logo o preço de referência. O número de apoios necessários diminui à medida que aumenta a reputação do melhor contribuidor que suporta esse preço.</div>
+    <div class="points-help">
+      <div><b>Novato</b><div class="muted tiny">5 utilizadores</div></div>
+      <div><b>Explorador</b><div class="muted tiny">4 utilizadores</div></div>
+      <div><b>Guia</b><div class="muted tiny">3 utilizadores</div></div>
+      <div><b>Especialista</b><div class="muted tiny">2 utilizadores</div></div>
+      <div><b>Embaixador</b><div class="muted tiny">1 utilizador</div></div>
     </div>
   </div>
 
@@ -263,6 +276,28 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
   </div>
 </div>
 
+
+
+<div id="addStationModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Adicionar posto em falta</h2><button class="btn secondary" onclick="closeAddStationModal()">Fechar</button></div>
+    <div class="form">
+      <input id="newStationName" class="input" placeholder="Nome do posto, ex.: RStar Anta">
+      <input id="newStationAddress" class="input" placeholder="Morada, ex.: Rua Ponte de Anta, Espinho">
+      <div class="two">
+        <input id="newStationLat" class="input" type="number" step="0.000001" placeholder="Latitude">
+        <input id="newStationLon" class="input" type="number" step="0.000001" placeholder="Longitude">
+      </div>
+      <div class="actions">
+        <button id="geocodeStationBtn" class="btn secondary" type="button">🔎 Encontrar pela morada</button>
+        <button id="useMyLocationStationBtn" class="btn secondary" type="button">📍 Usar a minha localização</button>
+      </div>
+      <div class="notice tiny">Também pode preencher latitude/longitude manualmente. O posto ficará identificado como “adicionado pela comunidade”.</div>
+      <button id="saveStationBtn" class="btn">Guardar posto</button>
+      <div id="newStationStatus" class="status"></div>
+    </div>
+  </div>
+</div>
 
 <div id="fuelPriceModal" class="modal">
   <div class="modal-card">
@@ -620,12 +655,56 @@ async function fetchOsmStations(lat,lon,radius){
       distance:haversineKm(lat,lon,c.lat,c.lon),officialPrice:null,officialUpdated:'',source:'OpenStreetMap'}
   }).filter(Boolean).sort((a,b)=>a.distance-b.distance)
 }
+
+async function fetchCommunityStations(lat,lon,radius){
+  const radiusKm=Number(radius)/1000;
+  const latDelta=radiusKm/111;
+  const lonDelta=radiusKm/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const {data,error}=await supabase.from('community_fuel_stations')
+    .select('*')
+    .gte('latitude',lat-latDelta).lte('latitude',lat+latDelta)
+    .gte('longitude',lon-lonDelta).lte('longitude',lon+lonDelta);
+  if(error)throw error;
+  return (data||[]).map(s=>({
+    key:`community:${s.id}`,communityId:s.id,name:s.name,brand:'',lat:Number(s.latitude),lon:Number(s.longitude),
+    address:s.address||'',distance:haversineKm(lat,lon,Number(s.latitude),Number(s.longitude)),
+    officialPrice:null,officialUpdated:'',source:'Comunidade'
+  })).filter(s=>s.distance<=radiusKm)
+}
+function mergeFuelStations(lists){
+  const all=lists.flat().filter(Boolean).sort((a,b)=>{
+    const priority={DGEG:0,OpenStreetMap:1,Comunidade:2};
+    return (priority[a.source]??9)-(priority[b.source]??9)
+  });
+  const out=[];
+  for(const s of all){
+    const dup=out.find(x=>haversineKm(x.lat,x.lon,s.lat,s.lon)<0.12 || (
+      norm(x.name)&&norm(s.name)&&(norm(x.name).includes(norm(s.name))||norm(s.name).includes(norm(x.name))) &&
+      haversineKm(x.lat,x.lon,s.lat,s.lon)<0.5
+    ));
+    if(!dup){
+      out.push({...s});
+      continue
+    }
+    if(!dup.officialPrice && s.officialPrice)dup.officialPrice=s.officialPrice;
+    if(!dup.officialUpdated && s.officialUpdated)dup.officialUpdated=s.officialUpdated;
+    if((!dup.address || dup.address.length<5) && s.address)dup.address=s.address;
+    if(!dup.brand && s.brand)dup.brand=s.brand;
+    if(dup.source!=='DGEG' && s.source==='DGEG'){
+      dup.key=s.key;dup.dgegId=s.dgegId;dup.source='DGEG'
+    }
+  }
+  return out
+}
 async function fetchNearbyStations(lat,lon,radius){
-  try{
-    const dgeg=await fetchDgegNearbyStations(lat,lon,radius);
-    if(dgeg.length)return dgeg
-  }catch(e){console.warn('DGEG indisponível:',e)}
-  return fetchOsmStations(lat,lon,radius)
+  const results=await Promise.allSettled([
+    fetchDgegNearbyStations(lat,lon,radius),
+    fetchOsmStations(lat,lon,radius),
+    fetchCommunityStations(lat,lon,radius)
+  ]);
+  const lists=results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+  if(!lists.length)throw new Error('Não foi possível obter os postos próximos.');
+  return mergeFuelStations(lists).filter(s=>s.distance<=Number(radius)/1000).sort((a,b)=>a.distance-b.distance)
 }
 async function fetchCommunityPrices(){
   if(fuelLat==null||fuelLon==null)return [];
@@ -636,41 +715,116 @@ async function fetchCommunityPrices(){
   if(error)throw error;return (data||[]).filter(r=>haversineKm(fuelLat,fuelLon,r.latitude,r.longitude)<=radiusKm)
 }
 function latestPriceByStation(reports){const map={};for(const r of reports){if(!map[r.station_key]||new Date(r.observed_at)>new Date(map[r.station_key].observed_at))map[r.station_key]=r}return map}
-async function fetchFuelValidations(ids){if(!ids.length)return [];const {data,error}=await supabase.from('fuel_price_validations').select('*').in('report_id',ids);if(error)throw error;return data||[]}
+async function fetchFuelValidations(ids){
+  if(!ids.length)return [];
+  const {data,error}=await supabase.from('fuel_price_validations').select('*').in('report_id',ids);
+  if(error)throw error;
+  return data||[]
+}
 async function fetchStationStatuses(keys){if(!keys.length)return [];const since=new Date(Date.now()-6*3600*1000).toISOString();const {data,error}=await supabase.from('fuel_station_status_reports').select('*').in('station_key',keys).gte('created_at',since);if(error)throw error;return data||[]}
 function validationStats(rows,id){const v=rows.filter(x=>x.report_id===id);return {yes:v.filter(x=>x.is_confirmed).length,no:v.filter(x=>!x.is_confirmed).length}}
+
+function requiredSupportForPoints(points){
+  points=Number(points||0);
+  if(points>=800)return 1;
+  if(points>=400)return 2;
+  if(points>=150)return 3;
+  if(points>=50)return 4;
+  return 5
+}
+function communityCandidateForStation(stationKey,reports,validations,contributors){
+  const stationReports=reports.filter(r=>r.station_key===stationKey);
+  if(!stationReports.length)return null;
+
+  const pointsByUser=Object.fromEntries((contributors||[]).map(x=>[x.user_id,Number(x.points||0)]));
+  const groups={};
+
+  for(const r of stationReports){
+    const key=Number(r.price).toFixed(3);
+    if(!groups[key])groups[key]={price:Number(r.price),reports:[],latest:r.observed_at,supporters:new Set(),maxPoints:0};
+    const g=groups[key];
+    g.reports.push(r);
+    g.supporters.add(r.user_id);
+    g.maxPoints=Math.max(g.maxPoints,pointsByUser[r.user_id]||0);
+    if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
+  }
+
+  for(const g of Object.values(groups)){
+    const ids=new Set(g.reports.map(r=>r.id));
+    for(const v of validations){
+      if(ids.has(v.report_id) && v.is_confirmed){
+        g.supporters.add(v.user_id);
+        g.maxPoints=Math.max(g.maxPoints,pointsByUser[v.user_id]||0)
+      }
+    }
+    g.supportCount=g.supporters.size;
+    g.required=requiredSupportForPoints(g.maxPoints);
+    g.accepted=g.supportCount>=g.required
+  }
+
+  const all=Object.values(groups).sort((a,b)=>{
+    if(a.accepted!==b.accepted)return a.accepted?-1:1;
+    if(a.supportCount!==b.supportCount)return b.supportCount-a.supportCount;
+    return new Date(b.latest)-new Date(a.latest)
+  });
+  return all[0]||null
+}
+
 function confidenceLabel(report,stats){if(!report)return {text:'Preço oficial',cls:'mid'};const h=(Date.now()-new Date(report.observed_at))/3600000,score=stats.yes-stats.no;if(h<=2&&score>=2)return {text:'Muito fiável',cls:'high'};if(h<=6&&score>=1)return {text:'Fiável',cls:'high'};if(h<=12)return {text:'A confirmar',cls:'mid'};return {text:'Desatualizado',cls:'low'}}
 function stationStatusSummary(statuses,key){const r=statuses.filter(x=>x.station_key===key);return r.filter(x=>x.status==='closed').length?'⚠️ reporte recente: posto fechado':''}
 function ensureFuelMap(){if(fuelMap)return;fuelMap=L.map('fuelMap').setView([39.5,-8],6);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(fuelMap)}
 
 async function renderFuelData(){
-  const reports=await fetchCommunityPrices(),latest=latestPriceByStation(reports),reportIds=Object.values(latest).map(r=>r.id);
-  const [validations,statuses]=await Promise.all([fetchFuelValidations(reportIds),fetchStationStatuses(nearbyStations.map(s=>s.key))]);
+  const reports=await fetchCommunityPrices();
+  const reportIds=reports.map(r=>r.id);
+  const [validations,statuses,contributorsRes]=await Promise.all([
+    fetchFuelValidations(reportIds),
+    fetchStationStatuses(nearbyStations.map(s=>s.key)),
+    supabase.from('fuel_contributor_stats').select('user_id,points,display_name,avatar_path')
+  ]);
+  const contributors=contributorsRes.data||[];
+
   const enriched=nearbyStations.map(s=>{
-    const report=latest[s.key]||null,stats=report?validationStats(validations,report.id):{yes:0,no:0},conf=confidenceLabel(report,stats);
-    const displayPrice=report?Number(report.price):(s.officialPrice||null);
-    return {...s,report,stats,conf,displayPrice,statusText:stationStatusSummary(statuses,s.key)}
+    const candidate=communityCandidateForStation(s.key,reports,validations,contributors);
+    const official=s.officialPrice||null;
+    const acceptedCommunity=candidate?.accepted?candidate.price:null;
+    const displayPrice=acceptedCommunity||official||null;
+    return {...s,candidate,displayPrice,statusText:stationStatusSummary(statuses,s.key)}
   }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
   el('fuelResults').className=enriched.length?'':'empty';
   el('fuelResults').innerHTML=enriched.length?enriched.slice(0,25).map((s,i)=>{
-    const p=s.report,st=s.stats,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):'—';
+    const c=s.candidate;
+    const price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):'—';
+    const officialLine=s.officialPrice?`<div class="official-price">DGEG: ${Number(s.officialPrice).toFixed(3).replace('.',',')} €/L${s.officialUpdated?' · '+esc(s.officialUpdated):''}</div>`:'';
+    let communityLine='<div class="community-note">Ainda sem proposta comunitária.</div>';
+    if(c){
+      communityLine=c.accepted
+        ? `<div class="accepted-price">✓ Comunidade validou ${c.price.toFixed(3).replace('.',',')} €/L · ${c.supportCount} apoio${c.supportCount===1?'':'s'}</div>`
+        : `<div class="pending-price">⏳ Novo preço proposto: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.supportCount}/${c.required} apoios</div>`;
+    }
     return `<div class="row fuel-card"><div><b>${i===0&&s.displayPrice?'🏆 ':''}${esc(s.name)}</b>
       <div class="muted tiny">${s.distance.toFixed(1)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-      ${s.officialPrice?`<div class="official-price">DGEG: ${Number(s.officialPrice).toFixed(3).replace('.',',')} €/L${s.officialUpdated?' · '+esc(s.officialUpdated):''}</div>`:''}
-      ${p?`<div class="community-note">Comunidade: ${Number(p.price).toFixed(3).replace('.',',')} €/L · ${fuelAgeLabel(p.observed_at)} · 👍 ${st.yes} · 👎 ${st.no}</div>`:'<div class="community-note">Sem correção comunitária</div>'}
+      ${officialLine}${s.source==='Comunidade'?'<div class="community-station">📍 Posto adicionado pela comunidade</div>':''}${communityLine}
       ${s.statusText?`<div class="tiny stale">${esc(s.statusText)}</div>`:''}
-      <div class="fuel-actions"><button class="go" onclick="startFuelNavigation('${s.key}')">🧭 Ir para aqui</button>
-      <button class="price-edit" onclick="openFuelPriceModal('${s.key}')">✏️ Atualizar preço</button>
-      ${p?`<button onclick="confirmFuelPrice('${p.id}',true)">✓ Confirmar</button><button onclick="confirmFuelPrice('${p.id}',false)">Preço incorreto</button>`:''}
-      <button onclick="reportStationClosed('${s.key}')">Posto fechado</button></div></div>
+      <div class="fuel-actions">
+        <button class="go" onclick="startFuelNavigation('${s.key}')">🧭 Ir para aqui</button>
+        <button class="price-edit" onclick="openFuelPriceModal('${s.key}')">✏️ Propor novo preço</button>
+        ${c&&c.reports?.length?`<button onclick="confirmFuelPrice('${c.reports[0].id}',true)">✓ Confirmar proposta</button><button onclick="confirmFuelPrice('${c.reports[0].id}',false)">Preço incorreto</button>`:''}
+        <button onclick="reportStationClosed('${s.key}')">Posto fechado</button>
+      </div></div>
       <div class="price-big">${price}<div class="muted tiny">€/L</div></div></div>`
   }).join(''):'Não foram encontrados postos neste raio.';
 
   ensureFuelMap();fuelMarkers.forEach(m=>fuelMap.removeLayer(m));fuelMarkers=[];
   if(userMarker)fuelMap.removeLayer(userMarker);userMarker=L.marker([fuelLat,fuelLon]).addTo(fuelMap).bindPopup('A sua localização');
-  for(const s of enriched){fuelMarkers.push(L.marker([s.lat,s.lon]).addTo(fuelMap).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="startFuelNavigation('${s.key}')">Ir para aqui</button>`))}
-  const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14});await loadFuelLeaderboard()
+  for(const s of enriched){
+    const c=s.candidate;
+    const extra=c&&!c.accepted?`<br>Proposta: ${c.price.toFixed(3).replace('.',',')} €/L (${c.supportCount}/${c.required})`:'';
+    fuelMarkers.push(L.marker([s.lat,s.lon]).addTo(fuelMap).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${extra}<br><button onclick="startFuelNavigation('${s.key}')">Ir para aqui</button>`))
+  }
+  const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14});
+  await loadFuelLeaderboard()
 }
 window.openFuelPriceModal=(key)=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s)return;currentFuelStation=s;
@@ -685,7 +839,7 @@ el('saveQuickFuelPrice').onclick=async()=>{
   if(!Number.isFinite(price)||price<0.5||price>5){el('fuelQuickStatus').textContent='Introduza um preço por litro, por exemplo 1,799.';return}
   const {data:{user}}=await supabase.auth.getUser();if(!user){el('fuelQuickStatus').textContent='É necessário iniciar sessão.';return}
   const s=currentFuelStation;const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:el('fuelType').value,price,observed_at:new Date().toISOString()});
-  if(error){el('fuelQuickStatus').textContent=mensagemErroPT(error);return}window.closeFuelPriceModal();await renderFuelData()
+  if(error){el('fuelQuickStatus').textContent=mensagemErroPT(error);return}window.closeFuelPriceModal();await renderFuelData();await loadFuelLeaderboard()
 }
 window.confirmFuelPrice=async(id,ok)=>{
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
@@ -729,8 +883,9 @@ function contributorLevel(points){
 }
 async function loadFuelLeaderboard(){
   const {data:{user}}=await supabase.auth.getUser();if(!user)return;
+  await supabase.rpc('ensure_my_fuel_profile');
   const {data,error}=await supabase.from('fuel_contributor_stats')
-    .select('user_id,display_name,points,price_reports,validations,status_reports')
+    .select('user_id,display_name,avatar_path,points,price_reports,validations,status_reports')
     .order('points',{ascending:false}).order('updated_at',{ascending:true}).limit(20);
   if(error){console.warn(error);return}
 
@@ -744,6 +899,13 @@ async function loadFuelLeaderboard(){
     const lvl=contributorLevel(my.points);
     el('myRankBadge').textContent=lvl.icon;
     el('myRankName').textContent=my.display_name||'Condutor';
+    const avatar=el('myRankAvatar');
+    if(my.avatar_path){
+      const {data:pub}=supabase.storage.from('avatars').getPublicUrl(my.avatar_path);
+      avatar.src=pub.publicUrl
+    }else{
+      avatar.src=`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="24" fill="#eef1f4"/><text x="60" y="72" text-anchor="middle" font-size="42">🚗</text></svg>`)}`
+    }
     el('myRankLevel').textContent=lvl.name;
     el('myRankPoints').textContent=`${Number(my.points||0)} pts`;
     el('contributorName').value=my.display_name||'';
@@ -765,11 +927,29 @@ async function loadFuelLeaderboard(){
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
     return `<div class="leader-row ${you?'leader-you':''}">
       <div class="leader-pos">${medal}</div>
-      <div><b>${esc(r.display_name||'Condutor')}</b>${you?' <span class="pill">Você</span>':''}<div class="muted tiny">${lvl.icon} ${lvl.name} · ${r.price_reports} preços · ${r.validations} validações</div></div>
+      <div style="display:flex;gap:9px;align-items:center"><img class="rank-avatar" style="width:38px;height:38px;border-radius:11px" src="${r.avatar_path?supabase.storage.from('avatars').getPublicUrl(r.avatar_path).data.publicUrl:`data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" rx="18" fill="#eef1f4"/><text x="40" y="50" text-anchor="middle" font-size="30">🚗</text></svg>')}`}" alt=""><div><b>${esc(r.display_name||'Condutor')}</b>${you?' <span class="pill">Você</span>':''}<div class="muted tiny">${lvl.icon} ${lvl.name} · ${r.price_reports} preços · ${r.validations} validações</div></div></div>
       <div style="font-weight:900">${r.points} pts</div>
     </div>`
   }).join('')
 }
+
+el('chooseContributorAvatar').onclick=()=>el('contributorAvatar').click();
+el('contributorAvatar').onchange=async e=>{
+  const file=e.target.files?.[0];e.target.value='';if(!file)return;
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){el('contributorNameStatus').textContent='Escolha uma imagem JPG, PNG ou WEBP.';return}
+  if(file.size>3*1024*1024){el('contributorNameStatus').textContent='A fotografia não pode exceder 3 MB.';return}
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
+  el('contributorNameStatus').textContent='A carregar fotografia…';
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+  const path=`${user.id}/perfil.${ext}`;
+  const {error:upErr}=await supabase.storage.from('avatars').upload(path,file,{upsert:true,contentType:file.type});
+  if(upErr){el('contributorNameStatus').textContent=mensagemErroPT(upErr);return}
+  const {error}=await supabase.from('fuel_contributor_stats').update({avatar_path:path}).eq('user_id',user.id);
+  if(error){el('contributorNameStatus').textContent=mensagemErroPT(error);return}
+  el('contributorNameStatus').textContent='Fotografia atualizada.';
+  await loadFuelLeaderboard()
+}
+
 el('saveContributorName').onclick=async()=>{
   const name=el('contributorName').value.trim();
   if(name.length<2){el('contributorNameStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}
@@ -780,6 +960,59 @@ el('saveContributorName').onclick=async()=>{
   if(error){el('contributorNameStatus').textContent=mensagemErroPT(error);return}
   el('contributorNameStatus').textContent='Nome atualizado.';
   await loadFuelLeaderboard()
+}
+
+
+window.openAddStationModal=()=>{
+  el('newStationName').value='';el('newStationAddress').value='';
+  el('newStationLat').value='';el('newStationLon').value='';
+  el('newStationStatus').textContent='';
+  el('addStationModal').classList.add('open')
+}
+window.closeAddStationModal=()=>el('addStationModal').classList.remove('open');
+el('addStationBtn').onclick=window.openAddStationModal;
+
+el('geocodeStationBtn').onclick=async()=>{
+  const address=el('newStationAddress').value.trim();
+  if(address.length<4){el('newStationStatus').textContent='Escreva uma morada para procurar.';return}
+  el('newStationStatus').textContent='A procurar a morada…';
+  try{
+    const u=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&q=${encodeURIComponent(address)}`;
+    const r=await fetch(u,{headers:{'Accept':'application/json'}});
+    if(!r.ok)throw new Error();
+    const rows=await r.json();
+    if(!rows.length){el('newStationStatus').textContent='Não encontrei essa morada. Pode usar a localização atual ou indicar as coordenadas.';return}
+    el('newStationLat').value=Number(rows[0].lat).toFixed(6);
+    el('newStationLon').value=Number(rows[0].lon).toFixed(6);
+    el('newStationStatus').textContent='Localização encontrada. Confirme e guarde o posto.'
+  }catch(e){el('newStationStatus').textContent='Não foi possível procurar a morada agora.'}
+}
+el('useMyLocationStationBtn').onclick=()=>{
+  if(!navigator.geolocation){el('newStationStatus').textContent='Este dispositivo não disponibiliza localização.';return}
+  el('newStationStatus').textContent='A obter a localização…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    el('newStationLat').value=pos.coords.latitude.toFixed(6);
+    el('newStationLon').value=pos.coords.longitude.toFixed(6);
+    el('newStationStatus').textContent='Localização preenchida.'
+  },()=>{el('newStationStatus').textContent='Não foi possível obter a localização.'},{enableHighAccuracy:true,timeout:10000})
+}
+el('saveStationBtn').onclick=async()=>{
+  const name=el('newStationName').value.trim(),address=el('newStationAddress').value.trim();
+  const lat=Number(el('newStationLat').value),lon=Number(el('newStationLon').value);
+  if(name.length<2){el('newStationStatus').textContent='Indique o nome do posto.';return}
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180){el('newStationStatus').textContent='Indique uma localização válida.';return}
+  const {data:{user}}=await supabase.auth.getUser();if(!user){el('newStationStatus').textContent='É necessário iniciar sessão.';return}
+  if(fuelLat!=null && haversineKm(fuelLat,fuelLon,lat,lon)>50){
+    if(!confirm('Este posto está a mais de 50 km da sua localização atual. Guardar na mesma?'))return
+  }
+  el('newStationStatus').textContent='A guardar posto…';
+  const {error}=await supabase.from('community_fuel_stations').insert({created_by:user.id,name,address:address||null,latitude:lat,longitude:lon});
+  if(error){el('newStationStatus').textContent=mensagemErroPT(error);return}
+  window.closeAddStationModal();
+  if(fuelLat!=null){
+    nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));
+    await renderFuelData()
+  }
 }
 
 async function locateAndSearchFuel(){
@@ -795,7 +1028,7 @@ function subscribeFuelRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
   fuelChannel=supabase.channel('fuel-community').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},async()=>{if(fuelLat!=null)await renderFuelData()})
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).subscribe()
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).on('postgres_changes',{event:'*',schema:'public',table:'community_fuel_stations'},async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}}).subscribe()
 }
 el('locateFuelBtn').onclick=locateAndSearchFuel;
 el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent='Pesquisa atualizada agora.'};

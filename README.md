@@ -1,29 +1,25 @@
-# CASA+ v0.8 — comunidade, pontos e ranking
+# CASA+ v1.0 — postos completos e comunidade
 
-## Gamificação tipo Waze
-Os utilizadores ganham pontos quando ajudam a comunidade:
+## Correção dos postos em falta
+A pesquisa deixa de escolher apenas uma fonte. Agora junta:
+- DGEG;
+- OpenStreetMap;
+- postos acrescentados pela comunidade.
 
-- +10 pontos: introduzir um novo preço;
-- +2 pontos: confirmar um preço;
-- +3 pontos: assinalar um preço incorreto;
-- +4 pontos: reportar posto fechado;
-- +5 pontos: quando outro utilizador confirma um preço introduzido por si.
+Os resultados são fundidos e os duplicados são removidos por proximidade e nome.
 
-Existe proteção básica contra abuso: introduções repetidas do mesmo utilizador, posto e combustível num intervalo curto não acumulam pontos.
+Isto resolve casos como a RStar de Anta/Espinho, que existe no OpenStreetMap mas podia desaparecer quando a DGEG devolvia outros postos.
 
-## Níveis
-- Novato: 0–49
-- Explorador: 50–149
-- Guia: 150–399
-- Especialista: 400–799
-- Embaixador: 800+
+## Adicionar posto em falta
+Qualquer utilizador autenticado pode:
+- carregar em “+ Adicionar posto”;
+- indicar nome e morada;
+- procurar automaticamente a morada;
+- usar a localização atual caso esteja fisicamente no posto;
+- indicar coordenadas manualmente;
+- guardar o posto para ficar disponível aos restantes utilizadores.
 
-## Ranking
-- Top 20 em tempo real;
-- nome público editável;
-- pontos e nível;
-- número de preços e validações;
-- posição do próprio utilizador destacada;
-- atualização através do Supabase Realtime.
+Os postos comunitários ficam identificados como tal.
 
-Mantém as funcionalidades anteriores: preços DGEG, validação comunitária, localização, mapa, rota, GPS, despesas, receitas, faturas e stock.
+## Mantém
+Preços DGEG, propostas comunitárias, hierarquia de confiança, pontos, ranking, perfis, fotografia, mapa, rota/GPS, despesas, receitas, faturas e existências.
