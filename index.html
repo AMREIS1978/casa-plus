@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v3.7 — gestão de utilizadores</title>
+<title>Bomba Certa v3.9 — validação e denúncias</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -135,6 +135,16 @@ header{
 @keyframes confetti-fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
 .level-only{font-size:12px;font-weight:850;color:#475467}
 
+
+.validation-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:7px;font-size:11px}
+.validation-ok{color:#18794e;font-weight:850}.validation-bad{color:#b42318;font-weight:850}.validation-pending{color:#667085;font-weight:750}
+.author-line{font-size:11px;color:#667085;margin-top:5px}.author-level{font-weight:850;color:#475467}
+.report-card{border:1px solid var(--line);border-radius:15px;padding:13px;margin-top:9px;background:#fff}
+.report-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.report-status{font-size:10px;font-weight:900;border-radius:999px;padding:4px 8px}
+.report-status.pendente{background:#fff7ed;color:#9a3412}.report-status.revista{background:#eff8ff;color:#175cd3}.report-status.arquivada{background:#f2f4f7;color:#667085}
+.report-meta{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -169,13 +179,7 @@ header{
   <section id="postos" class="section active">
     <div class="hero">
       <h1>Encontre o combustível certo.</h1>
-      <p>Veja rapidamente os postos perto de si. Atualize preços diretamente no cartão de cada posto.</p>
-    </div>
-
-    
-    <div class="card" style="margin-top:12px">
-      <button id="quickLocateBtn" class="btn" style="width:100%">📍 Ver postos perto de mim</button>
-      <div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
+      <p>Procure postos no raio que escolher e atualize preços diretamente no cartão de cada posto.</p>
     </div>
 
     <div class="ad" aria-label="Publicidade">
@@ -205,10 +209,12 @@ header{
           <option value="20000">20 km</option>
           <option value="30000">30 km</option>
           <option value="50000">50 km</option>
+          <option value="75000">75 km</option>
+          <option value="100000">100 km</option>
         </select>
         <button id="locateBtn" class="btn">📍 Procurar perto de mim</button>
       </div>
-      <div id="fuelStatus" class="status">Autorize a localização para procurar postos próximos.</div>
+      <div id="fuelStatus" class="status">Autorize a localização para procurar postos próximos.</div><div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
     </div>
 
     <div class="grid2">
@@ -357,7 +363,15 @@ header{
       <div class="section-title"><h2>Contas registadas</h2><button id="refreshAdminBtn" class="btn secondary">Atualizar</button></div>
       <div id="adminUsers" class="empty">A carregar utilizadores…</div>
     </div>
-  </section>
+  
+    <div class="card" style="margin-top:12px">
+      <div class="section-title">
+        <h2>Denúncias de utilizadores</h2>
+        <div class="actions"><span id="pendingReportsBadge" class="pill">0 pendentes</span><button id="refreshReportsBtn" class="btn secondary">Atualizar</button></div>
+      </div>
+      <div id="adminReports" class="empty">Ainda não existem denúncias.</div>
+    </div>
+</section>
 
 </main>
 
@@ -370,6 +384,29 @@ header{
 </nav>
 </div>
 
+
+
+<!-- Modal denunciar utilizador -->
+<div id="userReportModal" class="modal">
+  <div class="modal-card">
+    <div class="section-title"><h2>Denunciar utilizador</h2><button class="btn secondary" data-close="userReportModal">Fechar</button></div>
+    <div class="form">
+      <div class="card" style="box-shadow:none;padding:12px">
+        <b id="reportUserName">Utilizador</b>
+        <div id="reportPriceInfo" class="tiny muted"></div>
+      </div>
+      <select id="reportReason" class="input">
+        <option value="preco_falso">Preço falso ou enganador</option>
+        <option value="spam">Spam / alterações repetidas</option>
+        <option value="abuso">Comportamento abusivo</option>
+        <option value="outro">Outro motivo</option>
+      </select>
+      <textarea id="reportDetails" class="input" rows="3" maxlength="500" placeholder="Explique brevemente o motivo (opcional)"></textarea>
+      <button id="sendUserReportBtn" class="btn danger">Enviar denúncia</button>
+      <div id="userReportStatus" class="status"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal fotografia de perfil -->
 <div id="avatarModal" class="modal">
@@ -511,7 +548,7 @@ function fuelMatchesLabel(apiLabel,selected){
 }
 
 
-let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[];
+let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[],currentAuthUserId=null;
 let currentStation=null,currentPriceStation=null,fillups=[],monthlyChart=null,priceChart=null,fuelChannel=null,dgegFuelTypes=[];
 
 
@@ -565,7 +602,7 @@ function showSection(id){
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
   if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
-  if(id==='admin'&&isAdminUser)loadAdminUsers();
+  if(id==='admin'&&isAdminUser){loadAdminUsers();loadAdminReports();}
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
@@ -586,6 +623,43 @@ async function checkAdmin(){
   }
   return isAdminUser
 }
+
+function reportReasonPT(r){
+  return ({preco_falso:'Preço falso ou enganador',spam:'Spam / alterações repetidas',abuso:'Comportamento abusivo',outro:'Outro motivo'})[r]||r
+}
+async function loadAdminReports(){
+  if(!isAdminUser)return;
+  $('adminReports').className='empty';$('adminReports').textContent='A carregar denúncias…';
+  const {data,error}=await supabase.rpc('admin_list_user_reports');
+  if(error){$('adminReports').textContent=errPT(error);return}
+  const rows=data||[],pending=rows.filter(x=>x.status==='pendente').length;
+  $('pendingReportsBadge').textContent=`${pending} pendente${pending===1?'':'s'}`;
+  if(!rows.length){$('adminReports').className='empty';$('adminReports').textContent='Ainda não existem denúncias.';return}
+  $('adminReports').className='';
+  $('adminReports').innerHTML=rows.map(r=>`<div class="report-card">
+    <div class="report-head">
+      <div><b>🚩 ${esc(r.reported_name||'Utilizador')}</b><div class="admin-email">${esc(r.reported_email||'')}</div></div>
+      <span class="report-status ${esc(r.status)}">${esc(r.status)}</span>
+    </div>
+    <div class="report-meta">
+      Denunciado por <b>${esc(r.reporter_name||'Utilizador')}</b> · ${new Date(r.created_at).toLocaleString('pt-PT')}<br>
+      Motivo: <b>${esc(reportReasonPT(r.reason))}</b>
+      ${r.station_name?`<br>Preço: ${esc(r.station_name)} · ${esc(r.fuel_type||'')} · ${Number(r.reported_price||0).toFixed(3).replace('.',',')} €/L`:''}
+      ${r.details?`<br>Detalhe: ${esc(r.details)}`:''}
+    </div>
+    <div class="actions" style="margin-top:9px">
+      ${r.status!=='revista'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','revista')">Marcar revista</button>`:''}
+      ${r.status!=='arquivada'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','arquivada')">Arquivar</button>`:''}
+      ${r.status!=='pendente'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','pendente')">Reabrir</button>`:''}
+    </div>
+  </div>`).join('')
+}
+window.setAdminReportStatus=async(id,status)=>{
+  const {error}=await supabase.rpc('admin_set_user_report_status',{p_report_id:id,p_status:status});
+  if(error){alert(errPT(error));return}
+  await loadAdminReports()
+}
+
 async function loadAdminUsers(){
   if(!isAdminUser)return;
   $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
@@ -660,13 +734,15 @@ $('adminCreateUserBtn').onclick=async()=>{
 }
 
 $('refreshAdminBtn').onclick=loadAdminUsers;
+$('refreshReportsBtn').onclick=loadAdminReports;
 
 async function enterApp(){
   $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');
+  const {data:{user}}=await supabase.auth.getUser();currentAuthUserId=user?.id||null;
   await supabase.rpc('ensure_my_fuel_profile');
   await checkAdmin();
   await Promise.all([loadFillups(),loadLeaderboard()]);
-  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')) await loadAdminUsers();
+  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')) await Promise.all([loadAdminUsers(),loadAdminReports()]);
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
@@ -871,21 +947,26 @@ async function communityData(){
   ]);
   return {reports:reports||[],validations:validations||[],contributors:contributors||[],statuses:statuses||[]}
 }
-function candidateFor(key,reports,validations,contributors){
-  const rs=reports.filter(r=>r.station_key===key);if(!rs.length)return null;
-  const required=Object.fromEntries(contributors.map(x=>[x.user_id,Number(x.required_support||5)]));
-  const trusted=Object.fromEntries(contributors.map(x=>[x.user_id,Boolean(x.trusted_publisher)]));
-  const groups={};
-  for(const r of rs){
-    const k=Number(r.price).toFixed(3);groups[k]??={price:Number(r.price),reports:[],support:new Set(),max:0,latest:r.observed_at};
-    const g=groups[k];g.reports.push(r);g.support.add(r.user_id);g.required=Math.min(g.required??5,required[r.user_id]||5);g.trusted=Boolean(g.trusted||trusted[r.user_id]);if(new Date(r.observed_at)>new Date(g.latest))g.latest=r.observed_at
+function latestPriceFor(key,reports,validations,contributors){
+  const rs=reports.filter(r=>r.station_key===key).sort((a,b)=>new Date(b.observed_at)-new Date(a.observed_at));
+  if(!rs.length)return null;
+  const report=rs[0];
+  const author=contributors.find(x=>x.user_id===report.user_id)||null;
+  const votes=validations.filter(v=>v.report_id===report.id);
+  const confirmed=votes.filter(v=>v.is_confirmed===true).length;
+  const rejected=votes.filter(v=>v.is_confirmed===false).length;
+  return {
+    report,
+    reports:[report],
+    price:Number(report.price),
+    updatedAt:report.observed_at,
+    confirmed,
+    rejected,
+    authorUserId:report.user_id,
+    authorName:author?.display_name||'Utilizador',
+    authorLevel:author?.trusted_publisher?'Editor de confiança':(author?.level_name||'Novato'),
+    trusted:Boolean(author?.trusted_publisher)
   }
-  for(const g of Object.values(groups)){
-    const ids=new Set(g.reports.map(x=>x.id));
-    validations.filter(v=>v.is_confirmed&&ids.has(v.report_id)).forEach(v=>{g.support.add(v.user_id);g.required=Math.min(g.required??5,required[v.user_id]||5);g.trusted=Boolean(g.trusted||trusted[v.user_id])});
-    g.count=g.support.size;g.required=g.trusted?1:(g.required||5);g.accepted=g.trusted||g.count>=g.required;g.updatedAt=g.latest
-  }
-  return Object.values(groups).sort((a,b)=>Number(b.accepted)-Number(a.accepted)||b.count-a.count||new Date(b.latest)-new Date(a.latest))[0]
 }
 function closedText(key,statuses){
   const n=new Set(statuses.filter(x=>x.station_key===key&&x.status==='closed').map(x=>x.user_id)).size;
@@ -894,20 +975,26 @@ function closedText(key,statuses){
 async function renderStations(){
   const cd=await communityData();
   nearbyStations=nearbyStations.map(s=>{
-    const c=candidateFor(s.key,cd.reports,cd.validations,cd.contributors),community=c?.accepted?c.price:null,displayPrice=community||s.officialPrice||null;
-    const priceSource=community?'community':(s.officialPrice?'official':null);
+    const c=latestPriceFor(s.key,cd.reports,cd.validations,cd.contributors);
+    const community=c?.price??null;
+    const displayPrice=community??s.officialPrice??null;
+    const priceSource=community!=null?'community':(s.officialPrice?'official':null);
     const lastUpdated=priceSource==='community' ? c?.updatedAt : (s.officialUpdated||null);
     return {...s,candidate:c,displayPrice,priceSource,lastUpdated,closed:closedText(s.key,cd.statuses)}
   }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
   $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
     const c=s.candidate,price=s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',','):null;
-    const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade validada</span>':'<span class="source none">Sem preço confirmado</span>';
-    const proposal=c&&!c.accepted?`<div class="warn">Proposta: ${c.price.toFixed(3).replace('.',',')} €/L · ${c.count}/${c.required} apoios</div>`:'';
+    const source=s.priceSource==='official'?'<span class="source official">DGEG</span>':s.priceSource==='community'?'<span class="source community">Comunidade</span>':'<span class="source none">Sem preço confirmado</span>';
     const updateLine=s.lastUpdated
-      ? `<div class="price-update ${s.priceSource==='community'?'community':'official'}"><span class="dot"></span>${s.priceSource==='community'?'Preço atualizado pela comunidade':'Última atualização DGEG'} · ${relativeTime(s.lastUpdated)} <span>(${fmtDateTime(s.lastUpdated)})</span></div>`
+      ? `<div class="price-update ${s.priceSource==='community'?'community':'official'}"><span class="dot"></span>${s.priceSource==='community'?'Preço comunicado pela comunidade':'Última atualização DGEG'} · ${relativeTime(s.lastUpdated)} <span>(${fmtDateTime(s.lastUpdated)})</span></div>`
       : '';
-    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${proposal}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${c?.reports?.[0]?`<button onclick="confirmPrice('${c.reports[0].id}',true)">✓ Confirmar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+    const authorLine=c?`<div class="author-line">Comunicado por <b>${esc(c.authorName)}</b> · <span class="author-level">${esc(c.authorLevel)}</span></div>`:'';
+    const validationLine=c
+      ? `<div class="validation-line">${c.confirmed?`<span class="validation-ok">✓ ${c.confirmed} confirmação${c.confirmed===1?'':'ões'}</span>`:''}${c.rejected?`<span class="validation-bad">✕ ${c.rejected} rejeição${c.rejected===1?'':'ões'}</span>`:''}${!c.confirmed&&!c.rejected?'<span class="validation-pending">A aguardar validação</span>':''}${c.rejected>c.confirmed?'<span class="validation-bad">Preço contestado</span>':''}</div>`
+      : '';
+    const canValidate=c&&c.authorUserId!==currentAuthUserId;
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
 
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
@@ -922,7 +1009,6 @@ async function renderStations(){
   populateFillStations()
 }
 
-$('quickLocateBtn').onclick=()=>$('locateBtn').click();
 $('locateBtn').onclick=()=>{ $('fuelStatus').textContent='A localizar…'; useFastLocation() };
 $('refreshBtn').onclick=searchStations;
 $('fuelType').onchange=()=>currentLat!=null&&searchStations();
@@ -994,20 +1080,50 @@ $('savePriceBtn').onclick=async()=>{
   const {data:{user}}=await supabase.auth.getUser();const s=currentPriceStation;
   const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
   if(error){$('priceStatus').textContent=errPT(error);return}
-  $('priceStatus').textContent='Preço atualizado agora.';
+  $('priceStatus').textContent='Preço publicado. Já está visível e aguarda validação.';
   await Promise.all([renderStations(),loadLeaderboard()]);
-  const afterPoints=await myPoints();
-  const gained=Math.max(0,afterPoints-beforePoints);
-  setTimeout(()=>{$('priceModal').classList.remove('open');showReward(gained,gained>0?'Excelente!':'Preço atualizado')},180)
+  setTimeout(()=>{$('priceModal').classList.remove('open');showReward(0,'Preço publicado!')},180)
 };
 window.confirmPrice=async(id,ok)=>{
   const before=await myPoints();
   const {data:{user}}=await supabase.auth.getUser();
-  await supabase.from('fuel_price_validations').upsert({report_id:id,user_id:user.id,is_confirmed:ok,created_at:new Date().toISOString()},{onConflict:'report_id,user_id'});
+  const {error}=await supabase.from('fuel_price_validations').insert({report_id:id,user_id:user.id,is_confirmed:ok,created_at:new Date().toISOString()});
+  if(error){
+    const msg=String(error.message||'').toLowerCase();
+    alert(msg.includes('duplicate')||msg.includes('unique')?'Já validou este preço.':errPT(error));
+    return
+  }
   await Promise.all([renderStations(),loadLeaderboard()]);
   const after=await myPoints(),gained=Math.max(0,after-before);
-  if(gained>0)showReward(gained,'Obrigado!')
+  if(gained>0)showReward(gained,ok?'Obrigado por confirmar!':'Obrigado por sinalizar!')
 };
+
+let currentReportedPriceId=null,currentReportedUserId=null;
+window.openUserReport=(priceReportId,userId,userName)=>{
+  currentReportedPriceId=priceReportId;currentReportedUserId=userId;
+  $('reportUserName').textContent=userName||'Utilizador';
+  const station=nearbyStations.find(s=>s.candidate?.report?.id===priceReportId);
+  $('reportPriceInfo').textContent=station?`${station.name} · ${station.displayPrice?Number(station.displayPrice).toFixed(3).replace('.',',')+' €/L':''}`:'Preço comunicado';
+  $('reportReason').value='preco_falso';$('reportDetails').value='';$('userReportStatus').textContent='';
+  $('userReportModal').classList.add('open')
+};
+$('sendUserReportBtn').onclick=async()=>{
+  if(!currentReportedPriceId)return;
+  $('userReportStatus').textContent='A enviar denúncia…';
+  const {data,error}=await supabase.rpc('report_fuel_price_user',{
+    p_price_report_id:currentReportedPriceId,
+    p_reason:$('reportReason').value,
+    p_details:$('reportDetails').value.trim()||null
+  });
+  if(error){
+    const msg=String(error.message||'').toLowerCase();
+    $('userReportStatus').textContent=msg.includes('already reported')?'Já denunciou este preço/utilizador.':errPT(error);
+    return
+  }
+  $('userReportStatus').textContent='Denúncia enviada para a Administração.';
+  setTimeout(()=>{$('userReportModal').classList.remove('open')},450)
+};
+
 window.reportClosed=async key=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s||!confirm(`Reportar que ${s.name} parece estar encerrado?`))return;
   const {data:{user}}=await supabase.auth.getUser();
@@ -1200,7 +1316,8 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},()=>renderStations())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},()=>renderStations())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_fillups'},()=>loadFillups())
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},()=>loadLeaderboard()).subscribe()
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},()=>loadLeaderboard())
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_user_reports'},()=>{if(isAdminUser)loadAdminReports()}).subscribe()
 }
 
 authCheck();

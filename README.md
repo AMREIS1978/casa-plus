@@ -1,34 +1,69 @@
-# Bomba Certa v3.7 — gestão completa de utilizadores
+# Bomba Certa v3.9 — preços imediatos, validação e denúncias
 
-## Criar utilizadores
-Na secção Administração passa a ser possível criar novas contas diretamente com:
+## Nova regra de preços
+Qualquer utilizador pode comunicar um preço.
+
+Assim que o comunica:
+- o preço passa imediatamente a ser mostrado no posto;
+- não depende do nível/status;
+- fica visível quem o comunicou e o respetivo nível;
+- aparece a data/hora da atualização.
+
+O preço oficial DGEG continua disponível como referência de origem quando não existe uma comunicação comunitária mais recente.
+
+## Validação
+Outros utilizadores podem:
+- **Confirmar** o preço;
+- marcar como **Incorreto**.
+
+O próprio autor não pode validar o seu próprio preço.
+
+### Pontos
+- comunicar preço: não atribui pontos imediatamente;
+- confirmação: o autor do preço recebe **+5 pontos**;
+- rejeição: o autor perde **5 pontos** (sem descer abaixo de zero);
+- quem valida corretamente continua a receber pontos pela participação.
+
+Cada utilizador só pode votar uma vez por comunicação.
+
+## Denunciar utilizador
+Junto de um preço comunicado por outra pessoa surge:
+- `🚩 Denunciar`
+
+Motivos:
+- preço falso ou enganador;
+- spam / alterações repetidas;
+- comportamento abusivo;
+- outro.
+
+A denúncia fica ligada:
+- ao utilizador;
+- ao preço concreto;
+- ao posto;
+- ao combustível;
+- à data;
+- ao denunciante.
+
+## Administração
+Nova área:
+**Denúncias de utilizadores**
+
+O administrador vê:
+- utilizador denunciado;
 - email;
-- palavra-passe;
-- nível inicial.
+- denunciante;
+- motivo;
+- detalhes;
+- posto;
+- combustível;
+- preço;
+- data;
+- estado.
 
-## Níveis disponíveis
-- Novato
-- Explorador
-- Guia
-- Especialista
-- Embaixador
-- Editor de confiança
-- Administrador
+Estados:
+- Pendente
+- Revista
+- Arquivada
 
-## Alterar níveis
-O administrador pode também alterar o nível de qualquer utilizador já existente.
-
-Ao atribuir um nível, o backend ajusta automaticamente a reputação mínima correspondente.
-
-## Segurança
-A criação de utilizadores é feita numa Supabase Edge Function protegida por JWT e verificação de administrador.
-
-A `service_role` é usada apenas no backend da Edge Function e nunca aparece no HTML público.
-
-## Administradores
-Um utilizador com nível Administrador:
-- passa a integrar a lista privada de administradores;
-- tem acesso à Administração;
-- mantém as permissões administrativas já definidas.
-
-A última conta administradora continua protegida contra remoção acidental.
+## Integridade
+A denúncia é criada por uma função segura no backend que determina automaticamente o verdadeiro autor do preço. Não é possível indicar arbitrariamente outro utilizador como alvo.
