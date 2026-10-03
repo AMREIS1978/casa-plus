@@ -1,19 +1,26 @@
-# Bomba Certa v6.5 — login por username corrigido
+# Bomba Certa v6.6 — login corrigido de vez
 
-## Causa
-O login por username estava a resolver corretamente o utilizador, mas a validação da password no backend estava a usar o cliente administrativo.
+## Problema
+O campo de login tinha `maxlength=20` porque tinha sido pensado apenas para usernames.
 
-Isso podia devolver `invalid_credentials` mesmo quando o username estava corretamente associado à conta.
+Ao escrever um email, o browser cortava o texto, por exemplo:
+`a.miguel.reis@gmail.`
 
 ## Correção
-A função `public-login` foi atualizada para:
-1. resolver `username -> user_id` numa tabela privada;
-2. obter internamente o email associado;
-3. validar a password com um cliente Auth normal;
-4. devolver a sessão ao browser;
-5. o browser grava essa sessão e entra na aplicação.
+O campo de login:
+- deixou de ter limite de 20 caracteres;
+- aceita username;
+- aceita também email como fallback;
+- mantém password normal;
+- não altera o modelo de registo: novos utilizadores continuam a escolher username e o email continua associado à recuperação.
 
-O email continua escondido no login e serve apenas para recuperação.
+## Backend
+`public-login` foi atualizado para a versão 5.
 
-## Estado
-`public-login` encontra-se ativo na versão 4 do backend.
+Se o texto contém `@`, valida diretamente como email.
+Caso contrário, resolve o username através da tabela privada.
+
+Assim:
+- utilizadores novos podem entrar com username;
+- contas antigas e utilizadores habituados ao email continuam a conseguir entrar;
+- não há truncagem do email.
