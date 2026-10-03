@@ -1,25 +1,29 @@
-# CASA+ v0.7 — preços reais por posto + navegação
+# CASA+ v0.8 — comunidade, pontos e ranking
 
-## Combustíveis
-- Preços reais por posto através da API pública da DGEG.
-- Pesquisa a partir da localização do utilizador.
-- Filtro por combustível e raio.
-- Preço DGEG e data de atualização visíveis.
-- Comunidade pode confirmar ou corrigir o preço.
+## Gamificação tipo Waze
+Os utilizadores ganham pontos quando ajudam a comunidade:
 
-## Introdução de preço
-- Botão “Atualizar preço” em cada posto.
-- Campo grande, numérico e direto em €/L.
-- Exemplo: 1,799.
+- +10 pontos: introduzir um novo preço;
+- +2 pontos: confirmar um preço;
+- +3 pontos: assinalar um preço incorreto;
+- +4 pontos: reportar posto fechado;
+- +5 pontos: quando outro utilizador confirma um preço introduzido por si.
 
-## Navegação
-- Botão “Ir para aqui” em cada posto.
-- Rota desenhada no mapa.
-- Distância e tempo estimado.
-- Instruções de percurso.
-- Atualização da posição do utilizador.
-- Botão “Abrir GPS” para navegação externa.
+Existe proteção básica contra abuso: introduções repetidas do mesmo utilizador, posto e combustível num intervalo curto não acumulam pontos.
 
-## Outras melhorias
-- Despesas e receitas podem ser apagadas.
-- Interface em português de Portugal.
+## Níveis
+- Novato: 0–49
+- Explorador: 50–149
+- Guia: 150–399
+- Especialista: 400–799
+- Embaixador: 800+
+
+## Ranking
+- Top 20 em tempo real;
+- nome público editável;
+- pontos e nível;
+- número de preços e validações;
+- posição do próprio utilizador destacada;
+- atualização através do Supabase Realtime.
+
+Mantém as funcionalidades anteriores: preços DGEG, validação comunitária, localização, mapa, rota, GPS, despesas, receitas, faturas e stock.

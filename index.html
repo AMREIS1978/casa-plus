@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CASA+ v0.7 — preços reais e navegação</title>
+<title>CASA+ v0.8 — comunidade, pontos e ranking</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -41,7 +41,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
 .confidence{font-size:11px;font-weight:850}.confidence.high{color:#197a52}.confidence.mid{color:#a96522}.confidence.low{color:#8a4b4b}
 .price-modal-input{font-size:34px;font-weight:900;text-align:center;padding:18px}
 .route-box{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fafafa}
-.route-steps{max-height:190px;overflow:auto;margin-top:8px}.route-step{padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+.route-steps{max-height:190px;overflow:auto;margin-top:8px}.route-step{padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}.rank-grid{display:grid;grid-template-columns:.9fr 1.4fr;gap:12px;margin-top:12px}.rank-card{padding:16px}.rank-me{display:flex;gap:14px;align-items:center}.rank-badge{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:var(--soft);border:1px solid var(--line)}.rank-points{font-size:30px;font-weight:900}.progress-track{height:10px;border-radius:999px;background:#edf0f3;overflow:hidden}.progress-fill{height:100%;background:var(--ink);border-radius:999px}.leader-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.leader-pos{font-weight:900;text-align:center}.leader-you{background:#f6f8fa;border-radius:14px;padding-left:8px;padding-right:8px}.points-help{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.points-help>div{padding:10px;border:1px solid var(--line);border-radius:14px;text-align:center}@media(max-width:720px){.rank-grid{grid-template-columns:1fr}.points-help{grid-template-columns:1fr 1fr}}
 @media(max-width:720px){.fuel-controls{grid-template-columns:1fr 1fr}.fuel-controls .btn{grid-column:1/-1}}
 
 @media(max-width:520px){.app{padding:14px 12px 102px}.grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:19px}.card{padding:15px}.bottom{width:96%}.nav{font-size:11px}.items-grid{grid-template-columns:1fr 62px 75px 78px;gap:5px}}
@@ -161,6 +161,45 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;ma
     <div class="card">
       <div class="section-title" style="margin-top:0"><h2>Mais baratos perto de si</h2><span class="pill">Preço por litro</span></div>
       <div id="fuelResults" class="empty">Ainda não foi feita nenhuma pesquisa.</div>
+    </div>
+  </div>
+
+
+  <div class="rank-grid">
+    <div class="card rank-card">
+      <div class="section-title" style="margin-top:0"><h2>A minha reputação</h2><span class="pill">CASA+ Comunidade</span></div>
+      <div class="rank-me">
+        <div id="myRankBadge" class="rank-badge">🚗</div>
+        <div style="min-width:0;flex:1">
+          <div id="myRankName" style="font-weight:900">Condutor</div>
+          <div id="myRankLevel" class="muted tiny">Novato</div>
+          <div id="myRankPoints" class="rank-points">0 pts</div>
+        </div>
+      </div>
+      <div class="progress-track" style="margin-top:10px"><div id="myRankProgress" class="progress-fill" style="width:0%"></div></div>
+      <div id="myRankNext" class="muted tiny" style="margin-top:6px">Comece a contribuir para subir no ranking.</div>
+      <div class="form" style="margin-top:12px">
+        <input id="contributorName" class="input" maxlength="28" placeholder="Nome público no ranking">
+        <button id="saveContributorName" class="btn secondary">Guardar nome</button>
+        <div id="contributorNameStatus" class="status"></div>
+      </div>
+    </div>
+
+    <div class="card rank-card">
+      <div class="section-title" style="margin-top:0"><h2>Ranking da comunidade</h2><span class="pill">Top 20</span></div>
+      <div id="fuelLeaderboard" class="empty">Ainda não existem contribuições suficientes.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="section-title" style="margin-top:0"><h2>Como ganhar pontos</h2><span class="pill">Qualidade acima de quantidade</span></div>
+    <div class="points-help">
+      <div><b>+10</b><div class="muted tiny">Novo preço</div></div>
+      <div><b>+2</b><div class="muted tiny">Confirmar preço</div></div>
+      <div><b>+3</b><div class="muted tiny">Assinalar preço incorreto</div></div>
+      <div><b>+4</b><div class="muted tiny">Posto fechado</div></div>
+      <div><b>+5</b><div class="muted tiny">Alguém confirma o seu preço</div></div>
+      <div><b>Anti-abuso</b><div class="muted tiny">Repetições rápidas no mesmo posto não dão pontos</div></div>
     </div>
   </div>
 
@@ -631,7 +670,7 @@ async function renderFuelData(){
   ensureFuelMap();fuelMarkers.forEach(m=>fuelMap.removeLayer(m));fuelMarkers=[];
   if(userMarker)fuelMap.removeLayer(userMarker);userMarker=L.marker([fuelLat,fuelLon]).addTo(fuelMap).bindPopup('A sua localização');
   for(const s of enriched){fuelMarkers.push(L.marker([s.lat,s.lon]).addTo(fuelMap).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}<br><button onclick="startFuelNavigation('${s.key}')">Ir para aqui</button>`))}
-  const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14})
+  const bounds=L.latLngBounds([[fuelLat,fuelLon],...enriched.map(s=>[s.lat,s.lon])]);if(bounds.isValid())fuelMap.fitBounds(bounds.pad(.15),{maxZoom:14});await loadFuelLeaderboard()
 }
 window.openFuelPriceModal=(key)=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s)return;currentFuelStation=s;
@@ -679,6 +718,70 @@ window.startFuelNavigation=async(key)=>{
   const s=nearbyStations.find(x=>x.key===key);if(!s)return;await drawRouteToStation(s);el('fuelMap').scrollIntoView({behavior:'smooth',block:'center'});
   if(navigator.geolocation){if(navWatch)navigator.geolocation.clearWatch(navWatch);navWatch=navigator.geolocation.watchPosition(pos=>{fuelLat=pos.coords.latitude;fuelLon=pos.coords.longitude;if(userMarker)userMarker.setLatLng([fuelLat,fuelLon])},()=>{},{enableHighAccuracy:true,maximumAge:3000,timeout:10000})}
 }
+
+function contributorLevel(points){
+  points=Number(points||0);
+  if(points>=800)return {name:'Embaixador',icon:'🏆',min:800,next:null};
+  if(points>=400)return {name:'Especialista',icon:'⭐',min:400,next:800};
+  if(points>=150)return {name:'Guia',icon:'🧭',min:150,next:400};
+  if(points>=50)return {name:'Explorador',icon:'🗺️',min:50,next:150};
+  return {name:'Novato',icon:'🚗',min:0,next:50}
+}
+async function loadFuelLeaderboard(){
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
+  const {data,error}=await supabase.from('fuel_contributor_stats')
+    .select('user_id,display_name,points,price_reports,validations,status_reports')
+    .order('points',{ascending:false}).order('updated_at',{ascending:true}).limit(20);
+  if(error){console.warn(error);return}
+
+  const rows=data||[],mine=rows.find(x=>x.user_id===user.id);
+  let my=mine;
+  if(!my){
+    const r=await supabase.from('fuel_contributor_stats').select('*').eq('user_id',user.id).maybeSingle();
+    my=r.data||null
+  }
+  if(my){
+    const lvl=contributorLevel(my.points);
+    el('myRankBadge').textContent=lvl.icon;
+    el('myRankName').textContent=my.display_name||'Condutor';
+    el('myRankLevel').textContent=lvl.name;
+    el('myRankPoints').textContent=`${Number(my.points||0)} pts`;
+    el('contributorName').value=my.display_name||'';
+    if(lvl.next){
+      const pct=Math.max(0,Math.min(100,((my.points-lvl.min)/(lvl.next-lvl.min))*100));
+      el('myRankProgress').style.width=`${pct}%`;
+      el('myRankNext').textContent=`Faltam ${lvl.next-my.points} pontos para ${contributorLevel(lvl.next).name}.`
+    }else{
+      el('myRankProgress').style.width='100%';
+      el('myRankNext').textContent='Nível máximo atingido.'
+    }
+  }
+
+  const box=el('fuelLeaderboard');
+  if(!rows.length){box.className='empty';box.textContent='Ainda não existem contribuições suficientes.';return}
+  box.className='';
+  box.innerHTML=rows.map((r,i)=>{
+    const lvl=contributorLevel(r.points),you=r.user_id===user.id;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
+    return `<div class="leader-row ${you?'leader-you':''}">
+      <div class="leader-pos">${medal}</div>
+      <div><b>${esc(r.display_name||'Condutor')}</b>${you?' <span class="pill">Você</span>':''}<div class="muted tiny">${lvl.icon} ${lvl.name} · ${r.price_reports} preços · ${r.validations} validações</div></div>
+      <div style="font-weight:900">${r.points} pts</div>
+    </div>`
+  }).join('')
+}
+el('saveContributorName').onclick=async()=>{
+  const name=el('contributorName').value.trim();
+  if(name.length<2){el('contributorNameStatus').textContent='Escolha um nome com pelo menos 2 caracteres.';return}
+  if(name.length>28){el('contributorNameStatus').textContent='O nome é demasiado longo.';return}
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return;
+  el('contributorNameStatus').textContent='A guardar…';
+  const {error}=await supabase.from('fuel_contributor_stats').update({display_name:name}).eq('user_id',user.id);
+  if(error){el('contributorNameStatus').textContent=mensagemErroPT(error);return}
+  el('contributorNameStatus').textContent='Nome atualizado.';
+  await loadFuelLeaderboard()
+}
+
 async function locateAndSearchFuel(){
   if(!navigator.geolocation){el('fuelStatus').textContent='Este dispositivo não disponibiliza localização.';return}
   el('fuelStatus').textContent='A obter a sua localização…';
@@ -692,14 +795,14 @@ function subscribeFuelRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
   fuelChannel=supabase.channel('fuel-community').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},async()=>{if(fuelLat!=null)await renderFuelData()})
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},async()=>{if(fuelLat!=null)await renderFuelData()})
-    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).subscribe()
+    .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},async()=>{if(fuelLat!=null)await renderFuelData()}).on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},async()=>{await loadFuelLeaderboard()}).subscribe()
 }
 el('locateFuelBtn').onclick=locateAndSearchFuel;
 el('refreshFuelBtn').onclick=async()=>{if(fuelLat==null)return locateAndSearchFuel();nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData();el('fuelStatus').textContent='Pesquisa atualizada agora.'};
 el('fuelType').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
 el('fuelRadius').onchange=async()=>{if(fuelLat!=null){nearbyStations=await fetchNearbyStations(fuelLat,fuelLon,Number(el('fuelRadius').value));await renderFuelData()}};
 
-document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));n.classList.add('active');el(n.dataset.view).classList.add('active')})
+document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));n.classList.add('active');el(n.dataset.view).classList.add('active');if(n.dataset.view==='combustiveis')loadFuelLeaderboard()})
 document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>{
   const q=b.dataset.q;let ans='';if(q==='month'){const v=lastData.month.filter(x=>x.kind==='expense').reduce((s,x)=>s+Number(x.amount),0);ans=`Este mês gastou ${euro(v)}.`}
   if(q==='top'){const by={};lastData.month.filter(x=>x.kind==='expense').forEach(x=>{const k=x.categories?.name||'Sem categoria';by[k]=(by[k]||0)+Number(x.amount)});const top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];ans=top?`A maior categoria este mês é ${top[0]}, com ${euro(top[1])}.`:'Ainda não há despesas este mês.'}
