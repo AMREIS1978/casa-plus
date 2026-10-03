@@ -1,19 +1,24 @@
-# Bomba Certa v5.6 — painel de administração restaurado
+# Bomba Certa v5.7 — Admin como antes
 
-## Diagnóstico
-A conta principal continua registada no backend como:
-- papel: `owner`
-- acesso administrativo: ativo
+## Alteração principal
+Na conta proprietária, o painel Admin volta a aparecer imediatamente, sem esperar pela verificação assíncrona.
 
-O painel tinha desaparecido por causa da ordem de carregamento do frontend depois das alterações de autenticação.
+A conta:
+`a.miguel.reis@gmail.com`
 
-## Correções
-- a app aguarda a identidade autenticada antes de verificar `is_app_admin()`;
-- se a primeira verificação falhar por latência, tenta novamente uma vez;
-- o painel Admin volta a aparecer no menu inferior;
-- foi acrescentado `⚙️ Admin` no topo, junto de `Sair`;
-- no Perfil, administradores veem também `⚙️ Administração`;
-- o nível da conta proprietária passa a aparecer como `Administrador`, sem ser substituído por `Editor de confiança`;
-- ranking, perfil e mapa deixam de controlar ou atrasar a visibilidade do painel administrativo.
+passa a mostrar logo:
+- `⚙️ Admin` no topo;
+- `Admin` no menu inferior;
+- `⚙️ Administração` no Perfil;
+- nível `Administrador`.
 
-As permissões continuam a ser decididas no backend e não pelo email escrito no JavaScript.
+## Segurança
+A visibilidade é imediata apenas para melhorar a experiência da conta proprietária.
+
+As ações administrativas continuam protegidas no backend por:
+- `is_app_admin()`;
+- RLS;
+- RPCs administrativas;
+- tabela privada `private.app_admins`.
+
+Ou seja, mostrar o botão não concede permissões a quem não as tenha no backend.
