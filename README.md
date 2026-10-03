@@ -1,43 +1,14 @@
-# Bomba Certa v4.9 — registo corrigido + comunidade
+# Bomba Certa v5.1 — login corrigido
 
-## Registos corrigidos
-Os logs mostravam tentativas de `/signup` tratadas como registos anónimos, que o Auth rejeitava.
+## Diagnóstico
+Os logs do Supabase confirmam que a conta administrativa consegue autenticar por email/password com sucesso.
 
-A criação pública de conta passa agora por uma Edge Function própria:
-- nome público;
-- email;
-- palavra-passe;
-- conta criada e confirmada no backend;
-- login automático após a criação;
-- limite de registos por ligação para reduzir abuso;
-- honeypot anti-bot;
-- `service_role` nunca exposta no browser.
+O problema estava na interface: depois de uma autenticação aceite, qualquer falha posterior no arranque da app podia deixar ou voltar a mostrar uma mensagem de credenciais incorretas.
 
-## Perfil inicial
-O nome escolhido no registo é guardado nos metadados e usado automaticamente no perfil de contribuinte.
-
-## Comunidade e jogo
-Nova área na página inicial:
-- sequência de dias com atividade;
-- contribuições de hoje;
-- preços atualizados hoje;
-- validações de hoje;
-- participantes ativos hoje;
-- nível atual;
-- missões simples;
-- botão para convidar um amigo.
-
-## Primeira missão
-Depois do primeiro registo aparece um onboarding curto:
-- confirmar um preço de outro condutor; ou
-- atualizar o preço de um posto.
-
-## Filosofia
-A gamificação incentiva ajuda real entre utilizadores:
-- pontos por contribuições úteis;
-- progressão por níveis;
-- desbloqueios;
-- reconhecimento;
-- comunidade ativa.
-
-Não existem apostas, prémios monetários aleatórios ou mecânicas escondidas.
+## Correções
+- autenticação e arranque da app foram separados;
+- assim que o Supabase aceita o login, a sessão é considerada válida;
+- o ecrã de login desaparece imediatamente;
+- uma falha posterior no carregamento de mapa/perfil/comunidade não volta a ser apresentada como erro de palavra-passe;
+- mensagens antigas desaparecem assim que o utilizador volta a escrever;
+- se já existir uma sessão válida, a app entra diretamente sem voltar a pedir login.

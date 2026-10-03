@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.9 — registo e comunidade</title>
+<title>Bomba Certa v5.1 — login corrigido</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -217,7 +217,7 @@ header{
       <div class="signup-icon">🤝</div>
       <div>
         <b>Entre na comunidade Bomba Certa</b>
-        <div class="tiny muted">Ajude outros condutores, ganhe pontos e desbloqueie níveis.</div>
+        <div class="tiny muted">Ajude outros condutores, ganhe pontos, suba de nível e faça a comunidade crescer.</div>
       </div>
     </div>
     <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
@@ -230,6 +230,13 @@ header{
     <label class="tiny"><input id="signupAgree" type="checkbox"> Aceito participar de forma responsável e contribuir com informação verdadeira.</label>
     <button id="signupBtn" class="btn">Criar a minha conta</button>
     <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta</button>
+    <div class="signup-welcome" style="margin-top:4px">
+      <div class="signup-icon">🎯</div>
+      <div>
+        <b>Primeira missão</b>
+        <div class="tiny muted">Depois de entrar, atualize ou confirme um preço e comece logo a construir reputação.</div>
+      </div>
+    </div>
     <div id="signupStatus" class="status"></div>
   </div>
 </div>
@@ -261,7 +268,7 @@ header{
         <div class="unlock-teaser-icon">🏆</div>
         <div>
           <div class="unlock-teaser-title">Ganhe pontos. Suba de nível. Desbloqueie benefícios.</div>
-          <div id="homeUnlockCopy" class="unlock-teaser-copy">Contribua com preços e validações para evoluir o seu perfil.</div>
+          <div id="homeUnlockCopy" class="unlock-teaser-copy">Cada ajuda conta: atualize, confirme, proteja a comunidade e evolua o seu perfil.</div>
         </div>
       </div>
       <button id="seeUnlocksBtn" class="btn secondary">Ver desbloqueios</button>
@@ -1027,13 +1034,66 @@ async function enterApp(){
 }
 async function authCheck(){
   const {data:{session}}=await supabase.auth.getSession();
-  if(session){await enterApp();setTimeout(()=>showWelcomeMission(),350)}
+  if(session){
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.remove('hidden');
+    await enterApp();
+    setTimeout(()=>showWelcomeMission(),350)
+  }else{
+    $('authScreen').classList.remove('hidden');
+    $('appShell').classList.add('hidden')
+  }
 }
+
+['email','password'].forEach(id=>{
+  $(id).addEventListener('input',()=>{$('authStatus').textContent=''})
+});
+
 $('loginBtn').onclick=async()=>{
-  $('authStatus').textContent='A entrar…';
-  const {error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error){$('authStatus').textContent=errPT(error);return}
-  $('authStatus').textContent='';await enterApp()
+  const email=$('email').value.trim().toLowerCase();
+  const password=$('password').value;
+
+  if(!email||!password){
+    $('authStatus').textContent='Introduza email e palavra-passe.';
+    return
+  }
+
+  const btn=$('loginBtn'),old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='A entrar…';
+  $('authStatus').textContent='';
+
+  try{
+    const {data,error}=await supabase.auth.signInWithPassword({email,password});
+
+    if(error){
+      const low=String(error.message||'').toLowerCase();
+      if(low.includes('email not confirmed'))throw new Error('Confirme primeiro o email de registo.');
+      if(low.includes('invalid login credentials'))throw new Error('Email ou palavra-passe incorretos.');
+      throw error
+    }
+
+    if(!data?.session){
+      throw new Error('Não foi possível iniciar a sessão.')
+    }
+
+    // A autenticação já foi aceite: nunca voltar a mostrar erro de credenciais por causa do bootstrap da app.
+    $('authStatus').textContent='✓ Sessão iniciada.';
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.remove('hidden');
+
+    try{
+      await enterApp()
+    }catch(e){
+      console.error('Bootstrap após login:',e);
+      // Mantém a sessão iniciada e a app visível, sem culpar as credenciais.
+    }
+  }catch(e){
+    $('authStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;
+    btn.textContent=old
+  }
 };
 
 const signupStartedAt=Date.now();
@@ -1066,48 +1126,63 @@ $('signupBtn').onclick=async()=>{
   const password=$('signupPassword').value;
   const website=$('signupWebsite').value;
 
+  if(website)return;
   if(name.length<2){$('signupStatus').textContent='Escolha um nome público com pelo menos 2 caracteres.';return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('signupStatus').textContent='Introduza um email válido.';return}
   if(password.length<8){$('signupStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
   if(!$('signupAgree').checked){$('signupStatus').textContent='Confirme a participação responsável na comunidade.';return}
 
   const btn=$('signupBtn'),old=btn.textContent;
-  btn.disabled=true;btn.textContent='A criar conta…';
-  $('signupStatus').textContent='A preparar o seu perfil…';
+  btn.disabled=true;
+  btn.textContent='A criar conta…';
+  $('signupStatus').textContent='A criar o seu perfil…';
 
   try{
-    const response=await fetch(`${SUPABASE_URL}/functions/v1/public-signup`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
-      body:JSON.stringify({
-        display_name:name,email,password,website,
-        started_at:signupStartedAt
-      })
+    const redirectTo=(location.protocol==='http:'||location.protocol==='https:') ? location.origin : undefined;
+
+    const {data,error}=await supabase.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{display_name:name},
+        ...(redirectTo ? {emailRedirectTo:redirectTo} : {})
+      }
     });
 
-    let payload={};
-    try{payload=await response.json()}catch{}
-
-    if(!response.ok||payload?.error){
-      const msg=String(payload?.error||'Não foi possível criar a conta.');
-      if(msg.toLowerCase().includes('já existe')||msg.toLowerCase().includes('already')){
+    if(error){
+      const low=String(error.message||'').toLowerCase();
+      if(low.includes('anonymous sign-ins')){
+        throw new Error('Preencha nome, email e palavra-passe antes de criar a conta.')
+      }
+      if(low.includes('already')||low.includes('registered')){
         throw new Error('Já existe uma conta com este email.')
       }
-      throw new Error(msg)
+      if(low.includes('rate limit')){
+        throw new Error('Foram feitos vários pedidos seguidos. Aguarde alguns segundos e tente novamente.')
+      }
+      throw error
     }
 
-    $('signupStatus').textContent='✓ Conta criada. A entrar…';
-
-    const login=await supabase.auth.signInWithPassword({email,password});
-    if(login.error)throw login.error;
+    if(!data?.user)throw new Error('Não foi possível criar a conta.');
 
     localStorage.setItem('bombaCerta:newUser','1');
-    await enterApp();
-    setTimeout(()=>showWelcomeMission(),250)
+
+    if(data.session){
+      $('signupStatus').textContent='✓ Conta criada. Bem-vindo à comunidade!';
+      await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+      await enterApp();
+      setTimeout(()=>showWelcomeMission(),250)
+    }else{
+      $('signupStatus').textContent='✓ Conta criada. Confirme o email recebido e depois entre.';
+      $('email').value=email;
+      $('password').value='';
+      setTimeout(()=>showLoginPane(),1200)
+    }
   }catch(e){
     $('signupStatus').textContent=errPT(e)
   }finally{
-    btn.disabled=false;btn.textContent=old
+    btn.disabled=false;
+    btn.textContent=old
   }
 };
 
