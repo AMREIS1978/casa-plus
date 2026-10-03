@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v4.1 — topo e mapa rápido</title>
+<title>Bomba Certa v4.2 — pesquisa instantânea</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -150,6 +150,18 @@ header{
 .report-status.pendente{background:#fff7ed;color:#9a3412}.report-status.revista{background:#eff8ff;color:#175cd3}.report-status.arquivada{background:#f2f4f7;color:#667085}
 .report-meta{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
 
+
+.search-state{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:#667085;min-height:20px}
+.search-spinner{width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn.loading{opacity:.9;cursor:wait}
+.btn.loading:before{content:'';width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:7px;vertical-align:-2px}
+.station-skeleton{border:1px solid var(--line);border-radius:16px;padding:14px;background:white}
+.sk{height:12px;border-radius:7px;background:linear-gradient(90deg,#eef2f6 25%,#f8fafc 50%,#eef2f6 75%);background-size:200% 100%;animation:shimmer 1.1s infinite}
+.sk.w70{width:70%}.sk.w45{width:45%;margin-top:9px}.sk.w90{width:90%;margin-top:12px}
+@keyframes shimmer{to{background-position:-200% 0}}
+.cache-note{font-size:10px;color:#98a2b3;margin-top:5px}
+
 </style>
 </head>
 <body>
@@ -222,7 +234,7 @@ header{
         </select>
         <button id="locateBtn" class="btn">📍 Procurar perto de mim</button>
       </div>
-      <div id="fuelStatus" class="status">Autorize a localização para procurar postos próximos.</div><div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
+      <div id="fuelStatus" class="status">Toque em “Procurar perto de mim”.</div><div id="searchState" class="search-state hidden"><span class="search-spinner"></span><span id="searchStateText">A localizar…</span></div><div id="fastLocationInfo" class="location-fast hidden"><span class="pulse"></span><span>A usar a localização mais recente enquanto atualizo a posição.</span></div>
     </div>
 
     <div class="grid2">
@@ -797,6 +809,51 @@ $('signupBtn').onclick=async()=>{
 $('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()};
 
 
+
+function stationCacheKey(){
+  return `bombaCerta:stations:${$('fuelType')?.value||''}:${$('fuelRadius')?.value||''}`
+}
+function saveStationCache(){
+  try{
+    localStorage.setItem(stationCacheKey(),JSON.stringify({
+      lat:currentLat,lon:currentLon,ts:Date.now(),
+      stations:nearbyStations.slice(0,80).map(s=>({
+        key:s.key,dgegId:s.dgegId||null,name:s.name,brand:s.brand||'',address:s.address||'',
+        lat:s.lat,lon:s.lon,officialPrice:s.officialPrice??null,officialUpdated:s.officialUpdated||'',
+        source:s.source||'',distance:s.distance??null,displayPrice:s.displayPrice??null,
+        priceSource:s.priceSource||null,lastUpdated:s.lastUpdated||null
+      }))
+    }))
+  }catch{}
+}
+function getStationCache(lat,lon){
+  try{
+    const c=JSON.parse(localStorage.getItem(stationCacheKey())||'null');
+    if(!c||!Array.isArray(c.stations)||!c.stations.length)return null;
+    if(Date.now()-Number(c.ts||0)>20*60*1000)return null;
+    if(haversine(lat,lon,Number(c.lat),Number(c.lon))>3)return null;
+    return c
+  }catch{return null}
+}
+function showSearchState(text){
+  $('searchStateText').textContent=text;
+  $('searchState').classList.remove('hidden')
+}
+function hideSearchState(){
+  $('searchState').classList.add('hidden')
+}
+function setLocateLoading(on,label='A localizar…'){
+  const b=$('locateBtn');
+  if(on){
+    b.classList.add('loading');b.disabled=true;b.dataset.old=b.textContent;b.textContent=label
+  }else{
+    b.classList.remove('loading');b.disabled=false;b.textContent='📍 Procurar perto de mim'
+  }
+}
+function showStationSkeletons(){
+  $('stationList').innerHTML=Array.from({length:4},()=>`<div class="station-skeleton"><div class="sk w70"></div><div class="sk w45"></div><div class="sk w90"></div></div>`).join('')
+}
+
 function saveLastLocation(lat,lon){
   try{localStorage.setItem('bombaCerta:lastLocation',JSON.stringify({lat,lon,ts:Date.now()}))}catch{}
 }
@@ -958,55 +1015,129 @@ async function remember(stations){
   const payload=stations.slice(0,120).map(s=>({source_key:s.key,source:s.source==='Base Bomba Certa'?'Verificado':s.source,name:s.name,brand:s.brand||'',address:s.address||'',latitude:s.lat,longitude:s.lon,dgeg_id:s.dgegId||null})).filter(x=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(x.source));
   if(payload.length)await supabase.rpc('remember_fuel_stations',{p_stations:payload})
 }
-async function searchStations(){
+
+async function renderCachedStations(lat,lon){
+  const cache=getStationCache(lat,lon);
+  if(!cache)return false;
+  nearbyStations=cache.stations.map(s=>({
+    ...s,
+    lat:Number(s.lat),lon:Number(s.lon),
+    distance:haversine(lat,lon,Number(s.lat),Number(s.lon)),
+    candidate:null,
+    cached:true
+  }));
+  await renderStations();
+  $('fuelStatus').textContent=`${nearbyStations.length} postos mostrados imediatamente · a atualizar…`;
+  return true
+}
+
+async function searchStations({instant=true}={}){
   if(currentLat==null)return;
-  $('fuelStatus').textContent='A procurar postos…';
+  const r=Number($('fuelRadius').value);
   ensureMap();
+
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
   map.setView([currentLat,currentLon],13,{animate:false});
   requestAnimationFrame(()=>map.invalidateSize(false));
 
-  const r=Number($('fuelRadius').value);
-
-  // 1) Fontes rápidas: base local + comunidade
-  const fastResults=await Promise.allSettled([
-    registryStations(currentLat,currentLon,r),
-    communityStations(currentLat,currentLon,r)
-  ]);
-  nearbyStations=mergeStations(fastResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
-    .filter(s=>s.distance<=r/1000);
-
-  if(nearbyStations.length){
-    await renderStations();
-    $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a atualizar preços e cobertura…`;
+  let hadInstant=false;
+  if(instant){
+    hadInstant=await renderCachedStations(currentLat,currentLon);
+    if(!hadInstant)showStationSkeletons()
   }
 
-  // 2) Fontes externas em paralelo, sem bloquear a abertura inicial do mapa
-  const slowResults=await Promise.allSettled([
+  showSearchState(hadInstant?'A atualizar preços e postos…':'A procurar postos próximos…');
+
+  // Primeira vaga: fontes rápidas
+  const fastPromise=Promise.allSettled([
+    registryStations(currentLat,currentLon,r),
+    communityStations(currentLat,currentLon,r)
+  ]).then(async fastResults=>{
+    const fast=mergeStations(fastResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
+      .filter(s=>s.distance<=r/1000);
+
+    if(fast.length){
+      nearbyStations=mergeStations([nearbyStations,fast]).filter(s=>s.distance<=r/1000);
+      await renderStations();
+      $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a completar informação…`;
+    }
+  }).catch(()=>{});
+
+  // Segunda vaga: fontes externas, totalmente em paralelo
+  const slowPromise=Promise.allSettled([
     dgegStations(currentLat,currentLon,r),
     osmStations(currentLat,currentLon,r)
-  ]);
+  ]).then(async slowResults=>{
+    const slow=slowResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
+    nearbyStations=mergeStations([nearbyStations,...slow]).filter(s=>s.distance<=r/1000);
+    await renderStations();
 
-  nearbyStations=mergeStations([
-    nearbyStations,
-    ...slowResults.filter(x=>x.status==='fulfilled').map(x=>x.value||[])
-  ]).filter(s=>s.distance<=r/1000);
+    // preços adicionais depois de já haver conteúdo visível
+    const enrich=nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,24);
+    if(enrich.length){
+      await Promise.allSettled(enrich.map(enrichDetail));
+      await renderStations()
+    }
 
-  // 3) Detalhes de preço DGEG depois de já haver mapa/resultados no ecrã
-  await Promise.allSettled(
-    nearbyStations.filter(s=>s.dgegId&&!s.officialPrice).slice(0,30).map(enrichDetail)
-  );
+    saveStationCache();
+    remember(nearbyStations).catch(()=>{});
+    $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`;
+    hideSearchState();
+    setLocateLoading(false)
+  }).catch(()=>{
+    hideSearchState();setLocateLoading(false);
+    if(nearbyStations.length)$('fuelStatus').textContent=`${nearbyStations.length} postos disponíveis.`;
+    else $('fuelStatus').textContent='Não foi possível completar a pesquisa. Tente novamente.'
+  });
 
-  remember(nearbyStations).catch(()=>{});
-  await renderStations();
-  $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados no raio selecionado.`
+  // não bloquear a interface: as duas vagas seguem em background
+  await Promise.race([fastPromise,new Promise(r=>setTimeout(r,900))]);
 }
+$('locateBtn').onclick=async()=>{
+  setLocateLoading(true,'A localizar…');
+  showSearchState('A obter localização…');
 
-$('locateBtn').onclick=()=>{ $('fuelStatus').textContent='A localizar…'; useFastLocation() };
+  // 1. localização recente = resposta instantânea
+  const cached=getLastLocation();
+  if(cached){
+    currentLat=cached.lat;currentLon=cached.lon;
+    ensureMap();map.setView([currentLat,currentLon],13,{animate:false});
+    renderCachedStations(currentLat,currentLon).catch(()=>{});
+    $('fuelStatus').textContent='Localização encontrada · a atualizar…';
+  }else{
+    showStationSkeletons()
+  }
+
+  if(!navigator.geolocation){
+    hideSearchState();setLocateLoading(false);
+    $('fuelStatus').textContent='Este dispositivo não permite localização.';
+    return
+  }
+
+  // 2. pedir localização ao navegador com timeout curto
+  navigator.geolocation.getCurrentPosition(async p=>{
+    currentLat=p.coords.latitude;currentLon=p.coords.longitude;
+    saveLastLocation(currentLat,currentLon);
+    $('fuelStatus').textContent='Localização encontrada.';
+    showSearchState('A procurar postos próximos…');
+    await searchStations({instant:true});
+    subscribeRealtime()
+  },async ()=>{
+    if(cached){
+      currentLat=cached.lat;currentLon=cached.lon;
+      showSearchState('A usar a última localização conhecida…');
+      await searchStations({instant:true});
+      subscribeRealtime()
+    }else{
+      hideSearchState();setLocateLoading(false);
+      $('fuelStatus').textContent='Não consegui obter a localização. Verifique a permissão de localização do navegador.'
+    }
+  },{enableHighAccuracy:false,timeout:2500,maximumAge:600000})
+};
 $('refreshBtn').onclick=searchStations;
-$('fuelType').onchange=()=>currentLat!=null&&searchStations();
-$('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
+$('fuelType').onchange=()=>{if(currentLat!=null){setLocateLoading(true,'A atualizar…');searchStations({instant:true})}};
+$('fuelRadius').onchange=()=>{if(currentLat!=null){setLocateLoading(true,'A atualizar…');searchStations({instant:true})}};
 
 window.openPrice=key=>{
   currentPriceStation=nearbyStations.find(x=>x.key===key);if(!currentPriceStation)return;
@@ -1318,6 +1449,35 @@ function subscribeRealtime(){
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_contributor_stats'},()=>loadLeaderboard())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_user_reports'},()=>{if(isAdminUser)loadAdminReports()}).subscribe()
 }
+
+
+async function warmLocationAndStations(){
+  try{
+    const perm=await navigator.permissions?.query?.({name:'geolocation'});
+    if(perm?.state!=='granted')return;
+    navigator.geolocation.getCurrentPosition(async p=>{
+      currentLat=p.coords.latitude;currentLon=p.coords.longitude;
+      saveLastLocation(currentLat,currentLon);
+      ensureMap();map.setView([currentLat,currentLon],13,{animate:false});
+      await renderCachedStations(currentLat,currentLon);
+      // pré-carrega apenas as fontes rápidas sem mostrar loading
+      const r=Number($('fuelRadius').value);
+      const results=await Promise.allSettled([
+        registryStations(currentLat,currentLon,r),
+        communityStations(currentLat,currentLon,r)
+      ]);
+      const fast=mergeStations(results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
+        .filter(s=>s.distance<=r/1000);
+      if(fast.length){
+        nearbyStations=fast;
+        await renderStations();
+        saveStationCache();
+        $('fuelStatus').textContent=`${nearbyStations.length} postos prontos.`
+      }
+    },()=>{}, {enableHighAccuracy:false,timeout:1800,maximumAge:600000})
+  }catch{}
+}
+setTimeout(warmLocationAndStations,250);
 
 authCheck();
 </script>
