@@ -1,36 +1,33 @@
-# Bomba Certa v6.9 — registo final corrigido
+# Bomba Certa v7.0 — erro `supabase.rpc(...).catch is not a function` corrigido
 
-## Causa real encontrada
-O backend estava a tentar aceder diretamente às tabelas do schema `private`
-através do Data API/PostgREST.
+## Causa
+O cliente Supabase devolve um objeto PostgREST `thenable` em `supabase.rpc(...)`.
+Esse objeto pode ser usado com `await`, mas não deve ser tratado como uma Promise normal com `.catch()`.
 
-O Supabase devolvia `PGRST106 / 406`, por isso acontecia isto:
-- o utilizador preenchia corretamente o formulário;
-- o Auth chegava mesmo a criar o utilizador;
-- o passo seguinte, que ligava username e email de recuperação à conta, falhava;
-- o frontend recebia erro e parecia ficar bloqueado.
+A aplicação tinha três chamadas deste género:
 
-## Correção aplicada no backend
-Foram criadas RPCs `SECURITY DEFINER` para fazer, de forma controlada:
-- procurar username;
-- procurar email de recuperação;
-- registar a associação username + contacto de recuperação.
+`supabase.rpc('ensure_my_fuel_profile').catch(...)`
 
-As Edge Functions deixaram de tentar aceder diretamente ao schema privado.
+Isso fazia o JavaScript parar depois de criar/iniciar a conta.
 
-Estado:
-- `public-register`: versão 6
-- `public-login`: versão 7
+## Correção
+Foi criado um wrapper seguro:
 
-## Compatibilidade
-As contas já existentes não foram alteradas.
-Continuam a entrar como anteriormente.
+`safeEnsureFuelProfile()`
 
-## Experiência
-O estado do registo aparece agora imediatamente debaixo do botão.
+que usa `try/catch` com `await supabase.rpc(...)`.
 
-Depois da criação:
-`✅ Conta criada com sucesso. Parabéns!`
-`A entrar automaticamente na sua conta…`
+Foram corrigidas as três ocorrências:
+- carregamento inicial da aplicação;
+- criação de nova conta;
+- carregamento do perfil.
 
-A aplicação entra logo na conta quando a sessão é criada.
+## Resultado
+Depois de criar a conta:
+1. conta criada;
+2. sessão iniciada;
+3. perfil garantido;
+4. mensagem `Conta criada com sucesso. Parabéns!`;
+5. entrada imediata na aplicação.
+
+Nenhuma conta existente foi alterada.

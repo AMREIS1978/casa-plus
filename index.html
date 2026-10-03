@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v6.9 — registo final corrigido</title>
+<title>Bomba Certa v7.0 — RPC corrigido</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1151,6 +1151,17 @@ $('adminCreateUserBtn').onclick=async()=>{
 $('refreshAdminBtn').onclick=async()=>{await loadAdminUsers()};
 $('refreshReportsBtn').onclick=loadAdminReports;
 
+
+async function safeEnsureFuelProfile(){
+  try{
+    await supabase.rpc('ensure_my_fuel_profile')
+    return true
+  }catch(e){
+    console.warn('Não foi possível garantir o perfil neste momento:',e)
+    return false
+  }
+}
+
 async function enterApp(){
   $('authScreen').classList.add('hidden');
   $('appShell').classList.remove('hidden');
@@ -1171,7 +1182,7 @@ async function enterApp(){
 
   // Perfil visual pode carregar em paralelo.
   hydrateTopProfile().catch(()=>{});
-  supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+  await safeEnsureFuelProfile();
 
   // O papel administrativo é prioritário e não fica dependente do ranking/perfil.
   await checkAdmin();
@@ -1481,7 +1492,7 @@ $('signupBtn').onclick=async()=>{
 
       if(!sessionError && sessionData?.session){
         localStorage.setItem('bombaCerta:newUser','1');
-        await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+        await await safeEnsureFuelProfile();
         $('signupStatus').textContent='✓ Conta criada com sucesso. Parabéns!';
         await enterApp();
         showAccountCreatedToast();
@@ -2264,7 +2275,7 @@ async function hydrateTopProfile(){
   const {data:{user}}=await supabase.auth.getUser();
   if(!user)return;
 
-  await supabase.rpc('ensure_my_fuel_profile').catch(()=>{});
+  await await safeEnsureFuelProfile();
   const {data,error}=await supabase
     .from('fuel_contributor_stats')
     .select('display_name,points,trusted_publisher,avatar_path')
