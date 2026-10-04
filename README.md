@@ -1,39 +1,39 @@
-# Bomba Certa v9.5 — Navegação Social Otimizada
+# Bomba Certa v9.7 — Interações estilo Facebook
 
-## Problema corrigido
-A navegação social tinha demasiadas repetições: barra principal, atalhos laterais e Admin no topo.
+## Correção funcional
+Os botões de Gosto, Comentário e Partilha não respondiam corretamente porque a chave do posto era injetada diretamente nos atributos `onclick` com aspas incompatíveis.
 
-## Nova organização
+Foi substituída por uma chave codificada segura (`encodeURIComponent`) e todos os handlers descodificam a chave antes de agir.
 
-### PC
-- Bomba Certa à esquerda;
-- navegação principal centrada no topo, numa lógica semelhante ao Facebook;
-- perfil e saída à direita;
-- coluna esquerda apenas com perfil, ações rápidas, comunidade e publicidade;
-- feed de postos ao centro;
-- mapa à direita.
+## Três botões à esquerda
+Tal como no exemplo:
+- 👍 Reagir
+- 💬 Comentar
+- ↗ Partilhar
 
-### Telemóvel
-A mesma navegação principal passa automaticamente para a barra inferior. Não existe uma segunda cópia do menu.
+Ficam compactos e alinhados à esquerda.
 
-## Sem perder funcionalidades
-Continuam disponíveis:
-- Mapa/Postos;
-- Abastecimentos;
-- Viagem;
-- Análise;
-- Perfil;
-- Admin para o proprietário;
-- adicionar posto;
-- convidar amigo;
-- níveis;
-- reações/emojis;
-- comentários;
-- partilha;
-- publicidade.
+## Reações
+Ao clicar em Gosto abre uma barra flutuante com:
+- 👍 Gosto
+- ❤️ Adoro
+- 🥰 Carinho
+- 😆 Riso
+- 😮 Surpresa
+- 😢 Triste
+- 😡 Zangado
 
-## Ações rápidas
-A coluna esquerda passou a conter apenas ações complementares:
-- Adicionar posto;
-- Convidar amigo;
-- Ver níveis.
+A reação escolhida substitui o ícone de Gosto. Repetir a mesma reação remove-a.
+
+## Comentários
+O botão abre os comentários do posto e permite:
+- escrever;
+- inserir emojis;
+- publicar com Enter;
+- eliminar os próprios comentários.
+
+## Partilha
+Usa a partilha nativa do dispositivo quando disponível. Em PC copia o posto e o link para a área de transferência como fallback.
+
+## Backend
+O backend Supabase foi atualizado para aceitar as sete reações acima. As RPCs continuam exclusivas para utilizadores autenticados.
