@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.3 — Interface polida</title>
+<title>Bomba Certa v9.4 — Comunidade Social</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1016,6 +1016,167 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
   .map-fuel-row small{grid-column:1/-1;margin-top:-2px}
 }
 
+
+/* ===== v9.4 · Layout social inspirado em feeds modernos ===== */
+.social-layout{
+  display:grid;
+  grid-template-columns:230px minmax(520px,680px) minmax(330px,1fr);
+  grid-template-areas:"left feed map";
+  gap:16px;
+  align-items:start;
+  max-width:1380px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.social-left-rail{grid-area:left;position:sticky;top:88px;display:grid;gap:10px}
+.social-feed-panel{grid-area:feed;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+.social-map-rail{grid-area:map;position:sticky;top:88px;align-self:start}
+.social-feed-head{
+  background:#fff;border:1px solid #e2e7ee;border-radius:18px;padding:14px 15px;margin-bottom:10px;
+  box-shadow:0 2px 8px rgba(15,23,42,.035)
+}
+.social-feed-head p{margin:4px 0 0;color:#7c8798;font-size:10px}
+.social-profile-card,.social-rail-info,.social-rail-ad{
+  background:#fff;border:1px solid #e1e6ed;border-radius:16px;padding:11px;
+  box-shadow:0 2px 8px rgba(15,23,42,.03)
+}
+.social-profile-card{display:flex;align-items:center;gap:9px}
+.social-rail-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eef2f6;border:1px solid #e1e6ed}
+.social-rail-profile-copy{display:grid;gap:2px;min-width:0}
+.social-rail-profile-copy strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.social-rail-profile-copy span{font-size:8px;color:#7d8999}
+.social-shortcuts{display:grid;gap:3px}
+.social-shortcuts button{
+  border:0;background:transparent;border-radius:11px;min-height:42px;padding:7px 9px;
+  display:flex;align-items:center;gap:9px;text-align:left;color:#344054
+}
+.social-shortcuts button:hover{background:#eaf2ff;color:#1d67d2}
+.social-shortcuts button span{width:25px;height:25px;border-radius:8px;background:#eef3f8;display:grid;place-items:center}
+.social-shortcuts button b{font-size:9.5px}
+.social-rail-info{display:grid;gap:5px}
+.social-rail-info strong{font-size:11px}.social-rail-info span{font-size:8.5px;line-height:1.45;color:#778497}
+.social-rail-ad{background:linear-gradient(145deg,#fffaf0,#fff3d7)}
+.social-rail-ad span{font-size:7px;letter-spacing:.12em;color:#a38342;font-weight:900}
+.social-rail-ad b{display:block;font-size:11px;margin-top:4px}
+.social-rail-ad small{display:block;font-size:8px;line-height:1.4;color:#8c7a57;margin-top:3px}
+.social-map-note{margin-top:8px;font-size:8px;color:#718096;display:flex;gap:5px;align-items:center}
+.social-map-note span{color:#1d9b61}
+.social-feed.station-list{gap:11px}
+.social-feed .station{
+  border-radius:18px;
+  border:1px solid #dfe4eb;
+  background:#fff;
+  box-shadow:0 2px 7px rgba(15,23,42,.035);
+  padding:0;
+  overflow:visible;
+}
+.social-feed .station:hover{transform:none;box-shadow:0 4px 12px rgba(15,23,42,.055)}
+.social-feed .station-main{padding:13px 14px 0}
+.social-feed .fuel-price-grid{margin:10px 14px 0}
+.social-feed .price-update,.social-feed .author-line,.social-feed .validation-line{padding-right:3px}
+.utility-actions{
+  margin:0!important;padding:9px 13px 12px;border-top:1px solid #edf0f3;
+  background:#fbfcfe;
+}
+.utility-actions button{background:#fff!important;min-height:34px!important}
+.utility-actions .photo{background:#edf4ff!important;color:#1d67d2!important;border-color:#d9e7fb!important}
+
+/* Reações e comentários */
+.station-social{margin-top:11px;border-top:1px solid #edf0f3}
+.social-stats-row{
+  min-height:34px;padding:7px 14px 5px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:9px;color:#687588
+}
+.social-reaction-summary{display:flex;align-items:center;gap:5px}
+.social-reaction-icons{font-size:13px;letter-spacing:-4px;padding-right:4px}
+.social-muted{color:#98a2b3}
+.social-comment-count{border:0;background:transparent;color:#687588;font-size:9px;padding:2px 0}
+.social-comment-count:hover{text-decoration:underline}
+.social-action-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:4px 9px;
+  border-top:1px solid #edf0f3
+}
+.social-action-btn{
+  min-height:36px;border:0;background:transparent;border-radius:8px;color:#536176;
+  display:flex;align-items:center;justify-content:center;gap:6px;font-size:9.5px
+}
+.social-action-btn:hover{background:#f1f4f8}
+.social-action-btn span{font-size:15px}.social-action-btn b{font-weight:850}
+.social-action-btn.reacted{color:#1769d2}
+.social-reaction-wrap{position:relative}
+.reaction-picker{
+  position:absolute;left:50%;bottom:42px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:4px;background:#fff;padding:6px 7px;border-radius:999px;
+  border:1px solid #dfe4eb;box-shadow:0 10px 28px rgba(15,23,42,.18);z-index:80
+}
+.reaction-picker button{
+  width:34px;height:34px;border:0;background:transparent;border-radius:50%;font-size:20px;
+  transition:transform .12s ease,background .12s ease
+}
+.reaction-picker button:hover{transform:scale(1.18);background:#f5f7fa}
+.social-comments-panel{border-top:1px solid #edf0f3;padding:10px 13px 12px;background:#fff}
+.social-comments-list{display:grid;gap:8px;max-height:310px;overflow:auto;padding-right:2px}
+.social-comment{display:flex;align-items:flex-start;gap:7px}
+.social-comment-user-avatar,.social-comment-avatar{
+  width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:#e8eef6;display:grid;place-items:center;
+  color:#35445a;font-size:10px;font-weight:900
+}
+.social-comment-content{min-width:0}
+.social-comment-bubble{background:#f0f2f5;border-radius:14px;padding:7px 9px}
+.social-comment-name{font-size:9px;font-weight:900}
+.social-comment-body{font-size:9.5px;line-height:1.4;margin-top:2px;overflow-wrap:anywhere}
+.social-comment-meta{font-size:7.5px;color:#8a96a8;margin:3px 5px}
+.social-comment-meta button{border:0;background:transparent;padding:0;color:#69778b;font-size:7.5px;font-weight:800}
+.social-comment-compose{display:flex;gap:7px;align-items:flex-start;margin-top:10px}
+.social-comment-box{flex:1;background:#f0f2f5;border-radius:16px;padding:5px 7px}
+.social-comment-input{
+  width:100%;border:0;background:transparent;outline:none;min-height:28px;padding:4px 5px;font-size:10px;color:#1f2937
+}
+.social-comment-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 3px}
+.social-comment-emojis{display:flex;gap:1px}
+.social-comment-emojis button{border:0;background:transparent;padding:2px 3px;font-size:13px;border-radius:6px}
+.social-comment-emojis button:hover{background:#e4e8ee}
+.social-comment-send{border:0;background:transparent;color:#1769d2;font-size:8.5px;font-weight:900;padding:4px 5px}
+.social-no-comments,.social-comments-loading{padding:8px;text-align:center;color:#8a96a8;font-size:8.5px}
+.guest-social{padding:7px 12px;border-top:1px solid #edf0f3}
+.guest-social button{border:0;background:transparent;color:#1769d2;font-size:9px;font-weight:850;padding:4px 0}
+
+@media(max-width:1180px){
+  .social-layout{
+    grid-template-columns:minmax(0,1fr) minmax(330px,430px);
+    grid-template-areas:"feed map";
+  }
+  .social-left-rail{display:none}
+}
+@media(max-width:900px){
+  .social-layout{
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-areas:"map" "feed";
+    gap:10px;
+  }
+  .social-map-rail{position:relative;top:auto;max-height:none!important}
+  .social-map-rail #fuelMap{height:330px!important;min-height:0!important;max-height:none!important}
+  .social-feed-head{margin-bottom:8px}
+}
+@media(max-width:620px){
+  .social-layout{margin-top:10px}
+  .social-map-rail{padding:8px!important;border-radius:16px!important}
+  .social-map-rail .premium-panel-head{margin-bottom:7px}
+  .social-map-rail #fuelMap{height:245px!important;border-radius:13px}
+  .social-feed-head{border-radius:14px;padding:10px 11px}
+  .social-feed .station{border-radius:14px}
+  .social-feed .station-main{padding:11px 11px 0}
+  .social-feed .fuel-price-grid{margin:8px 11px 0}
+  .social-stats-row{padding-left:11px;padding-right:11px}
+  .social-action-row{padding-left:6px;padding-right:6px}
+  .social-action-btn{font-size:9px;gap:4px}
+  .social-action-btn span{font-size:14px}
+  .social-comments-panel{padding:9px 10px 10px}
+  .utility-actions{padding:8px 10px 10px}
+  .reaction-picker{left:8px;transform:none}
+}
+
 </style>
 </head>
 <body>
@@ -1212,29 +1373,62 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
       </div>
     </section>
 
-    <div class="premium-layout">
-      <div class="premium-map-card">
-        <div class="premium-panel-head">
+    <div class="premium-layout social-layout">
+      <aside class="social-left-rail" aria-label="Atalhos">
+        <div class="social-profile-card">
+          <img id="socialRailAvatar" class="social-rail-avatar" src="" alt="">
+          <div class="social-rail-profile-copy">
+            <strong id="socialRailName">Condutor</strong>
+            <span id="socialRailLevel">Comunidade Bomba Certa</span>
+          </div>
+        </div>
+
+        <div class="social-shortcuts">
+          <button type="button" data-social-section="postos"><span>⌖</span><b>Postos próximos</b></button>
+          <button type="button" data-social-section="viagem"><span>🧭</span><b>Viagem Inteligente</b></button>
+          <button type="button" data-social-section="abastecimentos"><span>⛽</span><b>Os meus abastecimentos</b></button>
+          <button type="button" data-social-section="estatisticas"><span>📊</span><b>Análise</b></button>
+        </div>
+
+        <div class="social-rail-info">
+          <div class="eyebrow">COMUNIDADE</div>
+          <strong>Partilhe informação útil</strong>
+          <span>Reaja aos postos, deixe comentários e ajude outros condutores.</span>
+        </div>
+
+        <div class="social-rail-ad" aria-label="Publicidade">
+          <span>PUBLICIDADE</span>
+          <b>Espaço parceiro</b>
+          <small>Ideal para marcas automóveis, seguros, oficinas ou mobilidade.</small>
+        </div>
+      </aside>
+
+      <div class="premium-stations-panel social-feed-panel">
+        <div class="premium-panel-head social-feed-head">
           <div>
             <div class="eyebrow">À SUA VOLTA</div>
-            <h2>Mapa</h2>
+            <h2>Postos próximos</h2>
+            <p>Compare preços e veja o que a comunidade diz.</p>
+          </div>
+          <button id="addStationBtn" class="btn secondary compact-btn">+ Posto</button>
+        </div>
+        <div id="stationList" class="station-list social-feed"><div class="empty">Faça uma pesquisa para ver os postos próximos.</div></div>
+      </div>
+
+      <aside class="premium-map-card social-map-rail">
+        <div class="premium-panel-head">
+          <div>
+            <div class="eyebrow">MAPA</div>
+            <h2>À sua volta</h2>
           </div>
           <button id="refreshBtn" class="btn secondary compact-btn">↻ Atualizar</button>
         </div>
         <div id="fuelMap"></div>
         <div id="routeBox" class="route hidden"></div>
-      </div>
-
-      <div class="premium-stations-panel">
-        <div class="premium-panel-head">
-          <div>
-            <div class="eyebrow">COMPARAÇÃO RÁPIDA</div>
-            <h2>Postos próximos</h2>
-          </div>
-          <button id="addStationBtn" class="btn secondary compact-btn">+ Posto</button>
+        <div class="social-map-note">
+          <span>●</span> Os preços aparecem nos marcadores e nos cartões dos postos.
         </div>
-        <div id="stationList" class="station-list"><div class="empty">Faça uma pesquisa para ver os postos próximos.</div></div>
-      </div>
+      </aside>
     </div>
 
     <div class="ad premium-ad premium-ad-secondary" aria-label="Publicidade">
@@ -2769,6 +2963,8 @@ function showSection(id){
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
+document.querySelectorAll('[data-social-section]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.socialSection)));
+
 $('profileTopBtn').onclick=()=>showSection('perfil');
 $('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 $('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
@@ -4350,6 +4546,241 @@ function mapStationPopupHTML(s){
   </div>`
 }
 
+
+const STATION_REACTIONS={
+  like:{emoji:'👍',label:'Gosto'},
+  love:{emoji:'❤️',label:'Adoro'},
+  fire:{emoji:'🔥',label:'Bom preço'},
+  useful:{emoji:'👏',label:'Útil'},
+  wow:{emoji:'😮',label:'Surpresa'}
+};
+let stationSocialCache={};
+
+function socialHash(value){
+  let h=2166136261;
+  const s=String(value||'');
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+  return (h>>>0).toString(36)
+}
+function socialDomId(key){return `social-${socialHash(key)}`}
+function jsArg(value){return JSON.stringify(String(value??''))}
+
+function stationSocialHTML(stationKey){
+  const id=socialDomId(stationKey);
+  if(isGuestMode){
+    return `<div class="station-social guest-social">
+      <button type="button" onclick="promptGuestSignup()">Entre para reagir e comentar</button>
+    </div>`
+  }
+  return `<div class="station-social" data-social-key="${esc(stationKey)}">
+    <div class="social-stats-row">
+      <div id="${id}-reaction-summary" class="social-reaction-summary"><span class="social-muted">Seja o primeiro a reagir</span></div>
+      <button id="${id}-comment-count" class="social-comment-count" type="button" onclick="toggleStationComments(${jsArg(stationKey)})">0 comentários</button>
+    </div>
+
+    <div class="social-action-row">
+      <div class="social-reaction-wrap">
+        <button id="${id}-my-reaction" class="social-action-btn" type="button" onclick="toggleReactionPicker(${jsArg(stationKey)})">
+          <span>👍</span><b>Gosto</b>
+        </button>
+        <div id="${id}-picker" class="reaction-picker hidden" role="menu" aria-label="Escolher reação">
+          ${Object.entries(STATION_REACTIONS).map(([key,r])=>`<button type="button" title="${esc(r.label)}" onclick="reactToStation(${jsArg(stationKey)},'${key}')">${r.emoji}</button>`).join('')}
+        </div>
+      </div>
+      <button class="social-action-btn" type="button" onclick="toggleStationComments(${jsArg(stationKey)})"><span>💬</span><b>Comentar</b></button>
+      <button class="social-action-btn" type="button" onclick="shareStation(${jsArg(stationKey)})"><span>↗</span><b>Partilhar</b></button>
+    </div>
+
+    <div id="${id}-comments-panel" class="social-comments-panel hidden">
+      <div id="${id}-comments" class="social-comments-list"><div class="social-comments-loading">A carregar comentários…</div></div>
+      <div class="social-comment-compose">
+        <div class="social-comment-avatar">👤</div>
+        <div class="social-comment-box">
+          <input id="${id}-comment-input" class="social-comment-input" maxlength="400" placeholder="Escreva um comentário…" data-social-comment-key="${esc(stationKey)}">
+          <div class="social-comment-tools">
+            <div class="social-comment-emojis">
+              ${['🙂','😂','❤️','🔥','👏'].map(e=>`<button type="button" onclick="insertCommentEmoji(${jsArg(stationKey)},'${e}')">${e}</button>`).join('')}
+            </div>
+            <button class="social-comment-send" type="button" onclick="addStationComment(${jsArg(stationKey)})">Publicar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+function renderSocialSummary(stationKey,row){
+  const id=socialDomId(stationKey);
+  const counts=row?.reaction_counts||{};
+  const entries=Object.entries(counts)
+    .map(([k,v])=>[k,Number(v||0)])
+    .filter(([k,v])=>STATION_REACTIONS[k]&&v>0)
+    .sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((a,[,v])=>a+v,0);
+  const icons=entries.slice(0,3).map(([k])=>STATION_REACTIONS[k].emoji).join('');
+  const summary=$(id+'-reaction-summary');
+  if(summary){
+    summary.innerHTML=total
+      ? `<span class="social-reaction-icons">${icons}</span><span>${total} ${total===1?'reação':'reações'}</span>`
+      : `<span class="social-muted">Seja o primeiro a reagir</span>`
+  }
+  const commentCount=Number(row?.comment_count||0);
+  const countEl=$(id+'-comment-count');
+  if(countEl)countEl.textContent=`${commentCount} ${commentCount===1?'comentário':'comentários'}`;
+
+  const my=row?.my_reaction;
+  const btn=$(id+'-my-reaction');
+  if(btn){
+    if(my&&STATION_REACTIONS[my]){
+      btn.classList.add('reacted');
+      btn.innerHTML=`<span>${STATION_REACTIONS[my].emoji}</span><b>${esc(STATION_REACTIONS[my].label)}</b>`
+    }else{
+      btn.classList.remove('reacted');
+      btn.innerHTML='<span>👍</span><b>Gosto</b>'
+    }
+  }
+}
+
+async function loadStationSocialSummaries(keys){
+  if(isGuestMode)return;
+  const clean=[...new Set((keys||[]).filter(Boolean))].slice(0,100);
+  if(!clean.length)return;
+  try{
+    const {data,error}=await supabase.rpc('station_social_summary',{p_station_keys:clean});
+    if(error)throw error;
+    for(const row of (data||[])){
+      stationSocialCache[row.station_key]=row;
+      renderSocialSummary(row.station_key,row)
+    }
+  }catch(e){
+    console.warn('Resumo social indisponível:',e)
+  }
+}
+async function refreshStationSocial(stationKey){
+  if(isGuestMode)return;
+  try{
+    const {data,error}=await supabase.rpc('station_social_summary',{p_station_keys:[stationKey]});
+    if(error)throw error;
+    const row=(data||[])[0]||{station_key:stationKey,reaction_counts:{},comment_count:0,my_reaction:null};
+    stationSocialCache[stationKey]=row;
+    renderSocialSummary(stationKey,row)
+  }catch(e){
+    console.warn('Falha ao atualizar interação:',e)
+  }
+}
+
+window.toggleReactionPicker=(stationKey)=>{
+  if(isGuestMode){promptGuestSignup();return}
+  const target=$(socialDomId(stationKey)+'-picker');
+  document.querySelectorAll('.reaction-picker').forEach(x=>{if(x!==target)x.classList.add('hidden')});
+  target?.classList.toggle('hidden')
+};
+window.reactToStation=async(stationKey,reaction)=>{
+  if(isGuestMode){promptGuestSignup();return}
+  const picker=$(socialDomId(stationKey)+'-picker');
+  picker?.classList.add('hidden');
+  try{
+    const {error}=await supabase.rpc('toggle_station_reaction',{p_station_key:stationKey,p_reaction:reaction});
+    if(error)throw error;
+    await refreshStationSocial(stationKey)
+  }catch(e){alert(errPT(e))}
+};
+
+function commentAvatar(name){
+  const initial=String(name||'U').trim().charAt(0).toUpperCase()||'U';
+  return `<span>${esc(initial)}</span>`
+}
+async function loadStationComments(stationKey){
+  if(isGuestMode)return;
+  const id=socialDomId(stationKey);
+  const box=$(id+'-comments');
+  if(box)box.innerHTML='<div class="social-comments-loading">A carregar comentários…</div>';
+  try{
+    const {data,error}=await supabase.rpc('station_social_comments',{p_station_key:stationKey,p_limit:30});
+    if(error)throw error;
+    const rows=data||[];
+    if(!box)return;
+    box.innerHTML=rows.length?rows.map(c=>`
+      <div class="social-comment">
+        <div class="social-comment-user-avatar">${commentAvatar(c.display_name)}</div>
+        <div class="social-comment-content">
+          <div class="social-comment-bubble">
+            <div class="social-comment-name">${esc(c.display_name||'Utilizador')}</div>
+            <div class="social-comment-body">${esc(c.body||'')}</div>
+          </div>
+          <div class="social-comment-meta">${relativeTime(c.created_at)}${c.is_mine?` · <button type="button" onclick="deleteStationComment('${c.comment_id}',${jsArg(stationKey)})">Eliminar</button>`:''}</div>
+        </div>
+      </div>`).join('')
+      :'<div class="social-no-comments">Ainda não existem comentários. Seja o primeiro.</div>'
+  }catch(e){
+    if(box)box.innerHTML='<div class="social-no-comments">Não foi possível carregar os comentários.</div>'
+  }
+}
+window.toggleStationComments=async(stationKey)=>{
+  if(isGuestMode){promptGuestSignup();return}
+  const id=socialDomId(stationKey);
+  const panel=$(id+'-comments-panel');
+  if(!panel)return;
+  const willOpen=panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  if(willOpen){
+    await loadStationComments(stationKey);
+    setTimeout(()=>$(id+'-comment-input')?.focus(),80)
+  }
+};
+window.insertCommentEmoji=(stationKey,emoji)=>{
+  const input=$(socialDomId(stationKey)+'-comment-input');
+  if(!input)return;
+  input.value=(input.value||'')+emoji;
+  input.focus()
+};
+window.addStationComment=async(stationKey)=>{
+  if(isGuestMode){promptGuestSignup();return}
+  const id=socialDomId(stationKey);
+  const input=$(id+'-comment-input');
+  const body=(input?.value||'').trim();
+  if(!body)return;
+  try{
+    const {error}=await supabase.rpc('add_station_comment',{p_station_key:stationKey,p_body:body});
+    if(error)throw error;
+    input.value='';
+    await Promise.all([loadStationComments(stationKey),refreshStationSocial(stationKey)])
+  }catch(e){alert(errPT(e))}
+};
+window.deleteStationComment=async(commentId,stationKey)=>{
+  if(!confirm('Eliminar este comentário?'))return;
+  try{
+    const {error}=await supabase.rpc('delete_station_comment',{p_comment_id:commentId});
+    if(error)throw error;
+    await Promise.all([loadStationComments(stationKey),refreshStationSocial(stationKey)])
+  }catch(e){alert(errPT(e))}
+};
+window.shareStation=async(stationKey)=>{
+  const s=nearbyStations.find(x=>String(x.key)===String(stationKey));
+  if(!s)return;
+  const price=s.displayPrice??s.officialPrice;
+  const text=`⛽ ${s.name}${price?` · ${Number(price).toFixed(3).replace('.',',')} €/L`:''}${s.address?` · ${s.address}`:''}`;
+  const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${s.lat},${s.lon}`)}`;
+  try{
+    if(navigator.share){await navigator.share({title:'Bomba Certa',text,url});return}
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    alert('Posto copiado para partilhar.')
+  }catch(e){if(e?.name!=='AbortError')window.prompt('Copie para partilhar:',`${text}\n${url}`)}
+};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !e.shiftKey && e.target?.classList?.contains('social-comment-input')){
+    e.preventDefault();
+    const key=e.target.dataset.socialCommentKey;
+    if(key)addStationComment(key)
+  }
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.social-reaction-wrap')){
+    document.querySelectorAll('.reaction-picker').forEach(x=>x.classList.add('hidden'))
+  }
+});
+
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
     const ap=a.displayPrice??a.officialPrice, bp=b.displayPrice??b.officialPrice;
@@ -4375,7 +4806,8 @@ function renderBasicStations(){
         <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'a atualizar'}</small></div>
       </div>
       ${stationFuelGridHTML(s,$('fuelType').value)}
-      <div class="station-actions">
+      ${stationSocialHTML(s.key)}
+      <div class="station-actions utility-actions">
         <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
         ${isGuestMode
           ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
@@ -4384,6 +4816,7 @@ function renderBasicStations(){
     </div>`
   }).join(''):'<div class="empty">Ainda não encontrei postos nesta zona.</div>';
 
+  loadStationSocialSummaries(rows.map(s=>s.key)).catch(()=>{});
   populateFillStations();
   updatePriceCoverage();
   renderSmartChoice();
@@ -4455,7 +4888,8 @@ async function renderStations(){
         <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'sem preço'}</small></div>
       </div>
       ${stationFuelGridHTML(s,$('fuelType').value)}
-      <div class="station-actions">
+      ${stationSocialHTML(s.key)}
+      <div class="station-actions utility-actions">
         <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
         ${isGuestMode
           ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
@@ -4464,6 +4898,7 @@ async function renderStations(){
     </div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
 
+  loadStationSocialSummaries(nearbyStations.map(s=>s.key)).catch(()=>{});
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
@@ -4806,12 +5241,15 @@ function applyTopProfile(data){
   if(!data)return;
   const lvl=profileLevelName(Number(data.points||0),Boolean(data.trusted_publisher));
   $('topLevel').textContent=lvl;
+  if($('socialRailName'))$('socialRailName').textContent=data.display_name||'Condutor';
+  if($('socialRailLevel'))$('socialRailLevel').textContent=lvl;
   $('homeUnlockCopy').textContent=`Nível atual: ${lvl}. Continue a contribuir para desbloquear mais.`;
 
   const src=data.avatar_path
     ? supabase.storage.from('avatars').getPublicUrl(data.avatar_path).data.publicUrl+'?v='+encodeURIComponent(data.avatar_path)
     : fallbackAvatar();
   setAvatarSafe($('topAvatar'),src);
+  if($('socialRailAvatar'))setAvatarSafe($('socialRailAvatar'),src);
   $('profileTopBtn')?.classList.add('ready')
 }
 async function hydrateTopProfile(){
