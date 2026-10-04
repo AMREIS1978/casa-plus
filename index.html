@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.4 — Comunidade Social</title>
+<title>Bomba Certa v9.5 — Navegação Social Otimizada</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1177,6 +1177,117 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
   .reaction-picker{left:8px;transform:none}
 }
 
+
+/* ===== v9.5 · Navegação social otimizada, sem opções repetidas ===== */
+header{
+  position:sticky;top:0;z-index:1200;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(16px) saturate(1.05);
+  border-bottom:1px solid #e3e7ed
+}
+.header-in{
+  max-width:1480px;min-height:68px;padding:7px 16px!important;
+  display:grid!important;grid-template-columns:220px minmax(520px,700px) 220px;
+  align-items:center;justify-content:space-between;gap:16px
+}
+.brand{font-size:23px;letter-spacing:-.04em}
+.header-actions{justify-self:end;display:flex;align-items:center;gap:8px}
+#adminTopBtn{display:none!important}
+
+/* PC: navegação principal única, centrada no topo. */
+.bottom-nav{
+  position:static!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;
+  width:100%!important;max-width:700px!important;justify-self:center;
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;
+  padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;backdrop-filter:none!important
+}
+.bottom-nav.admin-enabled{grid-template-columns:repeat(6,minmax(0,1fr))}
+.nav{
+  min-height:54px!important;border-radius:10px!important;padding:6px 5px 8px!important;
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:#667085!important;background:transparent!important;box-shadow:none!important;
+  transition:background .16s ease,color .16s ease
+}
+.nav:hover{background:#f2f4f7!important;transform:none!important;color:#1d67d2!important}
+.nav-icon{
+  width:30px!important;height:30px!important;border:0!important;border-radius:9px!important;background:transparent!important;
+  box-shadow:none!important;color:inherit!important;font-size:18px!important
+}
+.nav-label{font-size:9px!important;font-weight:850!important;color:inherit}
+.nav.active{color:#1769d2!important;background:transparent!important;position:relative}
+.nav.active .nav-icon{background:#eaf2ff!important;color:#1769d2!important;box-shadow:none!important}
+.nav.active::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:-7px;height:3px;border-radius:99px;background:#1769d2
+}
+
+/* Coluna esquerda = ações e contexto; não repete separadores. */
+.social-quick-actions{
+  background:#fff;border:1px solid #e1e6ed;border-radius:16px;padding:10px;
+  box-shadow:0 2px 8px rgba(15,23,42,.03);display:grid;gap:4px
+}
+.social-quick-actions .eyebrow{padding:2px 5px 5px}
+.social-quick-actions button{
+  border:0;background:transparent;border-radius:10px;min-height:40px;padding:7px 8px;
+  display:flex;align-items:center;gap:9px;text-align:left;color:#344054
+}
+.social-quick-actions button:hover{background:#f0f4f9;color:#1769d2}
+.social-quick-actions button span{
+  width:27px;height:27px;border-radius:9px;background:#eef3f8;display:grid;place-items:center;font-size:13px
+}
+.social-quick-actions button b{font-size:9.5px}
+
+/* Evitar choque entre ticker e navegação. */
+.community-activity-footer{z-index:980}
+body{padding-bottom:78px!important}
+.app{padding-bottom:145px!important}
+
+@media(max-width:1180px){
+  .header-in{grid-template-columns:180px minmax(450px,1fr) 180px;gap:10px}
+  .brand{font-size:20px}
+}
+
+@media(max-width:900px){
+  .header-in{
+    min-height:60px;display:flex!important;align-items:center;justify-content:space-between;
+    padding:7px 11px!important
+  }
+  .brand{font-size:20px}
+  .header-actions{margin-left:auto}
+  .top-profile-level{display:none}
+  #logoutBtn{font-size:9px;min-height:36px;padding:7px 10px}
+
+  /* Telemóvel/tablet: a MESMA barra desloca-se para baixo. */
+  .bottom-nav{
+    position:fixed!important;left:50%!important;right:auto!important;bottom:7px!important;
+    transform:translateX(-50%)!important;
+    width:calc(100% - 14px)!important;max-width:none!important;
+    padding:5px 6px calc(5px + env(safe-area-inset-bottom))!important;
+    border:1px solid rgba(220,227,237,.98)!important;border-radius:20px!important;
+    background:rgba(255,255,255,.96)!important;backdrop-filter:blur(16px)!important;
+    box-shadow:0 14px 38px rgba(15,23,42,.17)!important;
+    z-index:1300
+  }
+  .nav{min-height:50px!important;border-radius:12px!important;padding:5px 2px 7px!important;gap:2px}
+  .nav-icon{width:28px!important;height:28px!important;font-size:16px!important}
+  .nav-label{font-size:8px!important}
+  .nav.active{background:#edf4ff!important}
+  .nav.active::after{display:none}
+  body{padding-bottom:90px!important}
+  .app{padding-bottom:156px!important}
+  .community-activity-footer{bottom:72px!important}
+}
+
+@media(max-width:560px){
+  .header-in{padding-left:9px!important;padding-right:9px!important}
+  .brand{font-size:18px}
+  #logoutBtn{display:none}
+  .top-profile-btn{min-width:42px}
+  .bottom-nav{width:calc(100% - 10px)!important;bottom:5px!important;gap:3px!important}
+  .nav{min-height:48px!important}
+  .nav-label{font-size:7.7px!important}
+  .community-activity-footer{bottom:67px!important;width:calc(100% - 10px)!important}
+}
+
 </style>
 </head>
 <body>
@@ -1253,6 +1364,32 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
 <header>
   <div class="header-in">
     <div class="brand">Bomba <span>Certa</span></div>
+    <nav class="bottom-nav" aria-label="Navegação principal">
+  <button class="nav active" data-section="postos" aria-label="Mapa">
+    <span class="nav-icon" aria-hidden="true">⌖</span>
+    <span class="nav-label">Mapa</span>
+  </button>
+  <button class="nav" data-section="abastecimentos" aria-label="Abastecimentos">
+    <span class="nav-icon" aria-hidden="true">⛽</span>
+    <span class="nav-label">Abastecer</span>
+  </button>
+  <button id="tripNav" class="nav" data-section="viagem" aria-label="Viagem">
+    <span class="nav-icon" aria-hidden="true">🧭</span>
+    <span class="nav-label">Viagem</span>
+  </button>
+  <button class="nav" data-section="estatisticas" aria-label="Estatísticas">
+    <span class="nav-icon" aria-hidden="true">📊</span>
+    <span class="nav-label">Análise</span>
+  </button>
+  <button class="nav" data-section="perfil" aria-label="Perfil">
+    <span class="nav-icon" aria-hidden="true">👤</span>
+    <span class="nav-label">Perfil</span>
+  </button>
+  <button id="adminNav" class="nav hidden" data-section="admin" aria-label="Administração">
+    <span class="nav-icon" aria-hidden="true">⚙️</span>
+    <span class="nav-label">Admin</span>
+  </button>
+</nav>
     <div class="header-actions">
       <button id="profileTopBtn" class="top-profile-btn" aria-label="Abrir perfil">
         <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
@@ -1383,11 +1520,11 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
           </div>
         </div>
 
-        <div class="social-shortcuts">
-          <button type="button" data-social-section="postos"><span>⌖</span><b>Postos próximos</b></button>
-          <button type="button" data-social-section="viagem"><span>🧭</span><b>Viagem Inteligente</b></button>
-          <button type="button" data-social-section="abastecimentos"><span>⛽</span><b>Os meus abastecimentos</b></button>
-          <button type="button" data-social-section="estatisticas"><span>📊</span><b>Análise</b></button>
+        <div class="social-quick-actions">
+          <div class="eyebrow">AÇÕES RÁPIDAS</div>
+          <button type="button" id="railAddStationBtn"><span>＋</span><b>Adicionar posto</b></button>
+          <button type="button" id="railInviteBtn"><span>↗</span><b>Convidar amigo</b></button>
+          <button type="button" id="railLevelsBtn"><span>★</span><b>Ver níveis</b></button>
         </div>
 
         <div class="social-rail-info">
@@ -1849,32 +1986,7 @@ body{overflow-y:scroll;overscroll-behavior-y:auto}
   </div>
 </div>
 
-<nav class="bottom-nav" aria-label="Navegação principal">
-  <button class="nav active" data-section="postos" aria-label="Mapa">
-    <span class="nav-icon" aria-hidden="true">⌖</span>
-    <span class="nav-label">Mapa</span>
-  </button>
-  <button class="nav" data-section="abastecimentos" aria-label="Abastecimentos">
-    <span class="nav-icon" aria-hidden="true">⛽</span>
-    <span class="nav-label">Abastecer</span>
-  </button>
-  <button id="tripNav" class="nav" data-section="viagem" aria-label="Viagem">
-    <span class="nav-icon" aria-hidden="true">🧭</span>
-    <span class="nav-label">Viagem</span>
-  </button>
-  <button class="nav" data-section="estatisticas" aria-label="Estatísticas">
-    <span class="nav-icon" aria-hidden="true">📊</span>
-    <span class="nav-label">Análise</span>
-  </button>
-  <button class="nav" data-section="perfil" aria-label="Perfil">
-    <span class="nav-icon" aria-hidden="true">👤</span>
-    <span class="nav-label">Perfil</span>
-  </button>
-  <button id="adminNav" class="nav hidden" data-section="admin" aria-label="Administração">
-    <span class="nav-icon" aria-hidden="true">⚙️</span>
-    <span class="nav-label">Admin</span>
-  </button>
-</nav>
+
 </div>
 
 
@@ -2953,7 +3065,7 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
   $(id)?.classList.add('active');
-  document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
+  document.querySelectorAll(`.nav[data-section="${id}"]`).forEach(x=>x.classList.add('active'));
   if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
   if(id==='viagem'){
@@ -2963,7 +3075,12 @@ function showSection(id){
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
-document.querySelectorAll('[data-social-section]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.socialSection)));
+$('railAddStationBtn')?.addEventListener('click',()=>openAddStation());
+$('railInviteBtn')?.addEventListener('click',()=>$('shareAppBtn')?.click());
+$('railLevelsBtn')?.addEventListener('click',()=>{
+  showSection('perfil');
+  setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)
+});
 
 $('profileTopBtn').onclick=()=>showSection('perfil');
 $('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
