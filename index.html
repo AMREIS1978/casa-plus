@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.7 — preços em tempo real para toda a comunidade</title>
+<title>Bomba Certa v7.8 — preço comunitário persistente</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1932,6 +1932,7 @@ async function searchStations(){
       nearbyStations=mergeStations([nearbyStations,fast]).filter(s=>s.distance<=r/1000);
       renderBasicStations();
       $('fuelStatus').textContent=`${nearbyStations.length} postos encontrados · a completar preços oficiais…`;
+      try{await renderStations()}catch{}
       saveFastStationCache()
     }
   }).catch(()=>{});
@@ -2042,23 +2043,25 @@ function updatePriceCoverage(){
 
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
-    const ap=a.officialPrice??a.displayPrice, bp=b.officialPrice??b.displayPrice;
+    const ap=a.displayPrice??a.officialPrice, bp=b.displayPrice??b.officialPrice;
     if(ap!=null&&bp!=null)return Number(ap)-Number(bp);
     if(ap!=null)return -1;if(bp!=null)return 1;
     return Number(a.distance||0)-Number(b.distance||0)
   });
 
   $('stationList').innerHTML=rows.length?rows.map((s,i)=>{
-    const raw=s.officialPrice??s.displayPrice;
+    const raw=s.displayPrice??s.officialPrice;
     const price=raw!=null?Number(raw).toFixed(3).replace('.',','):null;
-    const source=s.officialPrice!=null
-      ?'<span class="source official">DGEG</span>'
-      :'<span class="source none">A atualizar</span>';
+    const source=s.priceSource==='community'
+      ?'<span class="source community">Comunidade</span>'
+      :s.officialPrice!=null
+        ?'<span class="source official">DGEG</span>'
+        :'<span class="source none">A atualizar</span>';
     return `<div class="station">
       <div>
         <div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div>
         <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-        <div class="basic-note">A completar preços e validações em segundo plano</div>
+        <div class="basic-note">${s.priceSource==='community'?'Preço comunitário mais recente · a completar validações':'A completar preços e validações em segundo plano'}</div>
         <div class="station-actions">
           <button class="go" onclick="openGps('${s.key}')">🧭 GPS</button>
           <button onclick="startRoute('${s.key}')">🗺️ Ver rota</button>
@@ -2079,8 +2082,9 @@ function renderBasicStations(){
     if(userMarker)map.removeLayer(userMarker);
     userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
     for(const s of rows){
-      const p=s.officialPrice??s.displayPrice;
-      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L':'Preço a atualizar'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+      const p=s.displayPrice??s.officialPrice;
+      const src=s.priceSource==='community'?' · Comunidade':(s.officialPrice!=null?' · DGEG':'');
+      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L'+src:'Preço a atualizar'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
       stationMarkers.push(m)
     }
     if(rows.length){
@@ -2137,7 +2141,10 @@ async function renderStations(){
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
-  populateFillStations();updatePriceCoverage()
+  populateFillStations();updatePriceCoverage();
+  // Guardar também a resolução final do preço. Assim, um refresh não volta
+  // temporariamente ao valor DGEG quando existe um preço comunitário mais recente.
+  saveFastStationCache()
 }
 
 $('locateBtn').onclick=()=>{

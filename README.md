@@ -1,28 +1,33 @@
-# Bomba Certa v7.7 — preços visíveis para toda a comunidade em tempo real
+# Bomba Certa v7.8 — correção da reversão para o preço DGEG
 
-## Alteração principal
-O canal Realtime passa agora a arrancar imediatamente após o login de qualquer utilizador.
+## Problema identificado
+O preço comunitário era corretamente gravado, mas a pesquisa de postos trabalha em vários fluxos assíncronos.
 
-Antes, a subscrição podia ficar dependente de a geolocalização terminar com sucesso.
-Agora isso deixa de acontecer.
+Depois de o preço comunitário aparecer, um dos fluxos de atualização DGEG podia executar `renderBasicStations()` novamente.
+Esse renderer dava prioridade a:
 
-## Resultado
-Quando um utilizador altera um preço:
+`officialPrice ?? displayPrice`
 
-1. o preço é gravado em `fuel_price_reports`;
-2. a tabela está incluída na publicação `supabase_realtime`;
-3. todos os utilizadores autenticados com a aplicação aberta recebem o evento;
-4. o rodapé `Comunidade em direto` atualiza automaticamente;
-5. quem estiver a visualizar esse posto recebe também a atualização da listagem;
-6. novos utilizadores que entrem depois veem a alteração porque os dados ficam persistidos na base de dados.
+Por isso o ecrã podia regressar temporariamente — ou ficar — no preço oficial anterior.
 
-## Segurança
-A leitura de `fuel_price_reports` continua limitada a utilizadores autenticados através de RLS.
-Cada alteração mantém:
-- utilizador responsável;
-- posto;
-- combustível;
-- preço;
-- data/hora.
+O caso R STAR confirmou o problema:
+existiam registos comunitários mais recentes, mas a interface mostrava novamente o valor DGEG.
 
-O feed público dentro da comunidade mostra apenas o nome público e a alteração efetuada.
+## Correção
+A prioridade visual passa a ser sempre:
+
+`displayPrice ?? officialPrice`
+
+Depois de `renderStations()` resolver o preço comunitário mais recente, esse valor não volta a ser substituído por um valor oficial antigo durante a mesma pesquisa.
+
+Além disso:
+- o ramo rápido de pesquisa termina também com `renderStations()`;
+- o preço comunitário resolvido é guardado no cache local;
+- o mapa usa a mesma prioridade;
+- o badge passa a manter `Comunidade` quando esse é o preço em vigor;
+- um refresh da página já não deve reintroduzir o DGEG antigo antes da atualização comunitária.
+
+## Regra funcional
+Um preço comunitário mais recente é o preço apresentado à comunidade até:
+- surgir uma atualização comunitária posterior;
+- ou a lógica de validação futura determinar que esse preço deve deixar de ser considerado válido.
