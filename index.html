@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.1 — registo simples e responsivo</title>
+<title>Bomba Certa v8.2 — melhor escolha inteligente</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -500,6 +500,72 @@ header{
   .premium-primary{width:100%}.header-actions #adminTopBtn{display:none!important}
 }
 
+
+/* ===== v8.2 · Melhor escolha inteligente ===== */
+.smart-choice-card{
+  margin-top:14px;padding:18px;border-radius:24px;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(82,148,255,.18),transparent 34%),
+    linear-gradient(135deg,#101c31,#172a49 58%,#203d69);
+  color:#fff;box-shadow:0 20px 46px rgba(18,33,59,.18);
+  border:1px solid rgba(255,255,255,.08)
+}
+.smart-choice-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start}
+.smart-choice-kicker{font-size:9px;font-weight:950;letter-spacing:.12em;color:#8fb9ff;margin-bottom:5px}
+.smart-choice-card h2{margin:0;font-size:24px;letter-spacing:-.035em}
+.smart-choice-meta{font-size:11px;color:#b9c7dc;margin-top:5px;line-height:1.45}
+.smart-choice-price{text-align:right}
+.smart-choice-price strong{display:block;font-size:31px;line-height:1;font-weight:950;letter-spacing:-.045em}
+.smart-choice-price span{display:block;font-size:9px;color:#b9c7dc;margin-top:4px}
+.smart-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.smart-choice-stat{
+  background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.08);
+  border-radius:15px;padding:11px
+}
+.smart-choice-stat span{display:block;font-size:8.5px;color:#afbdd2;text-transform:uppercase;letter-spacing:.05em}
+.smart-choice-stat strong{display:block;font-size:18px;margin-top:4px}
+.smart-choice-stat.saving{background:rgba(36,194,123,.13);border-color:rgba(82,220,153,.22)}
+.smart-choice-stat.saving strong{color:#82f0b8}
+.smart-choice-why{
+  margin-top:10px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.055);
+  font-size:10.5px;line-height:1.5;color:#d7e1ef
+}
+.smart-choice-actions{display:flex;gap:8px;margin-top:12px;align-items:center}
+.smart-route-btn{
+  background:#fff;color:#16335c;border:0;border-radius:12px;min-height:40px;
+  box-shadow:none
+}
+.smart-choice-settings{
+  margin-top:12px;padding:11px;border-radius:14px;background:rgba(255,255,255,.07);
+  display:grid;grid-template-columns:180px 230px 1fr;gap:10px;align-items:end
+}
+.smart-choice-settings label{display:grid;gap:5px}
+.smart-choice-settings label span{font-size:8.5px;color:#b9c7dc;text-transform:uppercase;letter-spacing:.04em;font-weight:850}
+.smart-choice-settings .input{
+  min-height:40px;border-radius:11px;border-color:rgba(255,255,255,.12);
+  background:rgba(255,255,255,.94);color:#13243f
+}
+.smart-choice-note{font-size:9px;line-height:1.4;color:#aebed3;padding-bottom:6px}
+@media(max-width:760px){
+  .smart-choice-card{padding:14px;border-radius:19px}
+  .smart-choice-top{grid-template-columns:1fr}
+  .smart-choice-price{text-align:left;display:flex;gap:7px;align-items:baseline}
+  .smart-choice-price strong{font-size:29px}
+  .smart-choice-grid{grid-template-columns:1fr 1fr}
+  .smart-choice-stat.saving{grid-column:1/-1}
+  .smart-choice-settings{grid-template-columns:1fr 1fr}
+  .smart-choice-note{grid-column:1/-1}
+}
+@media(max-width:430px){
+  .smart-choice-card h2{font-size:21px}
+  .smart-choice-grid{grid-template-columns:1fr}
+  .smart-choice-stat.saving{grid-column:auto}
+  .smart-choice-settings{grid-template-columns:1fr}
+  .smart-choice-note{grid-column:auto}
+  .smart-choice-actions{display:grid;grid-template-columns:1fr 1fr}
+  .smart-choice-actions button{width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -629,6 +695,54 @@ header{
         <div id="priceCoverage" class="tiny muted"></div>
       </div>
     </div>
+
+    <section id="smartChoiceCard" class="smart-choice-card hidden" aria-live="polite">
+      <div class="smart-choice-top">
+        <div>
+          <div class="smart-choice-kicker">★ MELHOR ESCOLHA PARA SI</div>
+          <h2 id="smartChoiceStation">A calcular…</h2>
+          <div id="smartChoiceMeta" class="smart-choice-meta"></div>
+        </div>
+        <div class="smart-choice-price">
+          <strong id="smartChoicePrice">—</strong>
+          <span id="smartChoiceFuel">por litro</span>
+        </div>
+      </div>
+
+      <div class="smart-choice-grid">
+        <div class="smart-choice-stat">
+          <span>Custo do abastecimento</span>
+          <strong id="smartChoiceFillCost">—</strong>
+        </div>
+        <div class="smart-choice-stat">
+          <span>Deslocação estimada</span>
+          <strong id="smartChoiceTravelCost">—</strong>
+        </div>
+        <div class="smart-choice-stat saving">
+          <span>Poupança estimada</span>
+          <strong id="smartChoiceSaving">—</strong>
+        </div>
+      </div>
+
+      <div id="smartChoiceWhy" class="smart-choice-why"></div>
+
+      <div class="smart-choice-actions">
+        <button id="smartChoiceRouteBtn" class="btn smart-route-btn" type="button">↗ Ver rota</button>
+        <button id="smartChoiceSettingsBtn" class="btn secondary compact-btn" type="button">Ajustar cálculo</button>
+      </div>
+
+      <div id="smartChoiceSettings" class="smart-choice-settings hidden">
+        <label>
+          <span>Litros a abastecer</span>
+          <input id="smartTankLiters" class="input" type="number" min="5" max="120" step="5" value="50">
+        </label>
+        <label>
+          <span>Consumo do carro (L/100 km)</span>
+          <input id="smartConsumption" class="input" type="number" min="2" max="30" step="0.1" value="6.5">
+        </label>
+        <div class="smart-choice-note">Estimativa baseada na distância em linha aproximada até ao posto. A rota real pode alterar ligeiramente o resultado.</div>
+      </div>
+    </section>
 
     <div class="premium-layout">
       <div class="premium-map-card">
@@ -2448,6 +2562,92 @@ function stationFuelGridHTML(s,selectedFuel){
   ).join('')}</div>`
 }
 
+
+let smartChoiceStationKey=null;
+
+function smartChoicePrefs(){
+  const liters=Math.min(120,Math.max(5,Number(localStorage.getItem('bombaCerta:smartLiters')||50)));
+  const consumption=Math.min(30,Math.max(2,Number(localStorage.getItem('bombaCerta:smartConsumption')||6.5)));
+  return {liters,consumption}
+}
+function moneyPT(v){
+  return Number(v).toLocaleString('pt-PT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2})
+}
+function calculateSmartChoice(stations){
+  const {liters,consumption}=smartChoicePrefs();
+  const candidates=(stations||[])
+    .filter(s=>Number.isFinite(Number(s.displayPrice??s.officialPrice)) && Number(s.displayPrice??s.officialPrice)>0)
+    .map(s=>{
+      const price=Number(s.displayPrice??s.officialPrice);
+      const distance=Math.max(0,Number(s.distance||0));
+      // Ida e volta: aproximação conservadora para o custo de ir abastecer e regressar.
+      const travelLiters=(distance*2)*(consumption/100);
+      const travelCost=travelLiters*price;
+      const fillCost=liters*price;
+      const totalCost=fillCost+travelCost;
+      return {...s,_smart:{price,distance,travelLiters,travelCost,fillCost,totalCost}}
+    });
+  if(!candidates.length)return null;
+
+  candidates.sort((a,b)=>a._smart.totalCost-b._smart.totalCost);
+  const best=candidates[0];
+
+  const nearest=[...candidates].sort((a,b)=>a._smart.distance-b._smart.distance)[0];
+  const cheapestPump=[...candidates].sort((a,b)=>a._smart.price-b._smart.price)[0];
+  const baseline=nearest;
+  const saving=Math.max(0,baseline._smart.totalCost-best._smart.totalCost);
+
+  return {best,nearest,cheapestPump,saving,liters,consumption}
+}
+
+function renderSmartChoice(){
+  const card=$('smartChoiceCard');
+  if(!card)return;
+  const result=calculateSmartChoice(nearbyStations);
+  if(!result){
+    card.classList.add('hidden');
+    smartChoiceStationKey=null;
+    return
+  }
+
+  const {best,nearest,cheapestPump,saving,liters,consumption}=result;
+  smartChoiceStationKey=best.key;
+  const s=best._smart;
+  const fuel=$('fuelType').value;
+  const source=best.priceSource==='community'?'Comunidade':'DGEG';
+
+  $('smartChoiceStation').textContent=best.name;
+  $('smartChoiceMeta').textContent=`${kmFmt(s.distance)} km · ${source} · cálculo para ${liters} L e consumo de ${String(consumption).replace('.',',')} L/100 km`;
+  $('smartChoicePrice').textContent=s.price.toFixed(3).replace('.',',')+' €';
+  $('smartChoiceFuel').textContent=fuel+' · por litro';
+  $('smartChoiceFillCost').textContent=moneyPT(s.fillCost);
+  $('smartChoiceTravelCost').textContent=moneyPT(s.travelCost);
+  $('smartChoiceSaving').textContent=saving>0?moneyPT(saving):'Melhor custo';
+
+  let why=`Custo total estimado: ${moneyPT(s.totalCost)}. `;
+  if(nearest?.key && nearest.key!==best.key && saving>0){
+    why+=`Mesmo não sendo o posto mais próximo, compensa a deslocação e poupa cerca de ${moneyPT(saving)} face ao posto disponível mais próximo.`
+  }else if(cheapestPump?.key===best.key){
+    why+='É simultaneamente uma das melhores opções em preço e deslocação.'
+  }else{
+    why+='É a opção com menor custo estimado depois de considerar preço e deslocação.'
+  }
+  $('smartChoiceWhy').textContent=why;
+
+  const prefs=smartChoicePrefs();
+  $('smartTankLiters').value=prefs.liters;
+  $('smartConsumption').value=prefs.consumption;
+  card.classList.remove('hidden')
+}
+
+function saveSmartChoicePrefs(){
+  const liters=Math.min(120,Math.max(5,Number($('smartTankLiters').value||50)));
+  const consumption=Math.min(30,Math.max(2,Number($('smartConsumption').value||6.5)));
+  localStorage.setItem('bombaCerta:smartLiters',String(liters));
+  localStorage.setItem('bombaCerta:smartConsumption',String(consumption));
+  renderSmartChoice()
+}
+
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
     const ap=a.displayPrice??a.officialPrice, bp=b.displayPrice??b.officialPrice;
@@ -2467,7 +2667,7 @@ function renderBasicStations(){
     return `<div class="station">
       <div class="station-main">
         <div>
-          <div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div>
+          <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
           <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
         </div>
         <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'a atualizar'}</small></div>
@@ -2483,6 +2683,7 @@ function renderBasicStations(){
 
   populateFillStations();
   updatePriceCoverage();
+  renderSmartChoice();
 
   ensureMap();
   if(map && currentLat!=null){
@@ -2541,7 +2742,7 @@ async function renderStations(){
     return `<div class="station">
       <div class="station-main">
         <div>
-          <div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div>
+          <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
           <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
           ${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}
         </div>
@@ -2568,6 +2769,7 @@ async function renderStations(){
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
   populateFillStations();updatePriceCoverage();
+  renderSmartChoice();
   // Guardar também a resolução final do preço. Assim, um refresh não volta
   // temporariamente ao valor DGEG quando existe um preço comunitário mais recente.
   saveFastStationCache()
@@ -2629,6 +2831,16 @@ async function loadRecentPriceActivity(){
     }
   }
 }
+
+
+$('smartChoiceSettingsBtn')?.addEventListener('click',()=>{
+  $('smartChoiceSettings').classList.toggle('hidden')
+});
+$('smartTankLiters')?.addEventListener('input',saveSmartChoicePrefs);
+$('smartConsumption')?.addEventListener('input',saveSmartChoicePrefs);
+$('smartChoiceRouteBtn')?.addEventListener('click',()=>{
+  if(smartChoiceStationKey)startRoute(smartChoiceStationKey)
+});
 
 window.openPrice=key=>{
   currentPriceStation=nearbyStations.find(x=>x.key===key);if(!currentPriceStation)return;
