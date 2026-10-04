@@ -1,25 +1,58 @@
-# Bomba Certa v7.4 — utilizador pode alterar o próprio nome
+# Bomba Certa v7.5 — atualização comunitária de preços
 
-## Erro encontrado
-O botão `Alterar nome` existia visualmente, mas não tinha qualquer evento JavaScript associado.
-O mesmo acontecia com o botão `Cancelar`.
+## Todos os utilizadores autenticados podem atualizar preços
 
-A função backend já existia e estava correta:
-`public.update_my_display_name(p_name text)`
+Foi consolidado um fluxo único de publicação através da RPC:
 
-Foi confirmado que:
-- é `SECURITY DEFINER`;
-- utilizadores autenticados têm permissão de `EXECUTE`.
+`public.submit_fuel_price(...)`
 
-## Correção
-Agora:
-1. O utilizador abre `Perfil`.
-2. Carrega em `✏️ Alterar nome`.
-3. Surge o campo com o nome atual já preenchido.
-4. Escreve o novo nome.
-5. Carrega em `Guardar nome` ou Enter.
-6. O nome é gravado através de `update_my_display_name`.
-7. O perfil, cabeçalho e ranking são atualizados.
-8. `Cancelar` ou Escape fecha a edição sem alterar nada.
+A função:
+- exige sessão autenticada;
+- usa automaticamente `auth.uid()`;
+- valida o posto;
+- valida o combustível;
+- valida preços entre 0,50 € e 5,00 €/L;
+- cria um novo registo comunitário sem permitir a um utilizador alterar diretamente o registo histórico de outro.
 
-Nenhuma conta ou dado existente foi alterado.
+Isto mantém histórico e responsabilidade por cada alteração.
+
+## Alterar qualquer combustível
+
+O modal `Atualizar preço` tem agora um seletor próprio de combustível.
+O utilizador pode atualizar diretamente:
+- Gasóleo simples
+- Gasóleo aditivado / premium
+- Gasolina simples 95
+- Gasolina 95 aditivada / premium
+- Gasolina 98
+- Gasolina 98 aditivada / premium
+- GPL Auto
+
+## Rodapé de atividade comunitária
+
+Foi acrescentado um rodapé persistente, imediatamente acima da navegação.
+
+Exemplo:
+
+`● Comunidade · João alterou Gasóleo simples em Posto X de 1,729 €/L para 1,699 €/L · há 2 min`
+
+Quando não existe preço anterior:
+
+`Maria alterou Gasolina simples 95 em Posto Y para 1,759 €/L`
+
+O rodapé:
+- mostra as últimas 12 alterações;
+- roda automaticamente as mensagens;
+- atualiza em Realtime quando entra uma nova alteração.
+
+## Privacidade
+
+O feed não expõe email, user_id, password ou contacto de recuperação.
+Mostra apenas:
+- nome público;
+- posto;
+- combustível;
+- preço;
+- momento da atualização.
+
+A consulta é feita por uma RPC `SECURITY DEFINER` que expõe apenas estes campos.

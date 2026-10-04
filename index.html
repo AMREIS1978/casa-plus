@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.4 — nome próprio editável</title>
+<title>Bomba Certa v7.5 — preços comunitários e atividade</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -212,6 +212,30 @@ header{
 .admin-day b{display:block;font-size:20px;line-height:1.1}
 .admin-day span{display:block;font-size:10px;color:var(--muted);margin-top:5px}
 @media(max-width:720px){.admin-daily-views{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+.community-activity-footer{
+  position:fixed;left:0;right:0;bottom:66px;z-index:990;
+  display:flex;align-items:center;gap:10px;
+  min-height:42px;padding:8px max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));
+  background:rgba(17,24,39,.96);color:#fff;border-top:1px solid rgba(255,255,255,.08);
+  box-shadow:0 -8px 24px rgba(15,23,42,.10);backdrop-filter:blur(12px)
+}
+.community-activity-label{
+  flex:0 0 auto;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.06em;
+  color:#86efac;white-space:nowrap
+}
+.community-activity-text{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:11px;font-weight:700
+}
+.community-activity-text .when{font-weight:500;color:#d0d5dd;margin-left:5px}
+.app{padding-bottom:132px}
+@media(max-width:560px){
+  .community-activity-footer{bottom:66px;min-height:44px;padding-top:7px;padding-bottom:7px}
+  .community-activity-label{font-size:9px}
+  .community-activity-text{font-size:10.5px}
+  .app{padding-bottom:136px}
+}
 </style>
 </head>
 <body>
@@ -552,6 +576,11 @@ header{
 
 </main>
 
+<div id="communityActivityFooter" class="community-activity-footer" aria-live="polite">
+  <div class="community-activity-label">● Comunidade</div>
+  <div id="communityActivityText" class="community-activity-text">A carregar as últimas atualizações de preços…</div>
+</div>
+
 <nav class="bottom-nav" aria-label="Navegação principal">
   <button class="nav active" data-section="postos"><span>⛽</span>Perto de mim</button>
   <button class="nav" data-section="abastecimentos"><span>🧾</span>Os meus gastos</button>
@@ -654,7 +683,16 @@ header{
     <div class="form">
       <div class="card" style="box-shadow:none;padding:12px">
         <b id="priceStationName">Posto</b>
-        <div id="priceFuelLabel" class="tiny muted"></div>
+        <div class="tiny muted" style="margin-top:6px">Combustível a atualizar</div>
+        <select id="priceFuelEdit" class="input" style="margin-top:6px">
+          <option value="Gasóleo simples">Gasóleo simples</option>
+          <option value="Gasóleo especial">Gasóleo aditivado / premium</option>
+          <option value="Gasolina simples 95">Gasolina simples 95</option>
+          <option value="Gasolina especial 95">Gasolina 95 aditivada / premium</option>
+          <option value="Gasolina 98">Gasolina 98</option>
+          <option value="Gasolina especial 98">Gasolina 98 aditivada / premium</option>
+          <option value="GPL Auto">GPL Auto</option>
+        </select>
         <div id="priceReference" class="tiny muted" style="margin-top:3px"></div>
       </div>
       <div style="position:relative">
@@ -1229,9 +1267,10 @@ async function enterApp(){
   $('authScreen').classList.add('hidden');
   $('appShell').classList.remove('hidden');
 
-  // Primeiro: mapa e pesquisa.
+  // Primeiro: mapa, pesquisa e atividade comunitária.
   ensureMap();
   setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
+  loadRecentPriceActivity().catch(()=>{});
 
   // Confirmar identidade antes de decidir permissões administrativas.
   try{
@@ -2094,12 +2133,59 @@ $('refreshBtn').onclick=searchStations;
 $('fuelType').onchange=()=>currentLat!=null&&searchStations();
 $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
 
+
+let recentPriceActivity=[];
+let recentPriceActivityIndex=0;
+let recentPriceActivityTimer=null;
+
+function activityPrice(v){
+  const n=Number(v);
+  return Number.isFinite(n)?n.toFixed(3).replace('.',',')+' €/L':'—'
+}
+
+function showPriceActivityItem(){
+  const el=$('communityActivityText');
+  if(!el)return;
+  if(!recentPriceActivity.length){
+    el.textContent='Ainda não existem alterações de preços feitas pela comunidade.';
+    return
+  }
+  const a=recentPriceActivity[recentPriceActivityIndex%recentPriceActivity.length];
+  recentPriceActivityIndex++;
+  const prev=a.previous_price!=null && Number(a.previous_price)!==Number(a.price)
+    ? ` de ${activityPrice(a.previous_price)} para ${activityPrice(a.price)}`
+    : ` para ${activityPrice(a.price)}`;
+  const when=a.changed_at?` · ${relativeTime(a.changed_at)}`:'';
+  el.innerHTML=`<b>${esc(a.display_name||'Utilizador')}</b> alterou ${esc(a.fuel_type||'combustível')} em <b>${esc(a.station_name||'posto')}</b>${esc(prev)}<span class="when">${esc(when)}</span>`
+}
+
+async function loadRecentPriceActivity(){
+  try{
+    const {data,error}=await supabase.rpc('community_recent_price_activity',{p_limit:12});
+    if(error)throw error;
+    recentPriceActivity=Array.isArray(data)?data:[];
+    recentPriceActivityIndex=0;
+    showPriceActivityItem();
+    clearInterval(recentPriceActivityTimer);
+    if(recentPriceActivity.length>1){
+      recentPriceActivityTimer=setInterval(showPriceActivityItem,6500)
+    }
+  }catch(e){
+    console.warn('Atividade da comunidade indisponível:',e);
+    const el=$('communityActivityText');
+    if(el)el.textContent='Atividade da comunidade temporariamente indisponível.'
+  }
+}
+
 window.openPrice=key=>{
   currentPriceStation=nearbyStations.find(x=>x.key===key);if(!currentPriceStation)return;
-  $('priceStationName').textContent=currentPriceStation.name;$('priceFuelLabel').textContent=$('fuelType').value;
-  $('priceReference').textContent=currentPriceStation.officialPrice?`Referência DGEG: ${currentPriceStation.officialPrice.toFixed(3).replace('.',',')} €/L`:'Sem referência DGEG disponível.';
+  $('priceStationName').textContent=currentPriceStation.name;
+  $('priceFuelEdit').value=$('fuelType').value;
+  $('priceReference').textContent=currentPriceStation.officialPrice?`Referência atual: ${currentPriceStation.officialPrice.toFixed(3).replace('.',',')} €/L`:'Pode introduzir o preço observado neste posto.';
   $('priceInput').value=currentPriceStation.displayPrice?Number(currentPriceStation.displayPrice).toFixed(3).replace('.',','):'';
-  $('photoStatus').textContent='';$('priceStatus').textContent='';$('priceModal').classList.add('open')
+  $('photoStatus').textContent='';
+  $('priceStatus').textContent='Qualquer utilizador autenticado pode atualizar um preço observado.';
+  $('priceModal').classList.add('open')
 };
 function detectFuelRowsFromPhoto(text){
   const raw=String(text||'').replace(/\r/g,'\n');
@@ -2157,11 +2243,20 @@ $('savePriceBtn').onclick=async()=>{
   if(!currentPriceStation)return;
   const price=Number($('priceInput').value.replace(',','.'));if(!(price>.5&&price<5)){$('priceStatus').textContent='Introduza um preço válido, por exemplo 1,799.';return}
   const beforePoints=await myPoints();
-  const {data:{user}}=await supabase.auth.getUser();const s=currentPriceStation;
-  const {error}=await supabase.from('fuel_price_reports').insert({user_id:user.id,station_key:s.key,station_name:s.name,latitude:s.lat,longitude:s.lon,fuel_type:$('fuelType').value,price,observed_at:new Date().toISOString()});
+  const s=currentPriceStation;
+  const fuel=$('priceFuelEdit').value;
+  const {data:reportId,error}=await supabase.rpc('submit_fuel_price',{
+    p_station_key:s.key,
+    p_station_name:s.name,
+    p_latitude:s.lat,
+    p_longitude:s.lon,
+    p_fuel_type:fuel,
+    p_price:price
+  });
   if(error){$('priceStatus').textContent=errPT(error);return}
-  $('priceStatus').textContent='Preço publicado. Já está visível e aguarda validação.';
-  await Promise.all([renderStations(),loadLeaderboard()]);loadCommunityGame().catch(()=>{});
+  $('priceStatus').textContent='Preço atualizado pela comunidade. Já está visível e aguarda validação.';
+  await Promise.all([renderStations(),loadLeaderboard(),loadRecentPriceActivity()]);
+  loadCommunityGame().catch(()=>{});
   setTimeout(()=>{$('priceModal').classList.remove('open');showReward(0,'Preço publicado!')},180)
 };
 window.confirmPrice=async(id,ok)=>{
@@ -2552,7 +2647,7 @@ $('saveAvatarBtn').onclick=async()=>{
 
 function subscribeRealtime(){
   if(fuelChannel)supabase.removeChannel(fuelChannel);
-  fuelChannel=supabase.channel('bomba-certa').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},()=>renderStations())
+  fuelChannel=supabase.channel('bomba-certa').on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_reports'},()=>{renderStations();loadRecentPriceActivity().catch(()=>{})})
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_price_validations'},()=>renderStations())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_station_status_reports'},()=>renderStations())
     .on('postgres_changes',{event:'*',schema:'public',table:'fuel_fillups'},()=>loadFillups())
