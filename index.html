@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.6 — rodapé em rotação contínua</title>
+<title>Bomba Certa v7.7 — preços em tempo real para toda a comunidade</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -588,7 +588,7 @@ header{
 </main>
 
 <div id="communityActivityFooter" class="community-activity-footer" aria-live="polite">
-  <div class="community-activity-label">● Comunidade</div>
+  <div class="community-activity-label">● Comunidade em direto</div>
   <div class="community-activity-marquee">
     <div id="communityActivityText" class="community-activity-text">A carregar as últimas atualizações de preços…</div>
   </div>
@@ -1280,8 +1280,12 @@ async function enterApp(){
   $('authScreen').classList.add('hidden');
   $('appShell').classList.remove('hidden');
 
-  // Primeiro: mapa, pesquisa e atividade comunitária.
+  // Primeiro: mapa, pesquisa, atividade comunitária e Realtime global.
+  // O Realtime arranca logo após o login para que qualquer alteração feita
+  // por um utilizador fique visível a toda a comunidade autenticada,
+  // mesmo que outro utilizador ainda não tenha autorizado a localização.
   ensureMap();
+  subscribeRealtime();
   setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
   loadRecentPriceActivity().catch(()=>{});
 
@@ -1698,8 +1702,7 @@ async function autoSearchOnOpen(){
   navigator.geolocation.getCurrentPosition(async p=>{
     currentLat=p.coords.latitude;currentLon=p.coords.longitude;
     saveLastLocation(currentLat,currentLon);
-    await searchStations();
-    subscribeRealtime()
+    await searchStations()
   },()=>{
     if(!cached){
       $('fuelStatus').textContent='Toque em “Procurar perto de mim” e autorize a localização.';
@@ -1723,7 +1726,7 @@ async function useFastLocation(){
   navigator.geolocation.getCurrentPosition(async p=>{
     currentLat=p.coords.latitude;currentLon=p.coords.longitude;saveLastLocation(currentLat,currentLon);
     $('fastLocationInfo')?.classList.add('hidden');
-    await searchStations();subscribeRealtime()
+    await searchStations()
   },()=>{
     $('fastLocationInfo')?.classList.add('hidden');
     if(!cached)$('fuelStatus').textContent='Não foi possível obter a localização. Autorize-a no navegador.'
@@ -2271,7 +2274,7 @@ $('savePriceBtn').onclick=async()=>{
     p_price:price
   });
   if(error){$('priceStatus').textContent=errPT(error);return}
-  $('priceStatus').textContent='Preço atualizado pela comunidade. Já está visível e aguarda validação.';
+  $('priceStatus').textContent='Preço atualizado. Já está visível para toda a comunidade e aguarda validação.';
   await Promise.all([renderStations(),loadLeaderboard(),loadRecentPriceActivity()]);
   loadCommunityGame().catch(()=>{});
   setTimeout(()=>{$('priceModal').classList.remove('open');showReward(0,'Preço publicado!')},180)
