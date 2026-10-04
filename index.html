@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.9 — Paragens só na reserva</title>
+<title>Bomba Certa v9.0 — Paragens Otimizadas</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -788,6 +788,13 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
 .trip-method-note{font-weight:750;color:#65748a}
 .trip-method-note::before{content:"⛽ ";color:inherit}
 
+
+/* ===== v9.0 · Otimização de paragens ===== */
+.trip-stop-reason.micro-stop{
+  background:#fff7ed;color:#9a5b08;border:1px solid #f5d7aa
+}
+.trip-stop-plan div:nth-child(2) strong{font-size:13px}
+
 </style>
 </head>
 <body>
@@ -1199,7 +1206,7 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
         </div>
 
         <div class="trip-form-foot">
-          <div class="trip-method-note">A app não manda parar antes do tempo: só propõe abastecer quando o carro entra na reserva. Se a autonomia chegar ao destino, não cria qualquer paragem.</div>
+          <div class="trip-method-note">A app só cria uma paragem quando ela é mesmo indispensável para terminar a viagem. Entrar na reserva é o gatilho para procurar um posto — não é obrigação de chegar ao destino ainda com reserva.</div>
           <button id="tripCalculateBtn" class="btn trip-calc-btn" type="button">✨ Criar plano de viagem</button>
         </div>
         <div id="tripStatus" class="status trip-status" aria-live="polite"></div>
@@ -2072,10 +2079,16 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
   let range=Math.max(0,autonomy);
   let guard=0;
 
-  // Se chega ao fim sem entrar na reserva, não existe paragem.
-  if(range>=totalKm+reserve)return {stops,fullRange};
+  // REGRA 1: se o destino é alcançável com a autonomia existente, não há paragem.
+  // A reserva serve para decidir QUANDO procurar um posto, não para obrigar a chegar com reserva intacta.
+  if(range>=totalKm)return {stops,fullRange};
 
-  while(pos+range<totalKm+reserve && guard++<20){
+  while(pos+range<totalKm && guard++<20){
+    const remainingFromHere=totalKm-pos;
+
+    // Se já conseguimos terminar a viagem, acabou. Não criar "top-ups" residuais.
+    if(range>=remainingFromHere)break;
+
     const reservePoint=Math.min(totalKm,pos+Math.max(0,range-reserve));
     const emptyPoint=Math.min(totalKm,pos+range);
 
@@ -2083,45 +2096,79 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
       throw new Error('A autonomia atual é demasiado baixa para continuar a viagem.')
     }
 
-    // Só consideramos postos alcançáveis antes de ficar sem autonomia.
     const reachable=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=emptyPoint-8);
     if(!reachable.length){
       throw new Error(`Não encontrei um posto com preço real antes de esgotar a autonomia disponível (${Math.round(range)} km).`)
     }
 
     const stop=tripChooseReserveStop(reachable,strategy,reservePoint,pos,emptyPoint);
-    if(!stop){
-      throw new Error('Não encontrei um posto adequado na zona de reserva.')
-    }
+    if(!stop)throw new Error('Não encontrei um posto adequado na zona de reserva.');
 
     const routeTravel=stop.routeKm-pos;
     const detourOut=(stop.detourKm||0)/2;
+    const detourBack=(stop.detourKm||0)/2;
     const arrivalRange=Math.max(0,range-routeTravel-detourOut);
     const currentLiters=arrivalRange*consumption/100;
 
-    const remaining=Math.max(0,totalKm-stop.routeKm);
-    const requiredRange=Math.min(fullRange,remaining+reserve);
-    const targetLiters=Math.min(tank,requiredRange*consumption/100);
+    const remainingAfterStop=Math.max(0,totalKm-stop.routeKm);
 
-    let buyLiters=Math.max(0,targetLiters-currentLiters);
-    if(remaining+reserve>fullRange){
-      buyLiters=Math.max(0,tank-currentLiters)
+    // Quanto precisamos para chegar ao destino a partir deste posto,
+    // incluindo apenas o regresso do posto à rota e uma pequena margem técnica de 5 km.
+    const finishRangeNeed=remainingAfterStop+detourBack+5;
+
+    let targetRange;
+    let finalStop=false;
+
+    if(finishRangeNeed<=fullRange){
+      // Dá para acabar a viagem a partir daqui: esta tem de ser a ÚLTIMA paragem.
+      targetRange=finishRangeNeed;
+      finalStop=true;
+    }else{
+      // Ainda será necessária outra paragem. Encher o depósito para maximizar a etapa seguinte.
+      targetRange=fullRange;
     }
-    if(buyLiters>0 && buyLiters<3)buyLiters=Math.min(tank-currentLiters,3);
 
+    const targetLiters=Math.min(tank,targetRange*consumption/100);
+    let buyLiters=Math.max(0,targetLiters-currentLiters);
+
+    // Nunca criar uma paragem com compra residual se, na realidade, já conseguimos terminar.
+    const rangeWithoutBuying=Math.max(0,arrivalRange-detourBack);
+    if(remainingAfterStop<=rangeWithoutBuying){
+      break
+    }
+
+    // Se a última compra for muito pequena, tentar absorvê-la na paragem anterior.
+    // Isto elimina situações absurdas como "parar para meter 3 L" quando havia capacidade na paragem anterior.
+    if(finalStop && buyLiters<8 && stops.length){
+      const prev=stops[stops.length-1];
+      const prevFreeLiters=Math.max(0,tank-(prev.afterFillLiters||0));
+      if(prevFreeLiters>=buyLiters+0.5){
+        const extra=buyLiters;
+        prev.buyLiters+=extra;
+        prev.purchaseCost=prev.buyLiters*prev.price;
+        prev.afterFillLiters=Math.min(tank,(prev.afterFillLiters||0)+extra);
+        prev.afterFillRange=prev.afterFillLiters/consumption*100;
+        prev.reason='Paragem otimizada: abastecimento reforçado para evitar uma segunda paragem desnecessária';
+        break
+      }
+    }
+
+    // Se ainda for inevitável uma compra pequena, não a mascara:
+    // mantém a paragem porque é matematicamente necessária para concluir a viagem.
     const purchaseCost=buyLiters*stop.price;
     const detourCost=(stop.detourKm||0)*consumption/100*stop.price;
     const afterFillLiters=Math.min(tank,currentLiters+buyLiters);
     const afterFillRange=afterFillLiters/consumption*100;
-    const returnToRoute=(stop.detourKm||0)/2;
 
     let reason;
-    if(stop._reserveFallback){
+    if(finalStop){
+      reason=buyLiters<8
+        ? 'Última paragem indispensável: falta pouca autonomia para concluir a viagem'
+        : 'Última paragem necessária para concluir a viagem';
+    }else if(stop._reserveFallback){
       reason='Paragem de segurança imediatamente antes da reserva — não existe posto adequado já dentro da zona de reserva';
-    }else if(arrivalRange<=reserve+8){
-      reason='Paragem proposta quando o carro entra na reserva';
     }else{
-      reason='Paragem necessária na zona de reserva';
+      reason='Paragem necessária quando o carro entra na reserva';
     }
 
     stops.push({
@@ -2131,12 +2178,17 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
       buyLiters,
       purchaseCost,
       detourCost,
+      afterFillLiters,
       afterFillRange,
       reason
     });
 
-    range=Math.max(0,afterFillRange-returnToRoute);
-    pos=stop.routeKm
+    // Depois de regressar à rota, esta é a autonomia efetiva disponível.
+    range=Math.max(0,afterFillRange-detourBack);
+    pos=stop.routeKm;
+
+    // REGRA 2: depois de abastecer, se já chega ao destino, terminar imediatamente.
+    if(range>=totalKm-pos)break
   }
 
   return {stops,fullRange}
@@ -2223,7 +2275,7 @@ function tripRenderPlan(plan){
         <div><span>Custo combustível</span><strong>${tripMoney(s.purchaseCost)}</strong></div>
         <div><span>Custo estimado do desvio</span><strong>${tripMoney(s.detourCost)}</strong></div>
       </div>
-      <div class="trip-stop-reason">✓ ${esc(s.reason||'Paragem necessária')}</div>
+      <div class="trip-stop-reason ${s.buyLiters<8?'micro-stop':''}">✓ ${esc(s.reason||'Paragem necessária')}</div>
       <div class="trip-stop-source">${esc(s.source)}${s.updatedAt?' · '+esc(sourceAgeLabel(s.updatedAt)):''}</div>
       <button class="trip-stop-nav" type="button" onclick="window.startTripStop(${s.lat},${s.lon})">Abrir este posto na navegação</button>
     </div>`).join(''):'<div class="empty">Não são necessárias paragens com a autonomia indicada.</div>';

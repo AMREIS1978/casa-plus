@@ -1,33 +1,34 @@
-# Bomba Certa v8.9 — Paragens só na reserva
+# Bomba Certa v9.0 — Paragens Otimizadas
 
-## Regra principal
-A Viagem Inteligente deixa de sugerir abastecimentos antecipados.
+## Problema corrigido
+A versão anterior podia criar uma segunda paragem de poucos litros porque tratava a reserva como uma quantidade que tinha de existir também à chegada ao destino.
 
-A lógica é:
-1. calcular quando a autonomia prevista entra na reserva;
-2. procurar um posto real nessa zona;
-3. escolher o melhor posto entre os que são alcançáveis durante a reserva;
-4. só criar nova paragem quando voltar a entrar na reserva.
+Isso estava errado para o comportamento pretendido.
 
-Se a autonomia chega ao destino com a reserva definida, a app apresenta **0 paragens**.
+## Nova regra
+A reserva passa a servir apenas como **gatilho para procurar uma paragem**.
 
-## Entrada na reserva
-O campo deixou de ser tratado como uma margem de segurança abstrata e passa a significar literalmente:
-**“quando faltam aproximadamente X km de autonomia, o carro entra na reserva.”**
+A app:
+1. verifica primeiro se a autonomia atual chega ao destino;
+2. se chegar, cria 0 paragens;
+3. quando entra na reserva, procura o melhor posto alcançável;
+4. nesse posto calcula se um abastecimento permite concluir toda a viagem;
+5. se permitir, abastece logo o necessário e termina o plano;
+6. se ainda forem necessárias mais etapas, maximiza a autonomia para reduzir o número de paragens.
 
-Exemplo:
-- autonomia atual: 250 km;
-- entrada na reserva: 40 km;
-- a app começa a procurar a paragem por volta dos 210 km percorridos.
+## Eliminação de micro-paragens
+Se a última paragem for inferior a 8 L, a app tenta primeiro transferir essa quantidade para a paragem anterior, desde que exista capacidade no depósito.
 
-## Fallback de segurança
-Se não existir nenhum posto com preço real na zona de reserva, a app pode usar o último posto imediatamente antes da reserva e explica explicitamente que se trata de um fallback de segurança.
+Assim evita situações como:
+- primeira paragem: 38 L;
+- segunda paragem: 3 L;
 
-## Resultado
-Cada paragem mostra:
-- autonomia prevista à chegada;
-- indicação de RESERVA;
-- litros recomendados;
-- preço real;
-- custo;
-- razão da paragem.
+quando seria possível reforçar a primeira e eliminar a segunda.
+
+Se não houver capacidade física para absorver esses litros na paragem anterior, a pequena paragem mantém-se e é identificada como **matematicamente indispensável** — nunca é escondida nem inventada.
+
+## Critério
+O objetivo prioritário passa a ser:
+**menor número real de paragens compatível com a autonomia do veículo**.
+
+O preço e o desvio escolhem o melhor posto apenas depois de garantido esse objetivo.
