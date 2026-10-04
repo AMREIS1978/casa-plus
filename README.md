@@ -1,24 +1,19 @@
-# Bomba Certa v9.8 — Mobile + Mapa ao Primeiro Toque
+# Bomba Certa v10.0 — Cabeçalho Mobile Corrigido
 
-## Nome da app no telemóvel
-Foi criada uma linha mobile dedicada exclusivamente ao wordmark **Bomba Certa**.
+## Correção estrutural
+O problema não era apenas o tamanho da palavra Bomba Certa. A navegação principal estava dentro do mesmo `header`, o que permitia sobreposição em determinados browsers/escala de dispositivo.
 
-Isto elimina a competição de espaço entre:
-- nome da app;
-- navegação;
-- perfil;
-- ações do cabeçalho.
+Nesta versão a estrutura foi alterada:
 
-Em PC continua a ser usada a marca original do cabeçalho. Em tablet/telemóvel aparece sempre a nova marca dedicada.
+- o header contém apenas **Bomba Certa + perfil**;
+- a navegação é um elemento independente;
+- no PC, a navegação fica centrada no topo;
+- no telemóvel/tablet, a mesma navegação passa para o fundo;
+- o nome da app nunca partilha o mesmo espaço físico com a barra de navegação.
 
-## Mapa
-O mapa foi ajustado para interação imediata em dispositivos tácteis:
-
-- `touch-action: none` apenas dentro do mapa;
-- foco no primeiro `pointerdown`;
-- duplo clique/box zoom desativados em touch;
-- scroll wheel desativado em touch;
-- marcadores abrem popup também em `touchstart`;
-- função única `makeFuelMarker()` garante o mesmo comportamento em todas as renderizações.
-
-Resultado esperado: um único toque num posto abre imediatamente o respetivo popup, sem ser necessário “ativar” primeiro o mapa.
+## Mobile
+- Bomba Certa sempre visível no topo;
+- perfil compacto à direita;
+- barra de navegação fixa no fundo;
+- saída continua acessível através do perfil;
+- safe-area respeitada em iPhone.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.8 — Mobile e Mapa Um Toque</title>
+<title>Bomba Certa v10.0 — Cabeçalho Mobile Corrigido</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1549,6 +1549,284 @@ body{padding-bottom:78px!important}
   .mobile-brand-row{padding-left:9px}
 }
 
+
+/* ===== v9.9 · Totais sociais + lista de quem reagiu ===== */
+.facebook-stats-row{
+  min-height:30px!important;
+  padding:6px 11px 4px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important
+}
+.social-stat-button{
+  border:0;background:transparent;padding:2px 0;color:#687588;
+  font-size:8.5px;line-height:1.2;cursor:pointer
+}
+.social-stat-button:hover{text-decoration:underline}
+.social-reaction-summary{
+  display:flex!important;align-items:center!important;gap:6px!important
+}
+.social-reaction-summary.has-social-count{cursor:pointer}
+.social-reaction-icons{
+  display:inline-flex;align-items:center;
+  font-size:14px!important;letter-spacing:-5px!important;
+  padding-right:6px!important
+}
+.social-stats-right{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  min-width:0
+}
+.social-shares-summary{font-size:8.5px;color:#687588;white-space:nowrap}
+
+/* Modal de reações */
+.social-reactors-modal-card{width:min(520px,100%)}
+.social-reactors-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  padding-bottom:10px;border-bottom:1px solid #edf0f3
+}
+.social-reactors-head h2{margin:2px 0 0;font-size:19px}
+.social-reactor-tabs{
+  display:flex;gap:5px;overflow-x:auto;padding:9px 0 8px;
+  border-bottom:1px solid #edf0f3;scrollbar-width:none
+}
+.social-reactor-tabs::-webkit-scrollbar{display:none}
+.social-reactor-tabs button{
+  min-height:32px;border:0;background:transparent;border-radius:8px;
+  padding:6px 9px;color:#637083;font-size:9px;font-weight:800;
+  display:flex;align-items:center;gap:5px;white-space:nowrap
+}
+.social-reactor-tabs button b{font-size:8px;color:#8c97a7}
+.social-reactor-tabs button.active{background:#edf4ff;color:#1769d2}
+.social-reactors-list{
+  display:grid;gap:2px;max-height:58vh;overflow:auto;padding-top:7px
+}
+.social-reactor-row{
+  min-height:52px;display:grid;grid-template-columns:38px 1fr 34px;
+  align-items:center;gap:9px;padding:6px 5px;border-radius:10px
+}
+.social-reactor-row:hover{background:#f5f7fa}
+.social-reactor-avatar{
+  width:36px;height:36px;border-radius:50%;background:#e8eef6;
+  display:grid;place-items:center;color:#344054;font-size:11px;font-weight:900
+}
+.social-reactor-copy{display:grid;gap:2px;min-width:0}
+.social-reactor-copy strong{
+  font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.social-reactor-copy span{font-size:8px;color:#7b8798}
+.social-reactor-emoji{font-size:20px;text-align:center}
+
+@media(max-width:560px){
+  .facebook-stats-row{padding-left:9px!important;padding-right:9px!important}
+  .social-stats-right{gap:6px}
+  .social-stat-button,.social-shares-summary{font-size:8px}
+  .social-reactors-modal-card{
+    border-radius:20px 20px 0 0!important;
+    max-height:82vh!important
+  }
+}
+
+
+/* ===== v10.0 · Cabeçalho e navegação definitivamente separados ===== */
+
+/* Cabeçalho: marca sempre visível, sem qualquer menu por cima. */
+header{
+  position:sticky!important;
+  top:0!important;
+  z-index:1200!important;
+  min-height:62px!important;
+  background:rgba(255,255,255,.98)!important;
+  border-bottom:1px solid #e7ebf0!important;
+  backdrop-filter:blur(14px)!important
+}
+.header-in{
+  max-width:1480px!important;
+  min-height:62px!important;
+  margin:0 auto!important;
+  padding:7px 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important
+}
+.header-in>.brand{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative!important;
+  z-index:2!important;
+  flex:0 0 auto!important;
+  min-width:max-content!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  font-size:23px!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:-.045em!important;
+  color:#10213b!important
+}
+.header-in>.brand span{
+  display:inline!important;
+  color:#2f7df6!important;
+  font-weight:800!important
+}
+.header-actions{
+  flex:0 0 auto!important;
+  margin-left:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important
+}
+
+/* A marca mobile antiga deixa de existir visualmente. */
+.mobile-brand-row{display:none!important}
+
+/* A navegação já não pertence ao header. Desktop: fica centrada no topo. */
+.bottom-nav{
+  position:fixed!important;
+  top:6px!important;
+  bottom:auto!important;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+  z-index:1250!important;
+  width:min(690px,calc(100vw - 500px))!important;
+  min-width:480px!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:5px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important
+}
+.bottom-nav.admin-enabled{
+  grid-template-columns:repeat(6,minmax(0,1fr))!important
+}
+.nav{
+  min-height:50px!important;
+  padding:5px 5px 8px!important;
+  border-radius:10px!important
+}
+
+/* Em desktop a marca e perfil reservam espaço; a navegação ocupa apenas o centro. */
+@media(min-width:901px){
+  .header-in{padding-left:18px!important;padding-right:18px!important}
+}
+
+/* Tablet e telemóvel: menu SEMPRE no fundo e marca SEMPRE no topo. */
+@media(max-width:900px){
+  header{
+    min-height:54px!important;
+    position:sticky!important;
+    top:0!important
+  }
+  .header-in{
+    min-height:54px!important;
+    padding:6px 10px!important;
+    display:flex!important;
+    grid-template-columns:none!important
+  }
+  .header-in>.brand{
+    display:block!important;
+    font-size:20px!important;
+    min-width:max-content!important
+  }
+  .header-actions{
+    margin-left:auto!important;
+    max-width:46%!important
+  }
+  #logoutBtn{display:none!important}
+  #adminTopBtn{display:none!important}
+  .top-profile-copy{display:none!important}
+  .top-profile-btn{
+    width:38px!important;
+    min-width:38px!important;
+    height:38px!important;
+    padding:0!important;
+    border-radius:50%!important
+  }
+  .top-profile-avatar{
+    width:32px!important;
+    height:32px!important
+  }
+
+  .bottom-nav{
+    top:auto!important;
+    bottom:6px!important;
+    left:50%!important;
+    transform:translateX(-50%)!important;
+    width:calc(100% - 12px)!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:5px 6px calc(5px + env(safe-area-inset-bottom))!important;
+    border:1px solid rgba(220,227,237,.98)!important;
+    border-radius:20px!important;
+    background:rgba(255,255,255,.97)!important;
+    backdrop-filter:blur(16px)!important;
+    box-shadow:0 14px 38px rgba(15,23,42,.16)!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important
+  }
+  .bottom-nav.admin-enabled{
+    grid-template-columns:repeat(6,minmax(0,1fr))!important
+  }
+  .nav{
+    min-height:48px!important;
+    padding:4px 2px 7px!important;
+    gap:2px!important;
+    border-radius:12px!important
+  }
+  .nav-icon{
+    width:27px!important;
+    height:27px!important;
+    font-size:16px!important
+  }
+  .nav-label{
+    font-size:8px!important
+  }
+  .nav.active{
+    background:#edf4ff!important
+  }
+  .nav.active::after{display:none!important}
+
+  body{padding-bottom:92px!important}
+  .app{padding-bottom:158px!important}
+  .community-activity-footer{
+    bottom:70px!important;
+    width:calc(100% - 12px)!important
+  }
+}
+
+@media(max-width:390px){
+  header{min-height:50px!important}
+  .header-in{
+    min-height:50px!important;
+    padding-left:9px!important;
+    padding-right:7px!important
+  }
+  .header-in>.brand{
+    font-size:18px!important
+  }
+  .top-profile-btn{
+    width:34px!important;
+    min-width:34px!important;
+    height:34px!important
+  }
+  .top-profile-avatar{
+    width:29px!important;
+    height:29px!important
+  }
+  .bottom-nav{
+    width:calc(100% - 8px)!important;
+    bottom:4px!important;
+    padding-left:4px!important;
+    padding-right:4px!important
+  }
+  .nav-label{font-size:7.4px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1623,12 +1901,19 @@ body{padding-bottom:78px!important}
 
 <div id="appShell" class="hidden">
 <header>
-  <div class="mobile-brand-row" aria-label="Bomba Certa">
-    <div class="mobile-brand-wordmark">Bomba <span>Certa</span></div>
-  </div>
-  <div class="header-in">
+<div class="header-in">
     <div class="brand">Bomba <span>Certa</span></div>
-    <nav class="bottom-nav" aria-label="Navegação principal">
+<div class="header-actions">
+      <button id="profileTopBtn" class="top-profile-btn" aria-label="Abrir perfil">
+        <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
+        <span id="topLevel" class="top-profile-level">Nível · Novato</span>
+      </button>
+      <button id="adminTopBtn" class="btn secondary hidden">⚙️ Admin</button>
+      <button id="logoutBtn" class="btn secondary">Sair</button>
+    </div>
+  </div>
+</header>
+<nav class="bottom-nav" aria-label="Navegação principal">
   <button class="nav active" data-section="postos" aria-label="Mapa">
     <span class="nav-icon" aria-hidden="true">⌖</span>
     <span class="nav-label">Mapa</span>
@@ -1654,16 +1939,7 @@ body{padding-bottom:78px!important}
     <span class="nav-label">Admin</span>
   </button>
 </nav>
-    <div class="header-actions">
-      <button id="profileTopBtn" class="top-profile-btn" aria-label="Abrir perfil">
-        <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
-        <span id="topLevel" class="top-profile-level">Nível · Novato</span>
-      </button>
-      <button id="adminTopBtn" class="btn secondary hidden">⚙️ Admin</button>
-      <button id="logoutBtn" class="btn secondary">Sair</button>
-    </div>
-  </div>
-</header>
+
 
 <main class="app">
   <section id="postos" class="section active premium-home">
@@ -2255,6 +2531,24 @@ body{padding-bottom:78px!important}
 
 
 
+
+
+<!-- Modal: quem reagiu ao posto -->
+<div id="stationReactorsModal" class="modal">
+  <div class="modal-card social-reactors-modal-card">
+    <div class="social-reactors-head">
+      <div>
+        <div class="eyebrow">REAÇÕES</div>
+        <h2 id="stationReactorsTitle">Quem reagiu</h2>
+      </div>
+      <button class="btn secondary compact-btn" data-close="stationReactorsModal">Fechar</button>
+    </div>
+    <div id="stationReactorsTabs" class="social-reactor-tabs"></div>
+    <div id="stationReactorsList" class="social-reactors-list">
+      <div class="social-comments-loading">A carregar…</div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal recuperar palavra-passe -->
 <div id="forgotPasswordModal" class="modal">
@@ -5007,9 +5301,16 @@ function stationSocialHTML(stationKey){
   }
 
   return `<div class="station-social facebook-social" data-social-key="${esc(stationKey)}">
-    <div class="social-stats-row">
-      <div id="${id}-reaction-summary" class="social-reaction-summary"><span class="social-muted">Sem reações</span></div>
-      <span id="${id}-comments-summary" class="social-comments-summary"></span>
+    <div class="social-stats-row facebook-stats-row">
+      <button id="${id}-reaction-summary" class="social-reaction-summary social-stat-button" type="button"
+        onclick="openStationReactors('${token}')" title="Ver quem reagiu">
+        <span class="social-muted">Sem reações</span>
+      </button>
+      <div class="social-stats-right">
+        <button id="${id}-comments-summary" class="social-stat-button social-comments-summary" type="button"
+          onclick="toggleStationComments('${token}')"></button>
+        <span id="${id}-shares-summary" class="social-shares-summary"></span>
+      </div>
     </div>
 
     <div class="social-action-row facebook-action-row">
@@ -5071,23 +5372,34 @@ function renderSocialSummary(stationKey,row){
     .filter(([k,v])=>STATION_REACTIONS[k]&&v>0)
     .sort((a,b)=>b[1]-a[1]);
 
-  const total=entries.reduce((a,[,v])=>a+v,0);
+  const total=Number(row?.reaction_count ?? entries.reduce((a,[,v])=>a+v,0));
   const summary=$(id+'-reaction-summary');
   if(summary){
     const top=entries.slice(0,3).map(([k])=>STATION_REACTIONS[k].emoji).join('');
     summary.innerHTML=total
       ? `<span class="social-reaction-icons">${top}</span><span>${total}</span>`
-      : `<span class="social-muted">Sem reações</span>`
+      : `<span class="social-muted">Sem reações</span>`;
+    summary.classList.toggle('has-social-count',total>0)
   }
 
   const commentCount=Number(row?.comment_count||0);
   const commentSummary=$(id+'-comments-summary');
-  if(commentSummary)commentSummary.textContent=commentCount
-    ? `${commentCount} ${commentCount===1?'comentário':'comentários'}`
-    : '';
+  if(commentSummary){
+    commentSummary.textContent=commentCount
+      ? `${commentCount} ${commentCount===1?'comentário':'comentários'}`
+      : '';
+  }
 
   const buttonCount=$(id+'-comment-button-count');
   if(buttonCount)buttonCount.textContent=commentCount?String(commentCount):'';
+
+  const shareCount=Number(row?.share_count||0);
+  const shareSummary=$(id+'-shares-summary');
+  if(shareSummary){
+    shareSummary.textContent=shareCount
+      ? `${shareCount} ${shareCount===1?'partilha':'partilhas'}`
+      : '';
+  }
 
   const my=row?.my_reaction;
   const btn=$(id+'-my-reaction');
@@ -5105,7 +5417,7 @@ async function loadStationSocialSummaries(keys){
   const clean=[...new Set((keys||[]).filter(Boolean))].slice(0,100);
   if(!clean.length)return;
   try{
-    const {data,error}=await supabase.rpc('station_social_summary',{p_station_keys:clean});
+    const {data,error}=await supabase.rpc('station_social_summary_v2',{p_station_keys:clean});
     if(error)throw error;
     for(const row of (data||[])){
       stationSocialCache[row.station_key]=row;
@@ -5118,7 +5430,7 @@ async function loadStationSocialSummaries(keys){
 async function refreshStationSocial(stationKey){
   if(isGuestMode)return;
   try{
-    const {data,error}=await supabase.rpc('station_social_summary',{p_station_keys:[stationKey]});
+    const {data,error}=await supabase.rpc('station_social_summary_v2',{p_station_keys:[stationKey]});
     if(error)throw error;
     const row=(data||[])[0]||{station_key:stationKey,reaction_counts:{},comment_count:0,my_reaction:null};
     stationSocialCache[stationKey]=row;
@@ -5145,6 +5457,80 @@ window.reactToStation=async(token,reaction)=>{
     if(error)throw error;
     await refreshStationSocial(stationKey)
   }catch(e){alert(errPT(e))}
+};
+
+
+let stationReactorsCache={};
+let activeReactorsStationKey=null;
+let activeReactorsFilter='all';
+
+function reactorRowHTML(row){
+  const r=STATION_REACTIONS[row.reaction]||{emoji:'👍',label:'Gosto'};
+  return `<div class="social-reactor-row">
+    <div class="social-reactor-avatar">${commentAvatar(row.display_name)}</div>
+    <div class="social-reactor-copy">
+      <strong>${esc(row.display_name||'Utilizador')}</strong>
+      <span>${esc(r.label)}</span>
+    </div>
+    <div class="social-reactor-emoji" title="${esc(r.label)}">${r.emoji}</div>
+  </div>`
+}
+
+function renderReactorsModal(){
+  const rows=stationReactorsCache[activeReactorsStationKey]||[];
+  const filtered=activeReactorsFilter==='all'?rows:rows.filter(r=>r.reaction===activeReactorsFilter);
+  const list=$('stationReactorsList');
+  if(list){
+    list.innerHTML=filtered.length
+      ? filtered.map(reactorRowHTML).join('')
+      : '<div class="social-no-comments">Não existem reações nesta categoria.</div>'
+  }
+
+  const counts={};
+  for(const r of rows)counts[r.reaction]=(counts[r.reaction]||0)+1;
+  const tabs=$('stationReactorsTabs');
+  if(tabs){
+    const items=[
+      ['all','Todas',rows.length],
+      ...Object.entries(STATION_REACTIONS)
+        .filter(([key])=>counts[key])
+        .map(([key,r])=>[key,r.emoji,counts[key]])
+    ];
+    tabs.innerHTML=items.map(([key,label,count])=>`
+      <button type="button" class="${activeReactorsFilter===key?'active':''}"
+        onclick="filterStationReactors('${key}')">
+        <span>${label}</span><b>${count}</b>
+      </button>`).join('')
+  }
+}
+
+window.filterStationReactors=(filter)=>{
+  activeReactorsFilter=filter;
+  renderReactorsModal()
+};
+
+window.openStationReactors=async(token)=>{
+  const stationKey=socialKey(token);
+  if(isGuestMode){promptGuestSignup();return}
+  const cached=stationSocialCache[stationKey];
+  if(!Number(cached?.reaction_count||0))return;
+
+  activeReactorsStationKey=stationKey;
+  activeReactorsFilter='all';
+  const station=nearbyStations.find(s=>String(s.key)===String(stationKey));
+  if($('stationReactorsTitle'))$('stationReactorsTitle').textContent=station?.name||'Quem reagiu';
+  $('stationReactorsList').innerHTML='<div class="social-comments-loading">A carregar…</div>';
+  $('stationReactorsTabs').innerHTML='';
+  $('stationReactorsModal').classList.add('open');
+
+  try{
+    const {data,error}=await supabase.rpc('station_social_reactors',{p_station_key:stationKey,p_limit:200});
+    if(error)throw error;
+    stationReactorsCache[stationKey]=data||[];
+    renderReactorsModal()
+  }catch(e){
+    $('stationReactorsList').innerHTML='<div class="social-no-comments">Não foi possível carregar as reações.</div>'
+  }
 };
 
 function commentAvatar(name){
@@ -5224,14 +5610,36 @@ window.shareStation=async(token)=>{
   const stationKey=socialKey(token);
   const s=nearbyStations.find(x=>String(x.key)===String(stationKey));
   if(!s)return;
+  if(isGuestMode){promptGuestSignup();return}
+
   const price=s.displayPrice??s.officialPrice;
   const text=`⛽ ${s.name}${price?` · ${Number(price).toFixed(3).replace('.',',')} €/L`:''}${s.address?` · ${s.address}`:''}`;
   const url=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${s.lat},${s.lon}`)}`;
+
+  let shared=false;
   try{
-    if(navigator.share){await navigator.share({title:'Bomba Certa',text,url});return}
-    await navigator.clipboard.writeText(`${text}\n${url}`);
-    alert('Posto copiado para partilhar.')
-  }catch(e){if(e?.name!=='AbortError')window.prompt('Copie para partilhar:',`${text}\n${url}`)}
+    if(navigator.share){
+      await navigator.share({title:'Bomba Certa',text,url});
+      shared=true
+    }else{
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      shared=true;
+      alert('Posto copiado para partilhar.')
+    }
+  }catch(e){
+    if(e?.name==='AbortError')return;
+    const copied=window.prompt('Copie para partilhar:',`${text}\n${url}`);
+    shared=!!copied
+  }
+
+  if(shared){
+    try{
+      await supabase.rpc('record_station_share',{p_station_key:stationKey});
+      await refreshStationSocial(stationKey)
+    }catch(e){
+      console.warn('Partilha efetuada, mas não foi possível atualizar o contador:',e)
+    }
+  }
 };
 
 document.addEventListener('keydown',e=>{
