@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.4 — cobertura máxima de preços</title>
+<title>Bomba Certa v8.5 — preços reais e cálculo corrigido</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -603,6 +603,21 @@ body.guest-mode .bottom-nav{max-width:220px}
   .fuel-price-chip{min-width:104px}
 }
 
+
+/* ===== v8.5 · fontes reais + cálculo transparente ===== */
+.price-source-legend{
+  width:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:7px;padding-top:7px;border-top:1px solid #edf0f5;
+  font-size:9px;color:#75839a
+}
+.price-source-legend span{display:inline-flex;align-items:center;gap:5px}
+.price-source-legend .legend-note{flex:1 1 320px}
+.dot-official,.dot-community{display:inline-block;width:7px;height:7px;border-radius:50%}
+.dot-official{background:#2e9d63}.dot-community{background:#2f7df6}
+.fuel-price-chip.stale-price{border-style:dashed}
+.fuel-stale{display:block;margin-top:3px;font-size:7px;color:#b26a00;font-weight:800}
+.fuel-price-chip.selected .fuel-stale{color:#ffd58b}
+
 </style>
 </head>
 <body>
@@ -731,6 +746,11 @@ body.guest-mode .bottom-nav{max-width:220px}
         <div id="fuelStatus" class="status">A preparar postos próximos…</div>
         <div id="fastLocationInfo" class="quick-load hidden"><span class="quick-dot"></span><span>A atualizar em segundo plano…</span></div>
         <div id="priceCoverage" class="tiny muted"></div>
+        <div class="price-source-legend">
+          <span><i class="dot-official"></i>DGEG</span>
+          <span><i class="dot-community"></i>Comunidade</span>
+          <span class="legend-note">Só mostramos valores provenientes de fontes reais. Quando não existe preço publicado, não inventamos.</span>
+        </div>
       </div>
     </div>
 
@@ -749,15 +769,15 @@ body.guest-mode .bottom-nav{max-width:220px}
 
       <div class="smart-choice-grid">
         <div class="smart-choice-stat">
-          <span>Custo do abastecimento</span>
+          <span>Custo no posto</span>
           <strong id="smartChoiceFillCost">—</strong>
         </div>
         <div class="smart-choice-stat">
-          <span>Deslocação estimada</span>
+          <span>Custo para chegar</span>
           <strong id="smartChoiceTravelCost">—</strong>
         </div>
         <div class="smart-choice-stat saving">
-          <span>Poupa vs. posto mais próximo</span>
+          <span>Vantagem líquida estimada</span>
           <strong id="smartChoiceSaving">—</strong>
         </div>
       </div>
@@ -768,12 +788,12 @@ body.guest-mode .bottom-nav{max-width:220px}
       <div id="smartChoiceExplain" class="smart-choice-explain hidden">
         <div class="smart-choice-explain-title">É simples: procuramos o menor custo total.</div>
         <div class="smart-choice-steps">
-          <div><b>1</b><span><strong>Preço</strong><small>Quanto custa cada litro.</small></span></div>
-          <div><b>2</b><span><strong>Abastecimento</strong><small>Preço × litros que quer abastecer.</small></span></div>
-          <div><b>3</b><span><strong>Deslocação</strong><small>Estimamos o combustível gasto para ir e voltar ao posto.</small></span></div>
-          <div><b>4</b><span><strong>Escolha final</strong><small>Ganha o posto com menor custo total estimado.</small></span></div>
+          <div><b>1</b><span><strong>Preço no posto</strong><small>Preço por litro × litros que pretende abastecer.</small></span></div>
+          <div><b>2</b><span><strong>Distância real</strong><small>Sempre que possível usamos a distância rodoviária até ao posto.</small></span></div>
+          <div><b>3</b><span><strong>Custo para chegar</strong><small>Distância × consumo médio ÷ 100 × preço por litro.</small></span></div>
+          <div><b>4</b><span><strong>Escolha final</strong><small>Comparamos o custo no posto + o custo para lá chegar.</small></span></div>
         </div>
-        <div class="smart-choice-baseline"><b>Poupança:</b> compara a Melhor Escolha com o posto disponível mais próximo.</div>
+        <div class="smart-choice-baseline"><b>Vantagem líquida:</b> diferença entre o custo total estimado da Melhor Escolha e o custo total do posto mais próximo que tenha preço para o combustível escolhido.</div>
       </div>
 
       <div class="smart-choice-actions">
@@ -2304,6 +2324,78 @@ async function officialPriceCache(lat,lon,radius){
   })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)&&s.distance<=km)
 }
 
+
+const DGEG_ALL_FUEL_IDS={
+  'Gasóleo simples':2101,
+  'Gasóleo especial':2105,
+  'Gasolina simples 95':3201,
+  'Gasolina especial 95':3205,
+  'Gasolina 98':3400,
+  'Gasolina especial 98':3405,
+  'GPL Auto':1120
+};
+let dgegAllFuelSessionCache=new Map();
+
+async function dgegFuelNationalRows(fuelType){
+  if(dgegAllFuelSessionCache.has(fuelType))return dgegAllFuelSessionCache.get(fuelType);
+  const id=DGEG_ALL_FUEL_IDS[fuelType];
+  if(!id)return [];
+  const rows=[];
+  for(let page=1;page<=10;page++){
+    const part=await dgeg(`/PesquisarPostos?idsTiposComb=${id}&idMarca=&idTipoPosto=&idDistrito=&idsMunicipios=&qtdPorPagina=500&pagina=${page}`);
+    if(!Array.isArray(part)||!part.length)break;
+    rows.push(...part);
+    if(part.length<500)break
+  }
+  dgegAllFuelSessionCache.set(fuelType,rows);
+  return rows
+}
+
+async function dgegAllFuelNearbyClient(lat,lon,radius){
+  const radiusKm=Number(radius)/1000;
+  const fuelTypes=Object.keys(DGEG_ALL_FUEL_IDS);
+  const matrixByStation=new Map();
+
+  // Máximo 3 combustíveis em paralelo para não saturar a API oficial.
+  for(let i=0;i<fuelTypes.length;i+=3){
+    const batch=fuelTypes.slice(i,i+3);
+    const results=await Promise.allSettled(batch.map(f=>dgegFuelNationalRows(f)));
+    for(let j=0;j<batch.length;j++){
+      if(results[j].status!=='fulfilled')continue;
+      const fuel=batch[j];
+      for(const p of results[j].value){
+        const la=Number(String(p.Latitude??'').replace(',','.'));
+        const lo=Number(String(p.Longitude??'').replace(',','.'));
+        const price=parsePrice(p.Preco);
+        if(!Number.isFinite(la)||!Number.isFinite(lo)||!price)continue;
+        const distance=haversine(lat,lon,la,lo);
+        if(distance>radiusKm)continue;
+        const key=`dgeg:${p.Id}`;
+        let s=matrixByStation.get(key);
+        if(!s){
+          s={
+            key,dgegId:Number(p.Id),name:p.Nome||'Posto',brand:p.Marca||'',
+            address:[p.Morada,p.Localidade,p.CodPostal].filter(Boolean).join(', '),
+            lat:la,lon:lo,source:'DGEG',distance,
+            officialPrice:null,officialUpdated:'',multiFuelPrices:{}
+          };
+          matrixByStation.set(key,s)
+        }
+        s.multiFuelPrices[fuel]={
+          price:Number(price),
+          source:'official',
+          updatedAt:p.DataAtualizacao||''
+        }
+        if(fuel===$('fuelType').value){
+          s.officialPrice=Number(price);
+          s.officialUpdated=p.DataAtualizacao||''
+        }
+      }
+    }
+  }
+  return [...matrixByStation.values()]
+}
+
 async function dgegServerStations(lat,lon,radius){
   const fuelType=$('fuelType').value;
   const {data,error}=await supabase.functions.invoke('dgeg-nearby-prices',{
@@ -2437,7 +2529,8 @@ async function searchStations(){
   Promise.allSettled([
     officialPriceCache(currentLat,currentLon,r),
     registryStations(currentLat,currentLon,r),
-    isGuestMode?Promise.resolve([]):communityStations(currentLat,currentLon,r)
+    isGuestMode?Promise.resolve([]):communityStations(currentLat,currentLon,r),
+    dgegAllFuelNearbyClient(currentLat,currentLon,r).catch(()=>[])
   ]).then(async results=>{
     const fast=mergeStations(results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
       .filter(s=>s.distance<=r/1000);
@@ -2454,7 +2547,9 @@ async function searchStations(){
   // 2) DGEG + OSM entram em background, sem prender o ecrã.
   setTimeout(()=>{
     Promise.allSettled([
-      dgegServerStations(currentLat,currentLon,r).catch(()=>dgegStations(currentLat,currentLon,r)),
+      dgegServerStations(currentLat,currentLon,r)
+        .catch(()=>dgegAllFuelNearbyClient(currentLat,currentLon,r))
+        .catch(()=>dgegStations(currentLat,currentLon,r)),
       osmStations(currentLat,currentLon,r)
     ]).then(async results=>{
       const slow=results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]);
@@ -2579,14 +2674,41 @@ function shortFuelName(f){
   })[f]||f
 }
 
+
+function parseSourceDate(value){
+  if(!value)return null;
+  const s=String(value).trim();
+  const iso=s.includes('T')?s:s.replace(/^(\d{4})-(\d{2})-(\d{2})\s+/, '$1-$2-$3T');
+  const d=new Date(iso);
+  return Number.isNaN(d.getTime())?null:d
+}
+function sourceAgeLabel(value){
+  const d=parseSourceDate(value);
+  if(!d)return '';
+  const days=Math.floor((Date.now()-d.getTime())/86400000);
+  if(days<=0)return 'hoje';
+  if(days===1)return 'há 1 dia';
+  if(days<30)return `há ${days} dias`;
+  const months=Math.floor(days/30);
+  return `há ${months} ${months===1?'mês':'meses'}`
+}
+function sourceIsStale(value){
+  const d=parseSourceDate(value);
+  return d ? (Date.now()-d.getTime()>21*86400000) : false
+}
+
 function fuelChipHTML(fuel,info,selectedFuel){
   const selected=fuel===selectedFuel;
   const val=info?.price!=null?Number(info.price).toFixed(3).replace('.',',')+' €':'—';
-  const src=info?.source==='community'?'Comunidade':info?.source==='official'?'DGEG':'Sem preço';
-  return `<div class="fuel-price-chip ${selected?'selected':''}">
+  const baseSrc=info?.source==='community'?'Comunidade':info?.source==='official'?'DGEG':'Sem preço publicado';
+  const age=info?.updatedAt?sourceAgeLabel(info.updatedAt):'';
+  const stale=info?.updatedAt&&sourceIsStale(info.updatedAt);
+  const src=baseSrc+(age?' · '+age:'');
+  return `<div class="fuel-price-chip ${selected?'selected':''} ${stale?'stale-price':''}">
     <span class="fuel-name">${esc(shortFuelName(fuel))}</span>
     <strong>${val}</strong>
     <span class="fuel-source">${esc(src)}</span>
+    ${stale?'<span class="fuel-stale">desatualizado na fonte</span>':''}
   </div>`
 }
 
@@ -2713,31 +2835,62 @@ function smartChoicePrefs(){
 function moneyPT(v){
   return Number(v).toLocaleString('pt-PT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2})
 }
+let smartRoadDistances={};
+
+async function refreshSmartRoadDistances(){
+  if(currentLat==null||currentLon==null||!nearbyStations.length)return;
+  const stations=nearbyStations.filter(s=>Number.isFinite(Number(s.lat))&&Number.isFinite(Number(s.lon))).slice(0,24);
+  if(!stations.length)return;
+  try{
+    const coords=[[currentLon,currentLat],...stations.map(s=>[Number(s.lon),Number(s.lat)])]
+      .map(x=>x.join(',')).join(';');
+    const url=`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&annotations=distance`;
+    const r=await fetch(url);
+    if(!r.ok)throw new Error('OSRM');
+    const j=await r.json();
+    const distances=j?.distances?.[0]||[];
+    const next={};
+    stations.forEach((s,i)=>{
+      const meters=Number(distances[i+1]);
+      if(Number.isFinite(meters))next[s.key]=meters/1000
+    });
+    smartRoadDistances=next;
+    renderSmartChoice()
+  }catch{
+    // Mantemos a distância geográfica como fallback, mas identificada como aproximação.
+  }
+}
+
 function calculateSmartChoice(stations){
   const {liters,consumption}=smartChoicePrefs();
   const candidates=(stations||[])
     .filter(s=>Number.isFinite(Number(s.displayPrice??s.officialPrice)) && Number(s.displayPrice??s.officialPrice)>0)
     .map(s=>{
       const price=Number(s.displayPrice??s.officialPrice);
-      const distance=Math.max(0,Number(s.distance||0));
-      // Ida e volta: aproximação conservadora para o custo de ir abastecer e regressar.
-      const travelLiters=(distance*2)*(consumption/100);
+      const straight=Math.max(0,Number(s.distance||0));
+      const road=Number(smartRoadDistances[s.key]);
+      const distanceKm=Number.isFinite(road)?road:straight;
+      const travelLiters=distanceKm*(consumption/100);
       const travelCost=travelLiters*price;
       const fillCost=liters*price;
       const totalCost=fillCost+travelCost;
-      return {...s,_smart:{price,distance,travelLiters,travelCost,fillCost,totalCost}}
+      return {...s,_smart:{
+        price,distanceKm,straight,usesRoad:Number.isFinite(road),
+        travelLiters,travelCost,fillCost,totalCost
+      }}
     });
   if(!candidates.length)return null;
 
-  candidates.sort((a,b)=>a._smart.totalCost-b._smart.totalCost);
-  const best=candidates[0];
+  // O posto "mais próximo" de referência é escolhido por distância, mas apenas entre
+  // postos que têm preço real para o combustível selecionado.
+  const nearest=[...candidates].sort((a,b)=>a._smart.distanceKm-b._smart.distanceKm)[0];
+  const best=[...candidates].sort((a,b)=>a._smart.totalCost-b._smart.totalCost)[0];
 
-  const nearest=[...candidates].sort((a,b)=>a._smart.distance-b._smart.distance)[0];
-  const cheapestPump=[...candidates].sort((a,b)=>a._smart.price-b._smart.price)[0];
-  const baseline=nearest;
-  const saving=Math.max(0,baseline._smart.totalCost-best._smart.totalCost);
+  const pumpSaving=Math.max(0,(nearest._smart.fillCost-best._smart.fillCost));
+  const extraTravel=Math.max(0,best._smart.travelCost-nearest._smart.travelCost);
+  const netAdvantage=Math.max(0,nearest._smart.totalCost-best._smart.totalCost);
 
-  return {best,nearest,cheapestPump,saving,liters,consumption}
+  return {best,nearest,pumpSaving,extraTravel,netAdvantage,liters,consumption}
 }
 
 function renderSmartChoice(){
@@ -2750,27 +2903,25 @@ function renderSmartChoice(){
     return
   }
 
-  const {best,nearest,cheapestPump,saving,liters,consumption}=result;
+  const {best,nearest,pumpSaving,extraTravel,netAdvantage,liters,consumption}=result;
   smartChoiceStationKey=best.key;
   const s=best._smart;
   const fuel=$('fuelType').value;
   const source=best.priceSource==='community'?'Comunidade':'DGEG';
 
   $('smartChoiceStation').textContent=best.name;
-  $('smartChoiceMeta').textContent=`${kmFmt(s.distance)} km · ${source} · cálculo para ${liters} L e consumo de ${String(consumption).replace('.',',')} L/100 km`;
+  $('smartChoiceMeta').textContent=`${kmFmt(s.distanceKm)} km ${s.usesRoad?'por estrada':'aprox.'} · ${source} · ${liters} L · ${String(consumption).replace('.',',')} L/100 km`;
   $('smartChoicePrice').textContent=s.price.toFixed(3).replace('.',',')+' €';
   $('smartChoiceFuel').textContent=fuel+' · por litro';
   $('smartChoiceFillCost').textContent=moneyPT(s.fillCost);
   $('smartChoiceTravelCost').textContent=moneyPT(s.travelCost);
-  $('smartChoiceSaving').textContent=saving>0?moneyPT(saving):'Melhor custo';
+  $('smartChoiceSaving').textContent=netAdvantage>0?moneyPT(netAdvantage):'Sem vantagem adicional';
 
-  let why=`Custo total estimado: ${moneyPT(s.totalCost)}. `;
-  if(nearest?.key && nearest.key!==best.key && saving>0){
-    why+=`Mesmo não sendo o posto mais próximo, compensa a deslocação e poupa cerca de ${moneyPT(saving)} face ao posto disponível mais próximo.`
-  }else if(cheapestPump?.key===best.key){
-    why+='É simultaneamente uma das melhores opções em preço e deslocação.'
+  let why=`No posto: ${moneyPT(s.fillCost)}. Para chegar: ${moneyPT(s.travelCost)}. Total estimado: ${moneyPT(s.totalCost)}. `;
+  if(nearest?.key && nearest.key!==best.key){
+    why+=`Face ao posto com preço conhecido mais próximo, poupa ${moneyPT(pumpSaving)} no abastecimento, gasta mais ${moneyPT(extraTravel)} na deslocação e fica com uma vantagem líquida estimada de ${moneyPT(netAdvantage)}.`
   }else{
-    why+='É a opção com menor custo estimado depois de considerar preço e deslocação.'
+    why+='Este já é o posto com preço conhecido mais próximo e apresenta o menor custo total estimado.'
   }
   $('smartChoiceWhy').textContent=why;
 
@@ -2915,6 +3066,7 @@ async function renderStations(){
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
   populateFillStations();updatePriceCoverage();
   renderSmartChoice();
+  refreshSmartRoadDistances().catch(()=>{});
   // Guardar também a resolução final do preço. Assim, um refresh não volta
   // temporariamente ao valor DGEG quando existe um preço comunitário mais recente.
   saveFastStationCache()

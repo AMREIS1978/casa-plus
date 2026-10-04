@@ -1,26 +1,41 @@
-# Bomba Certa v8.4 — Cobertura Máxima de Preços
+# Bomba Certa v8.5 — Preços reais + cálculo corrigido
 
-## Objetivo
-Reduzir drasticamente os cartões com “Sem preço” e mostrar, em cada posto, todos os combustíveis conhecidos independentemente do combustível selecionado.
+## O que foi corrigido
 
-## Alterações
-- os cartões mostram os 7 combustíveis suportados;
-- o combustível escolhido continua destacado;
-- a pesquisa DGEG passa a pedir dados multi-combustível;
-- a Edge Function `dgeg-nearby-prices` foi atualizada para v3;
-- a função usa o detalhe oficial de cada posto DGEG para recolher vários combustíveis numa única pesquisa;
-- o cache oficial passa a ser usado também para descobrir preços de outros combustíveis;
-- quando um posto OSM/Base Bomba Certa não tem a mesma chave DGEG, o frontend tenta associá-lo por proximidade geográfica e semelhança do nome;
-- preços comunitários recentes continuam a prevalecer sobre preços oficiais anteriores;
-- a cobertura mostra agora:
-  - postos com preço no combustível selecionado;
-  - postos com pelo menos um preço conhecido.
+### 1. Preços
+A aplicação deixa de depender do combustível selecionado para tentar preencher os cartões.
 
-## Fontes
-Prioridade de qualidade:
-1. Comunidade recente Bomba Certa, quando existente;
-2. DGEG / Preços dos Combustíveis;
-3. cache DGEG já validado;
-4. OpenStreetMap apenas para localização/descoberta de postos sem preço.
+Além da função backend, existe agora um fallback direto à API oficial da DGEG que:
+- pesquisa os 7 combustíveis;
+- percorre todas as páginas necessárias;
+- filtra apenas os postos no raio do utilizador;
+- agrega os preços por ID oficial do posto;
+- mantém a Comunidade como fonte prioritária quando existe uma atualização comunitária mais recente.
 
-Não são usados preços inventados nem valores estimados para preencher espaços vazios.
+Não são criados valores artificiais.
+
+### 2. Frescura
+Cada preço pode indicar:
+- DGEG / Comunidade;
+- há quanto tempo foi atualizado;
+- aviso “desatualizado na fonte” quando tem mais de 21 dias.
+
+Isto evita apresentar um preço antigo como se fosse atual.
+
+### 3. Melhor Escolha
+O cálculo foi refeito.
+
+Para cada posto:
+- custo no posto = litros × preço por litro;
+- custo para chegar = distância até ao posto × consumo médio / 100 × preço por litro;
+- custo total = custo no posto + custo para chegar.
+
+Sempre que possível, a distância usada é a distância rodoviária obtida por OSRM, e não a distância em linha reta.
+
+A “vantagem líquida estimada” compara a Melhor Escolha com o posto com preço conhecido mais próximo e mostra separadamente:
+- poupança no abastecimento;
+- custo extra de deslocação;
+- vantagem líquida.
+
+## Importante
+Nem todas as estações vendem todos os combustíveis e algumas fontes oficiais podem estar desatualizadas. Nesses casos a aplicação assinala a ausência/frescura em vez de inventar um valor.
