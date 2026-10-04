@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.1 — Mapa sempre ajustado</title>
+<title>Bomba Certa v9.2 — Navegação premium</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -856,6 +856,81 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
   }
 }
 
+
+
+/* ===== v9.2 · Navegação premium mais intuitiva ===== */
+body{padding-bottom:108px}
+.app{padding-bottom:176px}
+.bottom-nav{
+  position:fixed;left:50%;right:auto;transform:translateX(-50%);bottom:12px;z-index:1000;
+  width:min(980px,calc(100% - 22px));
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;
+  padding:8px;
+  border-radius:28px;
+  border:1px solid rgba(220,227,237,.95);
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px) saturate(1.05);
+  box-shadow:0 20px 54px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.85);
+}
+.bottom-nav.admin-enabled{grid-template-columns:repeat(6,minmax(0,1fr))}
+.nav{
+  border:0;background:transparent;border-radius:18px;
+  min-height:66px;padding:8px 8px 10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:#667085;font-size:11px;font-weight:900;line-height:1;
+  position:relative;transition:transform .18s ease,background .18s ease,color .18s ease,box-shadow .18s ease;
+}
+.nav:hover{background:#f8fbff;color:#1f6cd9;transform:translateY(-1px)}
+.nav:focus-visible{outline:3px solid rgba(47,125,246,.26);outline-offset:2px}
+.nav-icon{
+  width:34px;height:34px;border-radius:12px;display:grid;place-items:center;
+  background:linear-gradient(180deg,#f7f9fc,#eef3f8);
+  border:1px solid rgba(220,227,237,.98);
+  color:#344054;font-size:18px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88);
+  transition:inherit;
+}
+.nav-label{display:block;font-size:11px;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.nav:hover .nav-icon{background:linear-gradient(180deg,#eff6ff,#e1edff);border-color:#cfe0ff;color:#1f6cd9}
+.nav.active{
+  background:linear-gradient(180deg,#eef5ff,#e5f0ff);
+  color:#1554b4;
+  box-shadow:inset 0 0 0 1px rgba(143,188,255,.42),0 8px 20px rgba(47,125,246,.12)
+}
+.nav.active .nav-icon{
+  background:linear-gradient(180deg,#2f7df6,#1660d8);
+  color:#fff;border-color:transparent;
+  box-shadow:0 10px 24px rgba(47,125,246,.28)
+}
+.nav.active::after{
+  content:"";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
+  width:30px;height:4px;border-radius:999px;background:#2f7df6;opacity:.95
+}
+.community-activity-footer{bottom:92px}
+body.guest-mode .bottom-nav{width:min(360px,calc(100% - 22px));grid-template-columns:repeat(2,minmax(0,1fr))}
+body.guest-mode .nav{min-height:60px}
+@media (min-width:1180px){
+  .bottom-nav{width:min(1040px,calc(100% - 34px))}
+}
+@media (max-width:860px){
+  body{padding-bottom:100px}
+  .app{padding-bottom:168px}
+  .bottom-nav{width:calc(100% - 16px);bottom:8px;padding:7px;gap:6px;border-radius:24px}
+  .nav{min-height:60px;padding:7px 5px 9px;gap:5px}
+  .nav-icon{width:32px;height:32px;font-size:17px;border-radius:11px}
+  .nav-label{font-size:10px}
+  .community-activity-footer{bottom:84px;width:calc(100% - 16px)}
+}
+@media (max-width:560px){
+  body{padding-bottom:96px}
+  .app{padding-bottom:158px}
+  .bottom-nav{width:calc(100% - 12px);bottom:6px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));gap:5px;border-radius:22px}
+  .nav{min-height:56px;padding:6px 3px 8px}
+  .nav-icon{width:30px;height:30px;font-size:16px;border-radius:10px}
+  .nav-label{font-size:9px}
+  .community-activity-footer{bottom:78px;width:calc(100% - 12px)}
+}
+
 </style>
 </head>
 <body>
@@ -1487,12 +1562,30 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
 </div>
 
 <nav class="bottom-nav" aria-label="Navegação principal">
-  <button class="nav active" data-section="postos"><span>⌖</span>Mapa</button>
-  <button class="nav" data-section="abastecimentos"><span>⛽</span>Abastecimentos</button>
-  <button id="tripNav" class="nav" data-section="viagem"><span>🧭</span>Viagem</button>
-  <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
-  <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
-  <button id="adminNav" class="nav hidden" data-section="admin"><span>⚙️</span>Admin</button>
+  <button class="nav active" data-section="postos" aria-label="Mapa">
+    <span class="nav-icon" aria-hidden="true">⌖</span>
+    <span class="nav-label">Mapa</span>
+  </button>
+  <button class="nav" data-section="abastecimentos" aria-label="Abastecimentos">
+    <span class="nav-icon" aria-hidden="true">⛽</span>
+    <span class="nav-label">Abastecer</span>
+  </button>
+  <button id="tripNav" class="nav" data-section="viagem" aria-label="Viagem">
+    <span class="nav-icon" aria-hidden="true">🧭</span>
+    <span class="nav-label">Viagem</span>
+  </button>
+  <button class="nav" data-section="estatisticas" aria-label="Estatísticas">
+    <span class="nav-icon" aria-hidden="true">📊</span>
+    <span class="nav-label">Análise</span>
+  </button>
+  <button class="nav" data-section="perfil" aria-label="Perfil">
+    <span class="nav-icon" aria-hidden="true">👤</span>
+    <span class="nav-label">Perfil</span>
+  </button>
+  <button id="adminNav" class="nav hidden" data-section="admin" aria-label="Administração">
+    <span class="nav-icon" aria-hidden="true">⚙️</span>
+    <span class="nav-label">Admin</span>
+  </button>
 </nav>
 </div>
 
