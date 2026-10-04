@@ -1,26 +1,26 @@
-# Bomba Certa v8.3 — Visitante + Critério Transparente
+# Bomba Certa v8.4 — Cobertura Máxima de Preços
 
-## Critério da Melhor Escolha
-A app passa a explicar o cálculo dentro do próprio cartão:
-1. preço por litro;
-2. custo do abastecimento = preço × litros;
-3. custo estimado da deslocação de ida e volta;
-4. ganha o posto com menor custo total.
+## Objetivo
+Reduzir drasticamente os cartões com “Sem preço” e mostrar, em cada posto, todos os combustíveis conhecidos independentemente do combustível selecionado.
 
-A poupança fica explicitamente identificada como:
-**Poupa vs. posto mais próximo**.
+## Alterações
+- os cartões mostram os 7 combustíveis suportados;
+- o combustível escolhido continua destacado;
+- a pesquisa DGEG passa a pedir dados multi-combustível;
+- a Edge Function `dgeg-nearby-prices` foi atualizada para v3;
+- a função usa o detalhe oficial de cada posto DGEG para recolher vários combustíveis numa única pesquisa;
+- o cache oficial passa a ser usado também para descobrir preços de outros combustíveis;
+- quando um posto OSM/Base Bomba Certa não tem a mesma chave DGEG, o frontend tenta associá-lo por proximidade geográfica e semelhança do nome;
+- preços comunitários recentes continuam a prevalecer sobre preços oficiais anteriores;
+- a cobertura mostra agora:
+  - postos com preço no combustível selecionado;
+  - postos com pelo menos um preço conhecido.
 
-## Modo Visitante
-Novo botão no login:
-**Continuar como visitante**.
+## Fontes
+Prioridade de qualidade:
+1. Comunidade recente Bomba Certa, quando existente;
+2. DGEG / Preços dos Combustíveis;
+3. cache DGEG já validado;
+4. OpenStreetMap apenas para localização/descoberta de postos sem preço.
 
-O visitante pode consultar postos, preços oficiais, mapa, rota, vários combustíveis e a Melhor Escolha sem criar conta.
-
-Para alterar preços, validar informação, guardar abastecimentos ou reportar um posto é necessário criar conta.
-
-## Segurança
-O backend foi ajustado para leitura anónima apenas dos dados públicos necessários:
-- `fuel_official_prices`;
-- `fuel_station_registry`.
-
-Mantêm-se protegidos os dados de utilizadores, contribuições, validações, abastecimentos e administração.
+Não são usados preços inventados nem valores estimados para preencher espaços vazios.

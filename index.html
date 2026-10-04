@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.3 — visitante e critério transparente</title>
+<title>Bomba Certa v8.4 — cobertura máxima de preços</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -586,6 +586,22 @@ body.guest-mode .bottom-nav{max-width:220px}
 .guest-cta{margin-top:8px;padding:10px 12px;border-radius:13px;background:#f6f9ff;border:1px solid #e3ebf8;font-size:10px;line-height:1.45;color:#526078}
 @media(max-width:760px){.smart-choice-steps{grid-template-columns:1fr 1fr}}
 @media(max-width:430px){.smart-choice-steps{grid-template-columns:1fr}}
+
+
+/* ===== v8.4 · Cobertura máxima de preços ===== */
+.fuel-price-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.fuel-price-chip{min-height:67px}
+.fuel-price-chip.selected{
+  outline:2px solid rgba(47,125,246,.22);
+  box-shadow:0 9px 22px rgba(18,33,59,.18)
+}
+@media(max-width:1180px){
+  .fuel-price-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .fuel-price-grid{display:flex;overflow-x:auto;gap:7px}
+  .fuel-price-chip{min-width:104px}
+}
 
 </style>
 </head>
@@ -2291,23 +2307,34 @@ async function officialPriceCache(lat,lon,radius){
 async function dgegServerStations(lat,lon,radius){
   const fuelType=$('fuelType').value;
   const {data,error}=await supabase.functions.invoke('dgeg-nearby-prices',{
-    body:{lat,lon,radius:Number(radius),fuel_type:fuelType}
+    body:{lat,lon,radius:Number(radius),fuel_type:fuelType,include_all_fuels:true}
   });
   if(error)throw error;
   const rows=Array.isArray(data?.rows)?data.rows:[];
-  return rows.map(s=>({
-    key:s.key||`dgeg:${s.dgegId}`,
-    dgegId:Number(s.dgegId),
-    name:s.name||'Posto',
-    brand:s.brand||'',
-    address:s.address||'',
-    lat:Number(s.lat),
-    lon:Number(s.lon),
-    officialPrice:Number(s.officialPrice),
-    officialUpdated:s.officialUpdated||'',
-    source:'DGEG',
-    distance:Number(s.distance)
-  })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)&&Number.isFinite(s.officialPrice))
+  return rows.map(s=>{
+    const matrix={};
+    for(const [fuel,info] of Object.entries(s.prices||{})){
+      const p=Number(info?.price);
+      if(Number.isFinite(p)&&p>.5&&p<5){
+        matrix[fuel]={price:p,source:'official',updatedAt:info?.updatedAt||s.officialUpdated||''}
+      }
+    }
+    const selected=matrix[fuelType]?.price ?? Number(s.officialPrice);
+    return {
+      key:s.key||`dgeg:${s.dgegId}`,
+      dgegId:Number(s.dgegId),
+      name:s.name||'Posto',
+      brand:s.brand||'',
+      address:s.address||'',
+      lat:Number(s.lat),
+      lon:Number(s.lon),
+      officialPrice:Number.isFinite(Number(selected))?Number(selected):null,
+      officialUpdated:matrix[fuelType]?.updatedAt||s.officialUpdated||'',
+      multiFuelPrices:matrix,
+      source:'DGEG',
+      distance:Number(s.distance)
+    }
+  }).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon))
 }
 
 async function dgegStations(lat,lon,radius){
@@ -2366,6 +2393,7 @@ function mergeStations(lists){
     if(!dup.officialUpdated&&s.officialUpdated)dup.officialUpdated=s.officialUpdated;
     if(!dup.address&&s.address)dup.address=s.address;
     if(!dup.dgegId&&s.dgegId)dup.dgegId=s.dgegId;
+    dup.multiFuelPrices={...(dup.multiFuelPrices||{}),...(s.multiFuelPrices||{})};
     if((pri[s.source]??9)<(pri[dup.source]??9)){dup.source=s.source;dup.key=s.key}
   }
   return out
@@ -2524,7 +2552,8 @@ function updatePriceCoverage(){
   const priced=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
   if(!total){$('priceCoverage').textContent='';return}
   const pct=Math.round(priced/total*100);
-  $('priceCoverage').innerHTML=`<b>${priced}</b> de ${total} postos com preço (${pct}%) · <span>${isGuestMode?'modo visitante: preços oficiais disponíveis':'prioridade aos postos com preço disponível'}</span>`
+  const anyFuel=nearbyStations.filter(s=>Object.values(s.multiFuelPrices||{}).some(x=>Number(x?.price)>0)).length;
+  $('priceCoverage').innerHTML=`<b>${priced}</b> de ${total} com preço no combustível escolhido · <b>${anyFuel}</b> com pelo menos um preço conhecido · <span>${isGuestMode?'fontes oficiais disponíveis':'DGEG + comunidade'}</span>`
 }
 
 
@@ -2532,7 +2561,9 @@ const MULTI_FUEL_ORDER=[
   'Gasóleo simples',
   'Gasóleo especial',
   'Gasolina simples 95',
+  'Gasolina especial 95',
   'Gasolina 98',
+  'Gasolina especial 98',
   'GPL Auto'
 ];
 
@@ -2560,15 +2591,30 @@ function fuelChipHTML(fuel,info,selectedFuel){
 }
 
 async function loadMultiFuelMatrix(stations){
-  const keys=[...new Set((stations||[]).map(s=>s.key).filter(Boolean))].slice(0,80);
-  if(!keys.length)return {};
+  const list=(stations||[]).filter(s=>Number.isFinite(Number(s.lat))&&Number.isFinite(Number(s.lon)));
+  if(!list.length)return {};
 
+  const keys=[...new Set(list.map(s=>s.key).filter(Boolean))].slice(0,120);
   const since=new Date(Date.now()-7*86400000).toISOString();
-  const officialPromise=supabase.from('fuel_official_prices')
-      .select('station_key,fuel_type,price,fetched_at')
-      .in('station_key',keys)
-      .order('fetched_at',{ascending:false})
-      .limit(1500);
+  const radiusKm=Math.max(3,Number($('fuelRadius')?.value||5000)/1000);
+  const lat=currentLat ?? list[0].lat;
+  const lon=currentLon ?? list[0].lon;
+  const dy=radiusKm/111;
+  const dx=radiusKm/(111*Math.max(.2,Math.cos(Number(lat)*Math.PI/180)));
+
+  const officialByKeys=supabase.from('fuel_official_prices')
+    .select('dgeg_id,station_key,station_name,latitude,longitude,fuel_type,price,source_updated_text,fetched_at')
+    .in('station_key',keys)
+    .order('fetched_at',{ascending:false})
+    .limit(2500);
+
+  const officialNearby=supabase.from('fuel_official_prices')
+    .select('dgeg_id,station_key,station_name,latitude,longitude,fuel_type,price,source_updated_text,fetched_at')
+    .gte('latitude',Number(lat)-dy).lte('latitude',Number(lat)+dy)
+    .gte('longitude',Number(lon)-dx).lte('longitude',Number(lon)+dx)
+    .order('fetched_at',{ascending:false})
+    .limit(5000);
+
   const communityPromise=isGuestMode
     ? Promise.resolve({data:[]})
     : supabase.from('fuel_price_reports')
@@ -2576,27 +2622,72 @@ async function loadMultiFuelMatrix(stations){
       .in('station_key',keys)
       .gte('observed_at',since)
       .order('observed_at',{ascending:false})
-      .limit(1500);
-  const [{data:official},{data:community}]=await Promise.all([officialPromise,communityPromise]);
+      .limit(2000);
+
+  const [{data:officialExact},{data:officialGeo},{data:community}]=await Promise.all([
+    officialByKeys,officialNearby,communityPromise
+  ]);
+
+  const allOfficial=[];
+  const seenOfficial=new Set();
+  for(const row of [...(officialExact||[]),...(officialGeo||[])]){
+    const k=`${row.dgeg_id}|${row.fuel_type}|${row.price}|${row.fetched_at||''}`;
+    if(seenOfficial.has(k))continue;
+    seenOfficial.add(k);
+    allOfficial.push(row)
+  }
 
   const matrix={};
-  for(const row of (official||[])){
-    if(!matrix[row.station_key])matrix[row.station_key]={};
-    if(!matrix[row.station_key][row.fuel_type]){
-      matrix[row.station_key][row.fuel_type]={
-        price:Number(row.price),source:'official',updatedAt:row.fetched_at
+  for(const s of list)matrix[s.key]={...(s.multiFuelPrices||{})};
+
+  function attach(row){
+    const pr=Number(row.price);
+    if(!Number.isFinite(pr)||pr<=.5||pr>=5)return;
+    let station=list.find(s=>s.key===row.station_key);
+    if(!station && row.dgeg_id){
+      station=list.find(s=>String(s.dgegId||'')===String(row.dgeg_id))
+    }
+    if(!station){
+      const la=Number(row.latitude),lo=Number(row.longitude);
+      if(!Number.isFinite(la)||!Number.isFinite(lo))return;
+      let best=null,bestDist=Infinity;
+      for(const s of list){
+        const d=haversine(Number(s.lat),Number(s.lon),la,lo);
+        if(d>=bestDist)continue;
+        const sn=norm(s.name||''),rn=norm(row.station_name||'');
+        const nameLike=sn&&rn&&(sn.includes(rn)||rn.includes(sn));
+        // Muito perto: aceita mesmo com nomes diferentes. Mais longe: exige nome semelhante.
+        if(d<=0.14 || (d<=0.55 && nameLike)){
+          best=s;bestDist=d
+        }
+      }
+      station=best
+    }
+    if(!station)return;
+    if(!matrix[station.key])matrix[station.key]={};
+    const current=matrix[station.key][row.fuel_type];
+    if(!current || current.source!=='community'){
+      matrix[station.key][row.fuel_type]={
+        price:pr,
+        source:'official',
+        updatedAt:row.source_updated_text||row.fetched_at||''
       }
     }
+    if(row.dgeg_id && !station.dgegId)station.dgegId=Number(row.dgeg_id)
   }
+
+  for(const row of allOfficial)attach(row);
+
+  // A comunidade continua a prevalecer sobre a fonte oficial quando é mais recente.
   for(const row of (community||[])){
     if(!matrix[row.station_key])matrix[row.station_key]={};
-    const current=matrix[row.station_key][row.fuel_type];
-    if(!current || current.source!=='community'){
+    if(!matrix[row.station_key][row.fuel_type] || matrix[row.station_key][row.fuel_type].source!=='community'){
       matrix[row.station_key][row.fuel_type]={
         price:Number(row.price),source:'community',updatedAt:row.observed_at
       }
     }
   }
+
   return matrix
 }
 
@@ -2604,7 +2695,7 @@ function stationFuelGridHTML(s,selectedFuel){
   const matrix=s.multiFuelPrices||{};
   const fuels=[...MULTI_FUEL_ORDER];
   if(selectedFuel && !fuels.includes(selectedFuel))fuels.unshift(selectedFuel);
-  return `<div class="fuel-price-grid">${fuels.slice(0,5).map(f=>
+  return `<div class="fuel-price-grid">${fuels.map(f=>
     fuelChipHTML(f,matrix[f]||(f===selectedFuel&&s.displayPrice!=null?{
       price:s.displayPrice,source:s.priceSource||'official',updatedAt:s.lastUpdated
     }:null),selectedFuel)
@@ -2775,7 +2866,12 @@ async function renderStations(){
     const displayPrice=community??s.officialPrice??null;
     const priceSource=community!=null?'community':(s.officialPrice?'official':null);
     const lastUpdated=priceSource==='community' ? c?.updatedAt : (s.officialUpdated||null);
-    return {...s,candidate:c,displayPrice,priceSource,lastUpdated,multiFuelPrices:multiFuel[s.key]||s.multiFuelPrices||{},closed:closedText(s.key,cd.statuses)}
+    const mergedFuelPrices={...(s.multiFuelPrices||{}),...(multiFuel[s.key]||{})};
+    const selectedInfo=mergedFuelPrices[$('fuelType').value];
+    const resolvedDisplay=community ?? selectedInfo?.price ?? s.officialPrice ?? null;
+    const resolvedSource=community!=null?'community':(selectedInfo?.source||priceSource);
+    const resolvedUpdated=community!=null?c?.updatedAt:(selectedInfo?.updatedAt||lastUpdated);
+    return {...s,candidate:c,displayPrice:resolvedDisplay,priceSource:resolvedSource,lastUpdated:resolvedUpdated,multiFuelPrices:mergedFuelPrices,closed:closedText(s.key,cd.statuses)}
   }).sort((a,b)=>a.displayPrice&&b.displayPrice?a.displayPrice-b.displayPrice:a.displayPrice?-1:b.displayPrice?1:a.distance-b.distance);
 
   $('stationList').innerHTML=nearbyStations.length?nearbyStations.map((s,i)=>{
