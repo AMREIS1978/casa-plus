@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.8 — Rotas e Partilha</title>
+<title>Bomba Certa v8.9 — Paragens só na reserva</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -781,6 +781,13 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
   .trip-route-comparison{grid-template-columns:1fr}
 }
 
+
+/* ===== v8.9 · Parar só na reserva ===== */
+.trip-stop-plan strong{line-height:1.25}
+.trip-stop-reason{background:#fff5e8;color:#9a5a08;border:1px solid #f4dfbf}
+.trip-method-note{font-weight:750;color:#65748a}
+.trip-method-note::before{content:"⛽ ";color:inherit}
+
 </style>
 </head>
 <body>
@@ -1162,8 +1169,9 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
             <div class="trip-unit-input"><input id="tripTank" class="input" type="number" min="15" max="150" step="1" value="55"><b>L</b></div>
           </label>
           <label class="trip-field">
-            <span>Reserva de segurança</span>
+            <span>Entrada na reserva</span>
             <div class="trip-unit-input"><input id="tripReserve" class="input" type="number" min="10" max="150" step="5" value="40"><b>km</b></div>
+            <small>Ex.: 40 km = a app só procura uma paragem quando a autonomia prevista desce para cerca de 40 km.</small>
           </label>
           <div class="trip-route-choice-wrap">
             <span class="trip-route-choice-label">Tipo de percurso</span>
@@ -1191,7 +1199,7 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
         </div>
 
         <div class="trip-form-foot">
-          <div class="trip-method-note">Primeiro garantimos que chega em segurança. Só depois escolhemos, dentro das paragens necessárias, o posto mais vantajoso.</div>
+          <div class="trip-method-note">A app não manda parar antes do tempo: só propõe abastecer quando o carro entra na reserva. Se a autonomia chegar ao destino, não cria qualquer paragem.</div>
           <button id="tripCalculateBtn" class="btn trip-calc-btn" type="button">✨ Criar plano de viagem</button>
         </div>
         <div id="tripStatus" class="status trip-status" aria-live="polite"></div>
@@ -1999,34 +2007,63 @@ async function tripRefineDetours(stations){
 }
 
 
-function tripChooseNecessaryStop(options,strategy,currentPos,targetKm){
+
+function tripChooseReserveStop(options,strategy,reservePoint,currentPos,emptyPoint){
   if(!options.length)return null;
 
-  const windowStart=Math.max(currentPos+5,targetKm-45);
-  let pool=options.filter(s=>s.routeKm>=windowStart);
-  if(!pool.length)pool=options;
+  // Zona normal de paragem: desde a entrada na reserva até perto do limite físico.
+  // Tolerância de 5 km antes da reserva apenas para evitar falhar um posto praticamente coincidente.
+  const zoneStart=Math.max(currentPos+3,reservePoint-5);
+  const zoneEnd=Math.max(zoneStart,emptyPoint-8);
 
-  const maxProgress=Math.max(...pool.map(s=>s.routeKm));
+  let pool=options.filter(s=>s.routeKm>=zoneStart && s.routeKm<=zoneEnd);
+
+  // Se não houver nenhum posto nessa zona, aceitar o último posto imediatamente antes da reserva.
+  // Isto é um fallback de segurança, não uma otimização económica.
+  let fallbackBeforeReserve=false;
+  if(!pool.length){
+    const before=options
+      .filter(s=>s.routeKm>currentPos+3 && s.routeKm<zoneStart)
+      .sort((a,b)=>b.routeKm-a.routeKm);
+    if(before.length){
+      pool=[before[0]];
+      fallbackBeforeReserve=true
+    }
+  }
+  if(!pool.length)return null;
+
   const minPrice=Math.min(...pool.map(s=>s.price));
   const maxPrice=Math.max(...pool.map(s=>s.price));
   const priceSpan=Math.max(.001,maxPrice-minPrice);
 
-  return pool.map(s=>{
-    const progressPenalty=Math.max(0,(maxProgress-s.routeKm)/Math.max(1,targetKm-currentPos));
+  const scored=pool.map(s=>{
+    const afterReserve=Math.max(0,s.routeKm-reservePoint);
+    const beforeReserve=Math.max(0,reservePoint-s.routeKm);
     const pricePenalty=(s.price-minPrice)/priceSpan;
     const detourPenalty=Math.min(1,(s.detourKm||0)/12);
+
+    // Regra principal: parar perto do momento em que entra na reserva.
+    // O preço decide entre postos equivalentes nessa zona, nunca força uma paragem antecipada.
+    const timingPenalty=(afterReserve/Math.max(1,emptyPoint-reservePoint))*.55
+      +(beforeReserve/Math.max(1,reservePoint-currentPos))*.85;
+
     let score;
-    if(strategy==='cheapest') score=pricePenalty*.62+detourPenalty*.20+progressPenalty*.18;
-    else if(strategy==='fewer') score=detourPenalty*.55+progressPenalty*.35+pricePenalty*.10;
-    else score=progressPenalty*.44+pricePenalty*.34+detourPenalty*.22;
+    if(strategy==='cheapest') score=timingPenalty*.52+pricePenalty*.34+detourPenalty*.14;
+    else if(strategy==='fewer') score=timingPenalty*.66+detourPenalty*.27+pricePenalty*.07;
+    else score=timingPenalty*.60+pricePenalty*.24+detourPenalty*.16;
+
     return {s,score}
-  }).sort((a,b)=>a.score-b.score)[0]?.s||null
+  }).sort((a,b)=>a.score-b.score);
+
+  const chosen=scored[0]?.s||null;
+  if(chosen)chosen._reserveFallback=fallbackBeforeReserve;
+  return chosen
 }
 
 function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy){
   const fullRange=tank/consumption*100;
   if(!Number.isFinite(fullRange)||fullRange<=reserve+20){
-    throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia segura.')
+    throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia útil acima da reserva.')
   }
 
   const sorted=[...candidates].sort((a,b)=>a.routeKm-b.routeKm);
@@ -2035,24 +2072,27 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
   let range=Math.max(0,autonomy);
   let guard=0;
 
-  // Se a autonomia atual já cobre toda a viagem + reserva, zero paragens.
+  // Se chega ao fim sem entrar na reserva, não existe paragem.
   if(range>=totalKm+reserve)return {stops,fullRange};
 
   while(pos+range<totalKm+reserve && guard++<20){
-    const safeReach=Math.min(totalKm,pos+range-reserve);
-    if(safeReach<=pos+3){
-      throw new Error('A autonomia atual é demasiado baixa para chegar em segurança ao próximo posto com preço real.')
+    const reservePoint=Math.min(totalKm,pos+Math.max(0,range-reserve));
+    const emptyPoint=Math.min(totalKm,pos+range);
+
+    if(emptyPoint<=pos+5){
+      throw new Error('A autonomia atual é demasiado baixa para continuar a viagem.')
     }
 
-    const reachable=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=safeReach);
+    // Só consideramos postos alcançáveis antes de ficar sem autonomia.
+    const reachable=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=emptyPoint-8);
     if(!reachable.length){
-      throw new Error(`Não encontrei um posto com preço real dentro da autonomia segura disponível (${Math.round(range)} km).`)
+      throw new Error(`Não encontrei um posto com preço real antes de esgotar a autonomia disponível (${Math.round(range)} km).`)
     }
 
-    // A prioridade é avançar o máximo possível. O preço decide apenas dentro desta zona.
-    const targetKm=Math.max(...reachable.map(s=>s.routeKm));
-    const stop=tripChooseNecessaryStop(reachable,strategy,pos,targetKm);
-    if(!stop)throw new Error('Não foi possível selecionar uma paragem segura.');
+    const stop=tripChooseReserveStop(reachable,strategy,reservePoint,pos,emptyPoint);
+    if(!stop){
+      throw new Error('Não encontrei um posto adequado na zona de reserva.')
+    }
 
     const routeTravel=stop.routeKm-pos;
     const detourOut=(stop.detourKm||0)/2;
@@ -2065,7 +2105,6 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
 
     let buyLiters=Math.max(0,targetLiters-currentLiters);
     if(remaining+reserve>fullRange){
-      // Ainda haverá outra paragem obrigatória: maximizar a próxima etapa.
       buyLiters=Math.max(0,tank-currentLiters)
     }
     if(buyLiters>0 && buyLiters<3)buyLiters=Math.min(tank-currentLiters,3);
@@ -2076,16 +2115,24 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
     const afterFillRange=afterFillLiters/consumption*100;
     const returnToRoute=(stop.detourKm||0)/2;
 
+    let reason;
+    if(stop._reserveFallback){
+      reason='Paragem de segurança imediatamente antes da reserva — não existe posto adequado já dentro da zona de reserva';
+    }else if(arrivalRange<=reserve+8){
+      reason='Paragem proposta quando o carro entra na reserva';
+    }else{
+      reason='Paragem necessária na zona de reserva';
+    }
+
     stops.push({
       ...stop,
+      reservePoint,
       arrivalRange,
       buyLiters,
       purchaseCost,
       detourCost,
       afterFillRange,
-      reason: remaining+reserve<=fullRange
-        ? 'Última paragem necessária antes de concluir a viagem'
-        : 'Paragem necessária para manter autonomia segura'
+      reason
     });
 
     range=Math.max(0,afterFillRange-returnToRoute);
@@ -2155,7 +2202,7 @@ function tripRenderPlan(plan){
     ?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}`
     :'A autonomia atual é suficiente';
   $('tripHeadlineDetail').textContent=stops.length
-    ?`${routePreference==='eco'?'Rota económica':'Rota mais rápida'} · só incluímos paragens indispensáveis para manter autonomia segura. Dentro dessas zonas, escolhemos os postos mais vantajosos para ${fuel}.`
+    ?`${routePreference==='eco'?'Rota económica':'Rota mais rápida'} · só propomos parar quando a autonomia entra na reserva. Dentro dessa zona, escolhemos o posto mais vantajoso para ${fuel}.`
     :`Com a autonomia indicada, não precisa de abastecer durante os ${tripNum(totalKm,0)} km da viagem.`;
 
   $('tripRouteLabel').textContent=mode==='roundtrip'?'Ida e volta':'Só ida';
@@ -2171,7 +2218,7 @@ function tripRenderPlan(plan){
         <div class="trip-stop-price">${s.price.toFixed(3).replace('.',',')} €</div>
       </div>
       <div class="trip-stop-plan">
-        <div><span>Autonomia à chegada</span><strong>${tripNum(s.arrivalRange,0)} km</strong></div>
+        <div><span>Autonomia à chegada</span><strong>${tripNum(s.arrivalRange,0)} km ${s.arrivalRange<=plan.reserve+8?'· RESERVA':''}</strong></div>
         <div><span>Abastecer</span><strong>${tripNum(s.buyLiters,1)} L</strong></div>
         <div><span>Custo combustível</span><strong>${tripMoney(s.purchaseCost)}</strong></div>
         <div><span>Custo estimado do desvio</span><strong>${tripMoney(s.detourCost)}</strong></div>
@@ -2255,7 +2302,9 @@ async function calculateTrip(){
     const plan={origin,destination,outbound,returnRoute,path,totalKm,stops,candidates,autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference};
     localStorage.setItem('bombaCerta:tripPrefs',JSON.stringify({autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference}));
     tripRenderPlan(plan);
-    $('tripStatus').textContent=`✓ Plano calculado com ${candidates.length} postos reais considerados.`
+    $('tripStatus').textContent=stops.length
+      ?`✓ ${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'} — apenas na zona de reserva.`
+      :'✓ A autonomia indicada chega ao fim da viagem sem necessidade de parar.'
   }finally{
     $('tripCalculateBtn').disabled=false
   }

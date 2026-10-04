@@ -1,31 +1,33 @@
-# Bomba Certa v8.8 — Mais rápida + Mais económica + Partilha
+# Bomba Certa v8.9 — Paragens só na reserva
 
-## Percurso
-A opção predefinida é **⚡ Mais rápida**.
+## Regra principal
+A Viagem Inteligente deixa de sugerir abastecimentos antecipados.
 
-Foi acrescentada uma alternativa **💶 Mais económica**. Nesta opção a app pede rotas alternativas ao motor OSRM e compara:
-- distância;
-- duração;
-- estimativa de consumo;
-- relevo/subida acumulada quando a fonte de elevação responde.
+A lógica é:
+1. calcular quando a autonomia prevista entra na reserva;
+2. procurar um posto real nessa zona;
+3. escolher o melhor posto entre os que são alcançáveis durante a reserva;
+4. só criar nova paragem quando voltar a entrar na reserva.
 
-A rota económica é uma estimativa e não substitui dados reais de consumo do veículo. O consumo indicado pelo utilizador continua a ser a base.
+Se a autonomia chega ao destino com a reserva definida, a app apresenta **0 paragens**.
 
-## Paragens
-Mantém-se a regra da v8.7: só são criadas paragens quando a autonomia obriga a parar. A escolha de rota não cria abastecimentos desnecessários.
+## Entrada na reserva
+O campo deixou de ser tratado como uma margem de segurança abstrata e passa a significar literalmente:
+**“quando faltam aproximadamente X km de autonomia, o carro entra na reserva.”**
 
-## Partilhar
-Novo botão **↗ Partilhar percurso**.
+Exemplo:
+- autonomia atual: 250 km;
+- entrada na reserva: 40 km;
+- a app começa a procurar a paragem por volta dos 210 km percorridos.
 
-Em dispositivos compatíveis usa a partilha nativa do sistema. O conteúdo inclui:
-- origem/destino;
-- tipo de rota;
-- distância;
-- paragens necessárias;
-- posto, preço e litros recomendados;
-- link da rota no Google Maps.
+## Fallback de segurança
+Se não existir nenhum posto com preço real na zona de reserva, a app pode usar o último posto imediatamente antes da reserva e explica explicitamente que se trata de um fallback de segurança.
 
-Se a partilha nativa não estiver disponível, copia o plano e o link para a área de transferência.
-
-## Navegação
-O botão **▶ Iniciar rota** mantém origem, destino, paragens e regresso quando aplicável.
+## Resultado
+Cada paragem mostra:
+- autonomia prevista à chegada;
+- indicação de RESERVA;
+- litros recomendados;
+- preço real;
+- custo;
+- razão da paragem.
