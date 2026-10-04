@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.0 — interface premium</title>
+<title>Bomba Certa v8.1 — registo simples e responsivo</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -416,6 +416,90 @@ header{
   .community-activity-footer{bottom:72px;width:calc(100% - 16px)}
 }
 
+
+/* ===== v8.1 · Registo simples + responsive audit ===== */
+.auth{
+  width:min(1040px,100%);max-width:1040px;min-height:100dvh;margin:0 auto;
+  padding:clamp(24px,6vw,72px) clamp(18px,5vw,54px);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,430px);
+  grid-template-rows:auto auto 1fr;column-gap:clamp(36px,7vw,88px);
+  align-content:center;position:relative
+}
+.auth-logo{grid-column:1;grid-row:1;font-size:34px;color:var(--ink)}
+.auth-logo::after{content:"";display:inline-block;width:9px;height:9px;background:#2f7df6;border-radius:50%;margin-left:5px}
+.auth>h1{grid-column:1;grid-row:2;font-size:clamp(38px,5vw,64px);line-height:.98;letter-spacing:-.055em;margin:18px 0 0;max-width:560px}
+.auth>p{grid-column:1;grid-row:3;font-size:15px;line-height:1.6;max-width:520px;margin-top:16px}
+.auth>.form{grid-column:2;grid-row:1/4;align-self:center}
+.auth-card{background:rgba(255,255,255,.94);border:1px solid #e5eaf2;border-radius:24px;padding:20px;box-shadow:0 22px 60px rgba(18,33,59,.10);backdrop-filter:blur(16px)}
+.auth-card.form{gap:10px}
+.signup-card{max-height:min(780px,calc(100dvh - 32px));overflow:auto;overscroll-behavior:contain}
+.signup-head{display:flex;align-items:center;gap:11px;padding:2px 2px 10px}
+.signup-head b{display:block;font-size:20px;letter-spacing:-.025em}
+.signup-head .signup-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#edf4ff;font-size:22px;flex:0 0 auto}
+.signup-field{display:grid;gap:6px}
+.signup-field>span{font-size:11px;font-weight:900;color:#344054}
+.signup-field small{font-size:10px;color:#7d899b;line-height:1.4}
+.signup-field .input{min-height:50px;border-radius:14px;font-size:16px}
+.signup-field.valid .input{border-color:#77d6a5;box-shadow:0 0 0 3px rgba(18,183,106,.08)}
+.signup-field.invalid .input{border-color:#f4a7a2;box-shadow:0 0 0 3px rgba(217,45,32,.06)}
+.signup-field.valid small{color:#18794e}.signup-field.invalid small{color:#b42318;font-weight:700}
+.password-wrap{position:relative}.password-wrap .input{padding-right:78px}
+.password-toggle{position:absolute;right:6px;top:6px;height:38px;padding:0 11px;border:0;border-radius:10px;background:#eef4ff;color:#246bc3;font-weight:850;font-size:10px;cursor:pointer}
+.password-meter{height:5px;background:#eef1f5;border-radius:999px;overflow:hidden}
+.password-meter i{display:block;height:100%;width:0;border-radius:999px;background:#d92d20;transition:width .18s ease}
+.signup-trust{background:#f2fbf6;border:1px solid #d7f1e2;color:#25704a;border-radius:12px;padding:9px 10px;font-size:9.5px;font-weight:800;line-height:1.45}
+.signup-submit{min-height:52px;border-radius:15px;font-size:14px;background:linear-gradient(135deg,#2f7df6,#5b9cff);box-shadow:0 12px 24px rgba(47,125,246,.20)}
+.signup-submit:disabled{opacity:.65;cursor:wait}
+.signup-status{margin-top:0;min-height:0;border-radius:12px;font-size:11px;line-height:1.45}
+.signup-status:not(:empty){padding:10px 11px;background:#f8fafc;border:1px solid #e7ebf1}
+.signup-status.success{background:#ecfdf3;border-color:#abefc6;color:#166534}
+.signup-status.error{background:#fff4f3;border-color:#fecdca;color:#b42318}
+.signup-status.info{background:#eff8ff;border-color:#b2ddff;color:#175cd3}
+.signup-suggestion{justify-self:start;border:0;background:#edf4ff;color:#246bc3;padding:7px 10px;border-radius:10px;font-size:10px;font-weight:850;cursor:pointer}
+.signup-footnote{font-size:9px;color:#98a2b3;line-height:1.4;text-align:center;padding:0 6px}
+#loginPane.auth-card .btn{width:100%}#loginPane.auth-card .input{font-size:16px;min-height:50px}
+
+@media(max-width:1180px){
+  .app{max-width:100%;padding-left:18px;padding-right:18px}
+  .premium-layout{grid-template-columns:minmax(0,1fr) minmax(430px,.92fr)}
+  .fuel-price-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:960px){
+  .auth{grid-template-columns:minmax(0,1fr) minmax(340px,410px);column-gap:32px}
+  .auth>h1{font-size:44px}.premium-layout{grid-template-columns:1fr}
+  .fuel-price-grid{grid-template-columns:repeat(5,minmax(0,1fr))}#fuelMap{height:390px}
+}
+@media(max-width:760px){
+  .auth{display:block;min-height:100dvh;padding:24px 14px 32px;max-width:520px}
+  .auth-logo{font-size:26px}.auth>h1{font-size:34px;line-height:1.02;margin:14px 0 0}
+  .auth>p{font-size:12px;line-height:1.5;margin:9px 0 18px}
+  .auth-card{border-radius:20px;padding:15px;box-shadow:0 14px 40px rgba(18,33,59,.08)}
+  .signup-card{max-height:none;overflow:visible}.signup-head b{font-size:18px}
+  .signup-field .input,#loginPane.auth-card .input{min-height:52px}
+  .premium-search-row{grid-template-columns:1fr}.premium-primary{grid-column:auto}
+  .premium-layout{grid-template-columns:1fr}.fuel-price-grid{display:flex;overflow-x:auto;scroll-snap-type:x proximity}
+  .fuel-price-chip{min-width:96px;scroll-snap-align:start}#fuelMap{height:310px}
+  .premium-panel-head{align-items:flex-end}.premium-stations-panel,.premium-map-card{border-radius:18px}
+  .station-actions{display:grid;grid-template-columns:1fr 1fr}.station-actions button{width:100%}
+  .header-actions{gap:5px}#logoutBtn,#adminTopBtn{padding:8px 10px;font-size:10px;min-height:38px}
+}
+@media(max-width:480px){
+  .auth{padding:18px 10px 28px}.auth>h1{font-size:30px}.auth-card{padding:13px;border-radius:18px}
+  .signup-trust{font-size:9px}.app{padding-left:8px;padding-right:8px}.header-in{padding-left:9px;padding-right:9px}
+  .brand{font-size:18px}.top-profile-level{display:none}.top-profile-btn{padding:3px}.top-profile-avatar{width:34px;height:34px}
+  .premium-hero h1{font-size:29px}.premium-hero p{font-size:12px}.premium-search-shell{padding:9px;border-radius:17px}
+  .premium-map-card,.premium-stations-panel{padding:9px}#fuelMap{height:270px}.premium-panel-head h2{font-size:18px}
+  .station{padding:11px}.station h3{font-size:14px}.price{font-size:23px}
+  .station-actions{grid-template-columns:1fr 1fr}.station-actions button{font-size:9px;padding:7px 6px}
+  .premium-community-strip{padding:12px;border-radius:17px}.community-mini-kpis{gap:10px}
+  .bottom-nav{width:calc(100% - 10px);bottom:5px;padding:5px}.nav{font-size:8px;min-height:46px}
+  .community-activity-footer{width:calc(100% - 10px);bottom:66px}
+}
+@media(max-width:360px){
+  .station-actions{grid-template-columns:1fr}.premium-search-row{display:block}.premium-field{margin-bottom:8px}
+  .premium-primary{width:100%}.header-actions #adminTopBtn{display:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -425,7 +509,7 @@ header{
   <h1 id="authTitle">Combustível mais inteligente.</h1>
   <p id="authLead">Entre com o seu username e palavra-passe. Se preferir, também pode usar o email associado à conta.</p>
 
-  <div id="loginPane" class="form">
+  <div id="loginPane" class="form auth-card">
     <input id="username" class="input" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username ou email">
     <div style="position:relative">
       <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Palavra-passe" style="padding-right:54px">
@@ -437,37 +521,53 @@ header{
     <div class="tiny muted" style="margin-top:2px">Pode entrar com o username escolhido ou, em alternativa, com o email associado à conta.</div><div id="authStatus" class="status"></div>
   </div>
 
-  <div id="signupPane" class="form hidden">
-    <div class="signup-welcome">
-      <div class="signup-icon">🤝</div>
+  <div id="signupPane" class="form auth-card signup-card hidden">
+    <div class="signup-head">
+      <div class="signup-icon">👋</div>
       <div>
-        <b>Entre na comunidade Bomba Certa</b>
-        <div class="tiny muted">Ajude outros condutores, ganhe pontos, suba de nível e faça a comunidade crescer.</div>
+        <b>Criar conta</b>
+        <div class="tiny muted">Demora menos de um minuto. Entra automaticamente no fim.</div>
       </div>
     </div>
-    <input id="signupName" class="input" maxlength="28" autocomplete="nickname" placeholder="Nome público">
-    <input id="signupUsername" class="input" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Username">
-    <div class="tiny muted" style="margin-top:-4px">Escolha um username único para entrar na aplicação. Use 3–20 caracteres: letras, números, ponto, hífen ou underscore.</div>
-    <input id="signupEmail" class="input" type="email" autocomplete="email" placeholder="Email de recuperação">
-<div class="tiny muted" style="margin-top:-4px">Este email serve apenas para recuperar a conta. Não é usado para entrar.</div>
-    <div style="position:relative">
-      <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Palavra-passe (mín. 8 caracteres)" style="padding-right:54px">
-      <button id="toggleSignupPassword" type="button" class="btn secondary" style="position:absolute;right:4px;top:4px;min-height:38px;padding:7px 10px">👁</button>
-    </div>
+
+    <label class="signup-field">
+      <span>1. Como quer ser conhecido?</span>
+      <input id="signupName" class="input" maxlength="28" autocomplete="name" placeholder="Ex.: João Silva">
+      <small id="signupNameHint">Este é o nome público que a comunidade verá.</small>
+    </label>
+
+    <label class="signup-field">
+      <span>2. Escolha o seu username</span>
+      <input id="signupUsername" class="input" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex.: joao.silva">
+      <small id="signupUsernameHint">3–20 caracteres. Pode usar letras, números, ponto, hífen e _.</small>
+      <button id="signupSuggestionBtn" class="signup-suggestion hidden" type="button"></button>
+    </label>
+
+    <label class="signup-field">
+      <span>3. Email para recuperar a conta</span>
+      <input id="signupEmail" class="input" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="nome@email.pt">
+      <small id="signupEmailHint">Só é usado para recuperação. Pode continuar a entrar com o username.</small>
+    </label>
+
+    <label class="signup-field">
+      <span>4. Crie uma palavra-passe</span>
+      <div class="password-wrap">
+        <input id="signupPassword" class="input" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+        <button id="toggleSignupPassword" type="button" class="password-toggle" aria-label="Mostrar palavra-passe">Mostrar</button>
+      </div>
+      <div class="password-meter"><i id="signupPasswordMeter"></i></div>
+      <small id="signupPasswordHint">Use pelo menos 8 caracteres.</small>
+    </label>
+
     <input id="signupWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <label class="tiny"><input id="signupAgree" type="checkbox"> Aceito participar de forma responsável e contribuir com informação verdadeira.</label>
-    <button id="signupBtn" class="btn">Criar a minha conta</button>
-<div id="signupStatus" class="status" style="margin-top:10px;font-weight:700"></div>
-<div class="tiny muted" style="margin-top:-2px">Conta criada de imediato e entrada automática. Guarde bem o seu username.</div>
-    <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta</button>
-    <div class="signup-welcome" style="margin-top:4px">
-      <div class="signup-icon">🎯</div>
-      <div>
-        <b>Primeira missão</b>
-        <div class="tiny muted">O username é a sua identificação de acesso. O email fica separado e serve apenas para recuperação.</div>
-      </div>
-    </div>
-    
+    <input id="signupAgree" type="checkbox" checked hidden>
+
+    <div class="signup-trust">✓ Conta criada de imediato · ✓ Sem confirmação por email · ✓ Entrada automática</div>
+    <button id="signupBtn" class="btn signup-submit" type="button">Criar conta e entrar</button>
+    <div id="signupStatus" class="status signup-status" aria-live="polite"></div>
+    <button id="backLoginBtn" class="btn secondary" type="button">Já tenho conta — entrar</button>
+
+    <div class="signup-footnote">Ao criar a conta, compromete-se a contribuir de forma responsável e com informação verdadeira.</div>
   </div>
 </div>
 
@@ -1679,136 +1779,181 @@ $('loginBtn').onclick=async()=>{
 };
 
 const signupStartedAt=Date.now();
+let signupUsernameTouched=false;
 
+function setSignupFieldState(inputId,hintId,state,message){
+  const input=$(inputId),label=input?.closest('.signup-field');
+  if(label){label.classList.remove('valid','invalid');if(state)label.classList.add(state)}
+  if(message && $(hintId))$(hintId).textContent=message
+}
+function setSignupStatus(message,type=''){
+  const el=$('signupStatus');
+  el.className='status signup-status'+(type?' '+type:'');
+  el.innerHTML=message||''
+}
+function normalizeSignupUsername(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
+    .replace(/\s+/g,'.').replace(/[^a-z0-9_.-]/g,'').replace(/\.{2,}/g,'.')
+    .replace(/^[._-]+|[._-]+$/g,'').slice(0,20)
+}
+function suggestedUsernameFromName(){
+  const base=normalizeSignupUsername($('signupName').value);return base.length>=3?base:''
+}
+function validateSignupName(){
+  const v=$('signupName').value.trim(),ok=v.length>=2;
+  setSignupFieldState('signupName','signupNameHint',v?(ok?'valid':'invalid'):'',
+    v?(ok?'✓ Nome público válido.':'Escreva pelo menos 2 caracteres.'):'Este é o nome público que a comunidade verá.');
+  return ok
+}
+function validateSignupUsername(){
+  const el=$('signupUsername'),normalized=normalizeSignupUsername(el.value);
+  if(el.value!==normalized)el.value=normalized;
+  const ok=/^[a-z0-9_.-]{3,20}$/.test(normalized);
+  setSignupFieldState('signupUsername','signupUsernameHint',normalized?(ok?'valid':'invalid'):'',
+    normalized?(ok?'✓ Username com formato válido.':'Use 3–20 caracteres: letras, números, ponto, hífen ou _.'):'3–20 caracteres. Pode usar letras, números, ponto, hífen e _.');
+  return ok
+}
+function validateSignupEmail(){
+  const el=$('signupEmail');el.value=el.value.trim().toLowerCase();const v=el.value;
+  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  setSignupFieldState('signupEmail','signupEmailHint',v?(ok?'valid':'invalid'):'',
+    v?(ok?'✓ Email de recuperação válido.':'Verifique o email introduzido.'):'Só é usado para recuperação. Pode continuar a entrar com o username.');
+  return ok
+}
+function validateSignupPassword(){
+  const v=$('signupPassword').value,meter=$('signupPasswordMeter'),len=v.length;
+  const pct=len?Math.min(100,Math.max(18,len/12*100)):0;
+  if(meter){meter.style.width=pct+'%';meter.style.background=len>=10?'#12b76a':len>=8?'#f79009':'#d92d20'}
+  setSignupFieldState('signupPassword','signupPasswordHint',v?(len>=8?'valid':'invalid'):'',
+    len>=8?'✓ Palavra-passe válida.':'Use pelo menos 8 caracteres.');
+  return len>=8
+}
+function validateSignupForm(){
+  const a=validateSignupName(),b=validateSignupUsername(),c=validateSignupEmail(),d=validateSignupPassword();
+  return a&&b&&c&&d
+}
 function showLoginPane(){
-  $('signupPane').classList.add('hidden');
-  $('loginPane').classList.remove('hidden');
+  $('signupPane').classList.add('hidden');$('loginPane').classList.remove('hidden');
   $('authTitle').textContent='Combustível mais inteligente.';
-  $('authLead').textContent='Entre com o seu username e palavra-passe. Se preferir, também pode usar o email associado à conta.'
+  $('authLead').textContent='Entre com o seu username e palavra-passe. Também pode usar o email associado à conta.'
 }
 function showSignupPane(){
-  $('loginPane').classList.add('hidden');
-  $('signupPane').classList.remove('hidden');
-  $('authTitle').textContent='Junte-se à comunidade.';
-  $('authLead').textContent='Escolha o seu username, crie a palavra-passe e entre logo na Bomba Certa.';
-  $('signupUsername').value=$('username').value.trim();
-  $('signupName').focus()
+  $('loginPane').classList.add('hidden');$('signupPane').classList.remove('hidden');
+  $('authTitle').textContent='Criar conta é simples.';
+  $('authLead').textContent='Quatro dados, sem confirmação por email. No fim entra automaticamente.';
+  const fromLogin=normalizeSignupUsername($('username').value);
+  if(fromLogin && !fromLogin.includes('@')){$('signupUsername').value=fromLogin;signupUsernameTouched=true}
+  setSignupStatus('');setTimeout(()=>$('signupName').focus(),40)
 }
 $('openSignupBtn').onclick=showSignupPane;
 $('backLoginBtn').onclick=showLoginPane;
 $('toggleSignupPassword').onclick=()=>{
-  const p=$('signupPassword');
-  p.type=p.type==='password'?'text':'password';
-  $('toggleSignupPassword').textContent=p.type==='password'?'👁':'🙈'
+  const p=$('signupPassword');p.type=p.type==='password'?'text':'password';
+  $('toggleSignupPassword').textContent=p.type==='password'?'Mostrar':'Ocultar'
 };
 
-function showAccountCreatedToast(){
-  const old=document.getElementById('accountCreatedToast');
-  if(old)old.remove();
-  const el=document.createElement('div');
-  el.id='accountCreatedToast';
-  el.className='account-created-toast';
-  el.innerHTML='🎉 Conta criada com sucesso. Parabéns!<small>Bem-vindo à Bomba Certa.</small>';
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),3800)
+$('signupName').addEventListener('input',()=>{
+  validateSignupName();
+  if(!signupUsernameTouched){
+    const suggestion=suggestedUsernameFromName();
+    if(suggestion){$('signupUsername').value=suggestion;validateSignupUsername()}
+  }
+});
+$('signupUsername').addEventListener('input',()=>{
+  signupUsernameTouched=true;validateSignupUsername();$('signupSuggestionBtn').classList.add('hidden');setSignupStatus('')
+});
+$('signupEmail').addEventListener('input',()=>{validateSignupEmail();setSignupStatus('')});
+$('signupPassword').addEventListener('input',()=>{validateSignupPassword();setSignupStatus('')});
+
+$('signupSuggestionBtn').onclick=()=>{
+  const btn=$('signupSuggestionBtn'),suggestion=btn.dataset.username||'';
+  if(suggestion){
+    $('signupUsername').value=suggestion;signupUsernameTouched=true;validateSignupUsername();
+    btn.classList.add('hidden');setSignupStatus('Username alternativo aplicado. Pode continuar o registo.','info')
+  }
+};
+function offerUsernameSuggestion(base){
+  const clean=normalizeSignupUsername(base)||'condutor',suffix=String(Math.floor(10+Math.random()*90));
+  const candidate=(clean.slice(0,Math.max(3,20-suffix.length))+suffix).slice(0,20);
+  const btn=$('signupSuggestionBtn');btn.dataset.username=candidate;btn.textContent=`Usar ${candidate}`;btn.classList.remove('hidden')
 }
-
+async function loginWithNewAccount(username,password){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
+      method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+      body:JSON.stringify({login:username,password})
+    });
+    let p={};try{p=await r.json()}catch{}
+    if(!r.ok||!p?.access_token||!p?.refresh_token)return false;
+    const {data,error}=await supabase.auth.setSession({access_token:p.access_token,refresh_token:p.refresh_token});
+    if(error||!data?.session)return false;
+    localStorage.setItem('bombaCerta:newUser','1');await safeEnsureFuelProfile();await enterApp();
+    showAccountCreatedToast();setTimeout(()=>showWelcomeMission(),350);return true
+  }catch{return false}
+}
+function showAccountCreatedToast(){
+  document.getElementById('accountCreatedToast')?.remove();
+  const el=document.createElement('div');el.id='accountCreatedToast';el.className='account-created-toast';
+  el.innerHTML='🎉 Conta criada com sucesso<small>Bem-vindo à Bomba Certa.</small>';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3800)
+}
 $('signupBtn').onclick=async()=>{
-  const name=$('signupName').value.trim();
-  const usernameField=$('signupUsername');
-  if(!usernameField){
-    $('signupStatus').textContent='Erro do formulário: campo Username indisponível. Atualize a página.';
-    return
-  }
-  const username=usernameField.value.trim();
-  const usernameNorm=username.toLowerCase();
-  const email=$('signupEmail').value.trim().toLowerCase();
-  const password=$('signupPassword').value;
-  const website=$('signupWebsite').value;
-
+  const name=$('signupName').value.trim(),username=normalizeSignupUsername($('signupUsername').value);
+  $('signupUsername').value=username;
+  const email=$('signupEmail').value.trim().toLowerCase(),password=$('signupPassword').value,website=$('signupWebsite').value;
   if(website)return;
-  if(name.length<2){$('signupStatus').textContent='Escolha um nome público com pelo menos 2 caracteres.';return}
-  if(usernameNorm.length<3||usernameNorm.length>20||!/^[a-z0-9_.-]+$/.test(usernameNorm)){
-    $('signupStatus').textContent='O username deve ter 3–20 caracteres e usar apenas letras, números, ponto, hífen ou underscore.';
-    return
+  if(!validateSignupForm()){
+    setSignupStatus('Revise os campos assinalados acima.','error');
+    document.querySelector('#signupPane .signup-field.invalid .input')?.focus();return
   }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('signupStatus').textContent='Introduza um email de recuperação válido.';return}
-  if(password.length<8){$('signupStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
-  if(!$('signupAgree').checked){$('signupStatus').textContent='Confirme a participação responsável na comunidade.';return}
 
-  const btn=$('signupBtn'),old=btn.textContent;
-  btn.disabled=true;
-  btn.textContent='A criar conta…';
-  $('signupStatus').innerHTML='⏳ A criar a sua conta…';
+  const btn=$('signupBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='A criar conta…';
+  setSignupStatus('⏳ A criar a conta. Não feche esta janela…','info');
 
   try{
-    const response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SUPABASE_KEY
-      },
-      body:JSON.stringify({name,username,email,password,website})
-    });
+    let response;
+    try{
+      response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
+        method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+        body:JSON.stringify({name,username,email,password,website})
+      })
+    }catch{
+      if(await loginWithNewAccount(username,password))return;
+      throw new Error('A ligação foi interrompida. Verifique a internet e tente novamente.')
+    }
 
-    let payload={};
-    try{payload=await response.json()}catch{}
-
-    if(!response.ok || payload?.error){
+    let payload={};try{payload=await response.json()}catch{}
+    if(!response.ok||payload?.error){
       const code=String(payload?.error||'').toLowerCase();
-
-      if(code.includes('username_exists'))throw new Error('Este username já está a ser utilizado. Escolha outro.')
-      if(code.includes('email_exists'))throw new Error('Este email de recuperação já está associado a uma conta existente. Use outro email ou recupere a conta existente.')
-      if(code.includes('invalid_username'))throw new Error('Username inválido. Use 3–20 caracteres: letras, números, ponto, hífen ou underscore.')
-      if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos e tente novamente.')
-      if(code.includes('weak_password'))throw new Error('A palavra-passe deve ter pelo menos 8 caracteres.')
-      if(code.includes('invalid_email'))throw new Error('Introduza um email de recuperação válido.')
-                  if(code.includes('invalid_name'))throw new Error('Escolha um nome público com pelo menos 2 caracteres.')
-
+      if(code.includes('username_exists')){
+        if(await loginWithNewAccount(username,password))return;
+        offerUsernameSuggestion(username);
+        setSignupFieldState('signupUsername','signupUsernameHint','invalid','Este username já está ocupado. Escolha outro ou use a sugestão.');
+        $('signupUsername').focus();
+        throw new Error('Esse username já existe. Pode usar a sugestão apresentada abaixo.')
+      }
+      if(code.includes('email_exists')){
+        setSignupFieldState('signupEmail','signupEmailHint','invalid','Este email já está associado a outra conta.');
+        $('signupEmail').focus();
+        throw new Error('Este email já pertence a uma conta. Se for a sua, volte atrás e use “Recuperar acesso”.')
+      }
+      if(code.includes('invalid_username')){setSignupFieldState('signupUsername','signupUsernameHint','invalid','Username inválido.');throw new Error('Revise o username e tente novamente.')}
+      if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos antes de tentar novamente.')
+      if(code.includes('weak_password')){setSignupFieldState('signupPassword','signupPasswordHint','invalid','Use pelo menos 8 caracteres.');throw new Error('Escolha uma palavra-passe com pelo menos 8 caracteres.')}
+      if(code.includes('invalid_email')){setSignupFieldState('signupEmail','signupEmailHint','invalid','Verifique o email.');throw new Error('Introduza um email de recuperação válido.')}
+      if(code.includes('invalid_name')){setSignupFieldState('signupName','signupNameHint','invalid','Escreva pelo menos 2 caracteres.');throw new Error('Escolha um nome público com pelo menos 2 caracteres.')}
       throw new Error(payload?.error==='registration_failed'?'Não foi possível concluir o registo. Tente novamente.':(payload?.error||`Não foi possível criar a conta (${response.status}).`))
     }
 
-    $('signupStatus').innerHTML='<b>✅ Conta criada com sucesso. Parabéns!</b><br>A entrar automaticamente na sua conta…';
+    setSignupStatus('<b>✅ Conta criada.</b> A entrar automaticamente…','success');
+    if(await loginWithNewAccount(username,password))return;
 
-    const loginResponse=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SUPABASE_KEY
-      },
-      body:JSON.stringify({login:username,password})
-    });
-
-    let loginPayload={};
-    try{loginPayload=await loginResponse.json()}catch{}
-
-    if(loginResponse.ok && loginPayload?.access_token && loginPayload?.refresh_token){
-      const {data:sessionData,error:sessionError}=await supabase.auth.setSession({
-        access_token:loginPayload.access_token,
-        refresh_token:loginPayload.refresh_token
-      });
-
-      if(!sessionError && sessionData?.session){
-        localStorage.setItem('bombaCerta:newUser','1');
-        await await safeEnsureFuelProfile();
-        $('signupStatus').textContent='✓ Conta criada com sucesso. Parabéns!';
-        await enterApp();
-        showAccountCreatedToast();
-        setTimeout(()=>showWelcomeMission(),350);
-        return
-      }
-    }
-
-    // A conta já foi criada. Se o login automático falhar, não apresentar o registo como falhado.
-    $('username').value=username;
-    $('password').value='';
-    showLoginPane();
-    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso. Parabéns!</b> Introduza a palavra-passe escolhida para entrar.';
+    $('username').value=username;$('password').value='';showLoginPane();
+    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> Introduza a palavra-passe escolhida para entrar.'
   }catch(e){
-    $('signupStatus').textContent=errPT(e)
+    setSignupStatus(errPT(e),'error')
   }finally{
-    btn.disabled=false;
-    btn.textContent=old
+    btn.disabled=false;btn.textContent=old
   }
 };
 
