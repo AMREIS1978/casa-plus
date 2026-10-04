@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.0 — Paragens Otimizadas</title>
+<title>Bomba Certa v9.1 — Mapa sempre ajustado</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -794,6 +794,67 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
   background:#fff7ed;color:#9a5b08;border:1px solid #f5d7aa
 }
 .trip-stop-plan div:nth-child(2) strong{font-size:13px}
+
+
+/* ===== v9.1 · Mapa sempre ajustado durante o scroll ===== */
+@media (min-width:1001px){
+  .premium-layout{
+    align-items:start;
+  }
+  .premium-map-card{
+    position:sticky;
+    top:88px;
+    align-self:start;
+    max-height:calc(100vh - 108px);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .premium-map-card .premium-panel-head{
+    flex:0 0 auto;
+  }
+  .premium-map-card #fuelMap{
+    flex:1 1 auto;
+    height:calc(100vh - 190px);
+    min-height:520px;
+    max-height:760px;
+  }
+  .premium-map-card #routeBox:not(.hidden){
+    flex:0 0 auto;
+    max-height:150px;
+    overflow:auto;
+  }
+}
+/* Em ecrãs baixos, o mapa reduz-se em vez de deixar uma grande zona vazia. */
+@media (min-width:1001px) and (max-height:760px){
+  .premium-map-card{
+    top:76px;
+    max-height:calc(100vh - 92px);
+  }
+  .premium-map-card #fuelMap{
+    height:calc(100vh - 170px);
+    min-height:380px;
+  }
+}
+/* Tablet e telemóvel: volta ao fluxo normal, sem sticky. */
+@media (max-width:1000px){
+  .premium-map-card{
+    position:relative;
+    top:auto;
+    max-height:none;
+    overflow:visible;
+  }
+  .premium-map-card #fuelMap{
+    height:420px;
+    min-height:0;
+    max-height:none;
+  }
+}
+@media (max-width:720px){
+  .premium-map-card #fuelMap{
+    height:330px;
+  }
+}
 
 </style>
 </head>
@@ -3379,10 +3440,23 @@ async function useFastLocation(){
   }
 }
 
+
+let fuelMapResizeObserver=null;
+function bindFuelMapResize(){
+  const el=document.getElementById('fuelMap');
+  if(!el || typeof ResizeObserver==='undefined')return;
+  if(fuelMapResizeObserver)fuelMapResizeObserver.disconnect();
+  fuelMapResizeObserver=new ResizeObserver(()=>{
+    if(map)requestAnimationFrame(()=>map.invalidateSize({pan:false}))
+  });
+  fuelMapResizeObserver.observe(el)
+}
+
 function ensureMap(){
   if(map)return;
   map=L.map('fuelMap').setView([39.5,-8],6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap',updateWhenIdle:true,keepBuffer:2}).addTo(map)
+  bindFuelMapResize();
 }
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
