@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.8 — preço comunitário persistente</title>
+<title>Bomba Certa v7.9 — interface de preço simplificada</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2063,13 +2063,12 @@ function renderBasicStations(){
         <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
         <div class="basic-note">${s.priceSource==='community'?'Preço comunitário mais recente · a completar validações':'A completar preços e validações em segundo plano'}</div>
         <div class="station-actions">
-          <button class="go" onclick="openGps('${s.key}')">🧭 GPS</button>
-          <button onclick="startRoute('${s.key}')">🗺️ Ver rota</button>
+          <button class="go" onclick="startRoute('${s.key}')">🗺️ Ver rota</button>
           <button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button>
           <button onclick="openFill('${s.key}')">⛽ Abastecimento</button>
         </div>
       </div>
-      <div class="price">${price?price+' €':'—'}<small>${price?'por litro':'a atualizar'}</small></div>
+      <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'a atualizar'}</small></div>
     </div>`
   }).join(''):'<div class="empty">Ainda não encontrei postos nesta zona.</div>';
 
@@ -2084,7 +2083,7 @@ function renderBasicStations(){
     for(const s of rows){
       const p=s.displayPrice??s.officialPrice;
       const src=s.priceSource==='community'?' · Comunidade':(s.officialPrice!=null?' · DGEG':'');
-      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L'+src:'Preço a atualizar'}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L · '+esc($('fuelType').value)+src:'Preço a atualizar'}<br><button onclick="startRoute('${s.key}')">Ver rota</button>`);
       stationMarkers.push(m)
     }
     if(rows.length){
@@ -2129,7 +2128,7 @@ async function renderStations(){
       ? `<div class="validation-line">${c.confirmed?`<span class="validation-ok">✓ ${c.confirmed} confirmação${c.confirmed===1?'':'ões'}</span>`:''}${c.rejected?`<span class="validation-bad">✕ ${c.rejected} rejeição${c.rejected===1?'':'ões'}</span>`:''}${!c.confirmed&&!c.rejected?'<span class="validation-pending">A aguardar validação</span>':''}${c.rejected>c.confirmed?'<span class="validation-bad">Preço contestado</span>':''}</div>`
       : '';
     const canValidate=c&&c.authorUserId!==currentAuthUserId;
-    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="openGps('${s.key}')">🧭 GPS</button><button onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?'por litro':'sem preço'}</small></div></div>`
+    return `<div class="station"><div><div class="station-top"><h3>${i===0&&price?'🏆 ':''}${esc(s.name)}</h3>${source}</div><div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}<div class="station-actions"><button class="go" onclick="startRoute('${s.key}')">🗺️ Ver rota</button><button class="photo" onclick="openPrice('${s.key}')">📷 Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Reportar encerrado</button></div></div><div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'sem preço'}</small></div></div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
 
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
@@ -2137,7 +2136,7 @@ async function renderStations(){
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
   for(const s of nearbyStations){
     const upd=s.lastUpdated?`<br><span style="font-size:11px;color:#667085">${s.priceSource==='community'?'Atualizado pela comunidade':'Atualização DGEG'} · ${relativeTime(s.lastUpdated)}</span>`:'';
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L':'Sem preço'}${upd}<br><button onclick="openGps('${s.key}')">Abrir GPS</button>`);
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L · '+esc($('fuelType').value):'Sem preço'}${upd}<br><button onclick="startRoute('${s.key}')">Ver rota</button>`);
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
@@ -2359,8 +2358,8 @@ window.startRoute=async key=>{
     const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${currentLon},${currentLat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`),j=await r.json(),route=j.routes?.[0];if(!route)throw 0;
     if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.78}).addTo(map);map.fitBounds(routeLayer.getBounds().pad(.12));
     const google=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=driving`;
-    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><button class="btn" onclick="openGps('${s.key}')">🧭 Abrir GPS do telemóvel</button><a class="btn secondary" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">Google Maps</a></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
-  }catch{$('routeBox').innerHTML=`<b>Não foi possível desenhar a rota aqui.</b><div class="status">Pode continuar diretamente na app de navegação.</div><button class="btn" onclick="openGps('${s.key}')">🧭 Abrir GPS</button>`}
+    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><a class="btn secondary" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">Abrir no Google Maps</a></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
+  }catch{$('routeBox').innerHTML=`<b>Não foi possível desenhar a rota aqui.</b><div class="status">Tente novamente ou abra o percurso no Google Maps.</div>`}
 };
 
 $('addStationBtn').onclick=()=>{$('stationModal').classList.add('open');$('stationStatus').textContent=''};
