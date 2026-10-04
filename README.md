@@ -1,65 +1,19 @@
-# Bomba Certa v8.6 — Viagem Inteligente
+# Bomba Certa v8.7 — Viagem Inteligente Essencial
 
-## Acesso
-Funcionalidade exclusiva para **Explorador ou superior**.
+A Viagem Inteligente foi simplificada para fazer apenas o que interessa:
 
-O acesso não é apenas visual: foi criada no Supabase a função:
-`public.can_use_trip_planner()`
+- zero paragens se a autonomia atual chegar ao fim da viagem com reserva;
+- quando é necessário parar, procura o posto mais avançado possível dentro da autonomia segura;
+- o preço só decide entre postos nessa zona necessária;
+- um posto barato demasiado cedo já não cria uma paragem extra;
+- abastece apenas o necessário para concluir a próxima etapa ou maximizar a etapa seguinte;
+- cada paragem explica porque é necessária.
 
-Características:
-- `SECURITY INVOKER`;
-- usa o perfil do próprio utilizador;
-- `anon` sem permissão;
-- `authenticated` com execução;
-- desbloqueia a partir de 50 pontos ou Editor de confiança.
+## Iniciar rota
+Novo botão principal **▶ Iniciar rota**.
+Abre o Google Maps com origem, destino, paragens recomendadas e regresso à origem quando a viagem é ida e volta.
 
-## Planeamento
-O utilizador indica:
-- origem;
-- destino;
-- ida e volta / só ida;
-- combustível;
-- autonomia atual;
-- consumo médio;
-- capacidade do depósito;
-- reserva de segurança;
-- estratégia: Equilibrado / Mais barato / Menos paragens.
+Cada paragem permite também **Abrir este posto na navegação**.
 
-## Dados
-A rota usa OSRM.
-A geocodificação usa OpenStreetMap/Nominatim.
-Os preços usados no cálculo são reais:
-- DGEG;
-- Comunidade recente quando existe e pode ser associada ao posto.
-
-Postos sem preço real para o combustível selecionado não entram no cálculo económico.
-
-## Algoritmo
-1. Calcula a rota rodoviária.
-2. Pesquisa postos DGEG até 8 km do corredor da rota.
-3. Associa a posição de cada posto ao percurso.
-4. Refina o desvio rodoviário de postos relevantes com OSRM.
-5. Respeita autonomia e reserva mínima.
-6. Seleciona paragens de acordo com a estratégia.
-7. Quando existe um posto mais barato alcançável, recomenda apenas o combustível necessário para lá chegar com reserva; caso contrário, abastece o necessário para avançar com segurança.
-
-## Economia
-A economia não é comparada com um valor inventado.
-
-Referência:
-**os mesmos litros recomendados × preço mediano dos postos reais encontrados junto à rota**.
-
-Depois é descontado o custo estimado dos desvios.
-
-Mostra:
-- preço mediano encontrado;
-- custo dos abastecimentos recomendados;
-- custo dos desvios;
-- economia líquida estimada.
-
-## Responsive
-A nova área adapta-se a:
-- desktop;
-- portátil/tablet;
-- telemóvel;
-- ecrãs muito pequenos.
+## UX
+A área recebeu um visual mais forte e simples, CTA “Criar plano de viagem”, resumo mais claro e botões de navegação mais visíveis.

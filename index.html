@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.6 — Viagem Inteligente</title>
+<title>Bomba Certa v8.7 — Viagem Inteligente Essencial</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -719,6 +719,32 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
   .trip-summary-card{padding:14px}
 }
 
+
+/* ===== v8.7 · Viagem Essencial ===== */
+.trip-hero{
+  background:radial-gradient(circle at 88% 10%,rgba(66,136,255,.14),transparent 26%),linear-gradient(135deg,#fff,#f6f9ff);
+  border:1px solid #e4eaf3;border-radius:24px;padding:22px;margin:4px 0 14px
+}
+.trip-hero h1{font-size:38px}
+.trip-form-card{border-radius:24px;padding:20px}
+.trip-calc-btn{font-size:14px;font-weight:950;padding:12px 22px;box-shadow:0 12px 26px rgba(47,125,246,.22)}
+.trip-summary-actions{display:flex;gap:8px;margin-top:13px}
+.trip-start-route-btn{
+  background:linear-gradient(135deg,#25a463,#35c978);color:#fff;border:0;min-height:44px;
+  border-radius:13px;box-shadow:0 10px 22px rgba(37,164,99,.18)
+}
+.trip-summary-actions .secondary{min-height:44px;border-radius:13px}
+.trip-stop{position:relative;overflow:hidden}
+.trip-stop::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#2f7df6}
+.trip-stop-reason{margin-top:8px;padding:7px 8px;border-radius:9px;background:#eef8f2;color:#28744b;font-size:8.5px;font-weight:900}
+.trip-stop-nav{margin-top:8px;width:100%;min-height:36px;border:1px solid #dbe6f5;border-radius:10px;background:#fff;color:#246bc3;font-size:9px;font-weight:900;cursor:pointer}
+.trip-method-note::before{content:"✓ ";color:#21a366;font-weight:950}
+@media(max-width:720px){
+  .trip-hero{padding:16px;border-radius:19px}.trip-hero h1{font-size:30px}
+  .trip-summary-actions{display:grid;grid-template-columns:1fr 1fr}
+  .trip-summary-actions .btn{width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -1024,7 +1050,7 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
       <div>
         <div class="eyebrow">EXCLUSIVO · EXPLORADOR+</div>
         <h1>Viagem Inteligente</h1>
-        <p>Planeie a ida e o regresso. A Bomba Certa cruza autonomia, consumo, percurso e preços reais para sugerir onde compensa abastecer.</p>
+        <p>Diga onde quer ir e qual a autonomia que ainda tem. A Bomba Certa calcula apenas as paragens realmente necessárias e escolhe, entre elas, os postos que fazem mais sentido para poupar.</p>
       </div>
       <span id="tripAccessBadge" class="trip-access-badge">A verificar acesso…</span>
     </div>
@@ -1107,15 +1133,15 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
             <span>Estratégia</span>
             <select id="tripStrategy" class="input">
               <option value="balanced" selected>Equilibrado</option>
-              <option value="cheapest">Mais barato</option>
-              <option value="fewer">Menos paragens</option>
+              <option value="cheapest">Mais barato nas paragens necessárias</option>
+              <option value="fewer">Menor desvio</option>
             </select>
           </label>
         </div>
 
         <div class="trip-form-foot">
-          <div class="trip-method-note">Apenas usamos postos com preço real publicado. Um posto sem preço não entra no cálculo económico.</div>
-          <button id="tripCalculateBtn" class="btn trip-calc-btn" type="button">Calcular viagem</button>
+          <div class="trip-method-note">Primeiro garantimos que chega em segurança. Só depois escolhemos, dentro das paragens necessárias, o posto mais vantajoso.</div>
+          <button id="tripCalculateBtn" class="btn trip-calc-btn" type="button">✨ Criar plano de viagem</button>
         </div>
         <div id="tripStatus" class="status trip-status" aria-live="polite"></div>
       </div>
@@ -1149,7 +1175,11 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
             <div class="net"><span>Economia líquida estimada</span><strong id="tripNetSaving">—</strong></div>
           </div>
 
-          <button id="tripExplainBtn" class="trip-explain-btn" type="button">Como é calculada esta economia?</button>
+          <div class="trip-summary-actions">
+            <button id="tripStartRouteBtn" class="btn trip-start-route-btn" type="button">▶ Iniciar rota</button>
+            <button id="tripRecalculateBtn" class="btn secondary" type="button">↻ Recalcular</button>
+          </div>
+          <button id="tripExplainBtn" class="trip-explain-btn" type="button">Como é calculado o plano?</button>
           <div id="tripExplainBox" class="trip-explain-box hidden">
             Comparamos <b>os mesmos litros que o plano recomenda comprar</b> ao preço mediano dos postos reais encontrados junto à rota.
             Depois retiramos o combustível estimado gasto nos desvios aos postos. Não comparamos com um preço inventado nem com o posto mais caro.
@@ -1831,57 +1861,77 @@ async function tripRefineDetours(stations){
   return stations
 }
 
-function tripChooseStop(options,strategy,consumption,tankLiters,currentPos,safeMax){
-  if(!options.length)return null;
-  const prices=options.map(x=>x.price),minP=Math.min(...prices),maxP=Math.max(...prices);
-  const spanP=Math.max(.001,maxP-minP),spanD=Math.max(1,safeMax-currentPos);
-  const scored=options.map(s=>{
-    const priceN=(s.price-minP)/spanP;
-    const detourN=Math.min(1,(s.detourKm||0)/12);
-    const progressN=Math.max(0,Math.min(1,(s.routeKm-currentPos)/spanD));
-    let score;
-    if(strategy==='cheapest')score=priceN*.78+detourN*.17-progressN*.05;
-    else if(strategy==='fewer')score=-progressN*.75+priceN*.15+detourN*.10;
-    else score=priceN*.46+detourN*.24-progressN*.30;
-    return {s,score}
-  }).sort((a,b)=>a.score-b.score);
-  return scored[0]?.s||null
-}
 
-function tripNextCheaper(stations,from,fullRange,price,reserve,totalKm){
-  return stations.find(s=>s.routeKm>from+5 && s.routeKm<=Math.min(totalKm,from+fullRange-reserve) && s.price<price-.005)
+function tripChooseNecessaryStop(options,strategy,currentPos,targetKm){
+  if(!options.length)return null;
+
+  const windowStart=Math.max(currentPos+5,targetKm-45);
+  let pool=options.filter(s=>s.routeKm>=windowStart);
+  if(!pool.length)pool=options;
+
+  const maxProgress=Math.max(...pool.map(s=>s.routeKm));
+  const minPrice=Math.min(...pool.map(s=>s.price));
+  const maxPrice=Math.max(...pool.map(s=>s.price));
+  const priceSpan=Math.max(.001,maxPrice-minPrice);
+
+  return pool.map(s=>{
+    const progressPenalty=Math.max(0,(maxProgress-s.routeKm)/Math.max(1,targetKm-currentPos));
+    const pricePenalty=(s.price-minPrice)/priceSpan;
+    const detourPenalty=Math.min(1,(s.detourKm||0)/12);
+    let score;
+    if(strategy==='cheapest') score=pricePenalty*.62+detourPenalty*.20+progressPenalty*.18;
+    else if(strategy==='fewer') score=detourPenalty*.55+progressPenalty*.35+pricePenalty*.10;
+    else score=progressPenalty*.44+pricePenalty*.34+detourPenalty*.22;
+    return {s,score}
+  }).sort((a,b)=>a.score-b.score)[0]?.s||null
 }
 
 function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy){
   const fullRange=tank/consumption*100;
-  if(!Number.isFinite(fullRange)||fullRange<=reserve+20)throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia segura.');
+  if(!Number.isFinite(fullRange)||fullRange<=reserve+20){
+    throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia segura.')
+  }
 
   const sorted=[...candidates].sort((a,b)=>a.routeKm-b.routeKm);
-  let pos=0,range=Math.min(Math.max(0,autonomy),Math.max(autonomy,fullRange));
   const stops=[];
+  let pos=0;
+  let range=Math.max(0,autonomy);
   let guard=0;
 
-  while(pos+range<totalKm+reserve && guard++<20){
-    const safeMax=Math.min(totalKm,pos+range-reserve);
-    let opts=sorted.filter(s=>s.routeKm>pos+8 && s.routeKm<=safeMax);
-    if(!opts.length){
-      // tolerância de segurança: procurar até ao limite físico, mas marcar risco se necessário.
-      opts=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=Math.min(totalKm,pos+range-8))
-    }
-    if(!opts.length)throw new Error(`Não encontrei um posto com preço real dentro da autonomia segura disponível (${Math.round(range)} km).`);
+  // Se a autonomia atual já cobre toda a viagem + reserva, zero paragens.
+  if(range>=totalKm+reserve)return {stops,fullRange};
 
-    const stop=tripChooseStop(opts,strategy,consumption,tank,pos,safeMax);
-    const roadSince=stop.routeKm-pos;
-    const toStation=(stop.detourKm||0)/2;
-    const arrivalRange=Math.max(0,range-roadSince-toStation);
+  while(pos+range<totalKm+reserve && guard++<20){
+    const safeReach=Math.min(totalKm,pos+range-reserve);
+    if(safeReach<=pos+3){
+      throw new Error('A autonomia atual é demasiado baixa para chegar em segurança ao próximo posto com preço real.')
+    }
+
+    const reachable=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=safeReach);
+    if(!reachable.length){
+      throw new Error(`Não encontrei um posto com preço real dentro da autonomia segura disponível (${Math.round(range)} km).`)
+    }
+
+    // A prioridade é avançar o máximo possível. O preço decide apenas dentro desta zona.
+    const targetKm=Math.max(...reachable.map(s=>s.routeKm));
+    const stop=tripChooseNecessaryStop(reachable,strategy,pos,targetKm);
+    if(!stop)throw new Error('Não foi possível selecionar uma paragem segura.');
+
+    const routeTravel=stop.routeKm-pos;
+    const detourOut=(stop.detourKm||0)/2;
+    const arrivalRange=Math.max(0,range-routeTravel-detourOut);
     const currentLiters=arrivalRange*consumption/100;
 
-    const cheaper=tripNextCheaper(sorted,stop.routeKm,fullRange,stop.price,reserve,totalKm);
-    const distanceTarget=cheaper ? (cheaper.routeKm-stop.routeKm)+(cheaper.detourKm||0)/2+reserve
-                                  : Math.min(fullRange,(totalKm-stop.routeKm)+reserve);
-    const targetLiters=Math.min(tank,Math.max(0,distanceTarget*consumption/100));
+    const remaining=Math.max(0,totalKm-stop.routeKm);
+    const requiredRange=Math.min(fullRange,remaining+reserve);
+    const targetLiters=Math.min(tank,requiredRange*consumption/100);
+
     let buyLiters=Math.max(0,targetLiters-currentLiters);
-    if(buyLiters<3)buyLiters=Math.min(tank-currentLiters,Math.max(3,buyLiters));
+    if(remaining+reserve>fullRange){
+      // Ainda haverá outra paragem obrigatória: maximizar a próxima etapa.
+      buyLiters=Math.max(0,tank-currentLiters)
+    }
+    if(buyLiters>0 && buyLiters<3)buyLiters=Math.min(tank-currentLiters,3);
 
     const purchaseCost=buyLiters*stop.price;
     const detourCost=(stop.detourKm||0)*consumption/100*stop.price;
@@ -1889,7 +1939,18 @@ function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,stra
     const afterFillRange=afterFillLiters/consumption*100;
     const returnToRoute=(stop.detourKm||0)/2;
 
-    stops.push({...stop,arrivalRange,buyLiters,purchaseCost,detourCost,afterFillRange});
+    stops.push({
+      ...stop,
+      arrivalRange,
+      buyLiters,
+      purchaseCost,
+      detourCost,
+      afterFillRange,
+      reason: remaining+reserve<=fullRange
+        ? 'Última paragem necessária antes de concluir a viagem'
+        : 'Paragem necessária para manter autonomia segura'
+    });
+
     range=Math.max(0,afterFillRange-returnToRoute);
     pos=stop.routeKm
   }
@@ -1944,10 +2005,10 @@ function tripRenderPlan(plan){
   $('tripSavingBasis').textContent='vs. preço mediano dos postos reais encontrados';
 
   $('tripHeadline').textContent=stops.length
-    ?`${stops.length} ${stops.length===1?'paragem recomendada':'paragens recomendadas'}`
+    ?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}`
     :'A autonomia atual é suficiente';
   $('tripHeadlineDetail').textContent=stops.length
-    ?`Plano ${$('tripStrategy').selectedOptions[0].textContent.toLowerCase()} para ${tripNum(totalKm,0)} km, usando apenas postos com preço real para ${fuel}.`
+    ?`Só incluímos paragens indispensáveis para manter autonomia segura. Dentro dessas zonas, escolhemos os postos mais vantajosos para ${fuel}.`
     :`Com a autonomia indicada, não precisa de abastecer durante os ${tripNum(totalKm,0)} km da viagem.`;
 
   $('tripRouteLabel').textContent=mode==='roundtrip'?'Ida e volta':'Só ida';
@@ -1968,7 +2029,9 @@ function tripRenderPlan(plan){
         <div><span>Custo combustível</span><strong>${tripMoney(s.purchaseCost)}</strong></div>
         <div><span>Custo estimado do desvio</span><strong>${tripMoney(s.detourCost)}</strong></div>
       </div>
+      <div class="trip-stop-reason">✓ ${esc(s.reason||'Paragem necessária')}</div>
       <div class="trip-stop-source">${esc(s.source)}${s.updatedAt?' · '+esc(sourceAgeLabel(s.updatedAt)):''}</div>
+      <button class="trip-stop-nav" type="button" onclick="window.startTripStop(${s.lat},${s.lon})">Abrir este posto na navegação</button>
     </div>`).join(''):'<div class="empty">Não são necessárias paragens com a autonomia indicada.</div>';
 
   $('tripAlternatives').innerHTML=candidates.slice(0,24).map(s=>`
@@ -2049,6 +2112,66 @@ async function calculateTrip(){
     $('tripCalculateBtn').disabled=false
   }
 }
+
+
+window.startTripStop=(lat,lon)=>{
+  const url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${lat},${lon}`)}&travelmode=driving`;
+  window.open(url,'_blank','noopener')
+};
+
+function tripGoogleMapsUrl(plan){
+  if(!plan?.origin||!plan?.destination)return null;
+
+  const origin=`${plan.origin.lat},${plan.origin.lon}`;
+  const finalDestination=plan.mode==='roundtrip'
+    ? `${plan.origin.lat},${plan.origin.lon}`
+    : `${plan.destination.lat},${plan.destination.lon}`;
+
+  const waypoints=[];
+  const sortedStops=[...(plan.stops||[])].sort((a,b)=>a.routeKm-b.routeKm);
+
+  if(plan.mode==='roundtrip'){
+    const outboundKm=Number(plan.outbound?.distanceKm||0);
+    let destinationInserted=false;
+    for(const s of sortedStops){
+      if(!destinationInserted && s.routeKm>outboundKm){
+        waypoints.push(`${plan.destination.lat},${plan.destination.lon}`);
+        destinationInserted=true
+      }
+      waypoints.push(`${s.lat},${s.lon}`)
+    }
+    if(!destinationInserted)waypoints.push(`${plan.destination.lat},${plan.destination.lon}`)
+  }else{
+    sortedStops.forEach(s=>waypoints.push(`${s.lat},${s.lon}`))
+  }
+
+  const params=new URLSearchParams({
+    api:'1',
+    origin,
+    destination:finalDestination,
+    travelmode:'driving'
+  });
+  if(waypoints.length)params.set('waypoints',waypoints.slice(0,9).join('|'));
+  return `https://www.google.com/maps/dir/?${params.toString()}`
+}
+
+function startTripRoute(){
+  if(!lastTripPlan){
+    $('tripStatus').textContent='Calcule primeiro a viagem.';
+    return
+  }
+  const url=tripGoogleMapsUrl(lastTripPlan);
+  if(!url){
+    $('tripStatus').textContent='Não foi possível preparar a navegação.';
+    return
+  }
+  window.open(url,'_blank','noopener')
+}
+
+$('tripStartRouteBtn')?.addEventListener('click',startTripRoute);
+$('tripRecalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
+  $('tripStatus').textContent=errPT(e)
+}));
 
 $('tripCalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
   $('tripStatus').textContent=errPT(e)
