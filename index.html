@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.5 — preços reais e cálculo corrigido</title>
+<title>Bomba Certa v8.6 — Viagem Inteligente</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -618,6 +618,107 @@ body.guest-mode .bottom-nav{max-width:220px}
 .fuel-stale{display:block;margin-top:3px;font-size:7px;color:#b26a00;font-weight:800}
 .fuel-price-chip.selected .fuel-stale{color:#ffd58b}
 
+
+/* ===== v8.6 · Viagem Inteligente ===== */
+.bottom-nav{grid-template-columns:repeat(5,1fr)}
+.bottom-nav.admin-enabled{grid-template-columns:repeat(6,1fr)}
+body.guest-mode .nav[data-section="viagem"]{display:none!important}
+.trip-section{padding-top:8px}
+.trip-hero{
+  display:flex;justify-content:space-between;gap:20px;align-items:flex-start;
+  padding:22px 2px 16px
+}
+.trip-hero h1{font-size:34px;letter-spacing:-.045em;margin:3px 0 5px}
+.trip-hero p{max-width:800px;color:#69788f;font-size:13px;line-height:1.55;margin:0}
+.trip-access-badge{
+  flex:0 0 auto;padding:8px 11px;border-radius:999px;background:#edf4ff;color:#236ac8;
+  border:1px solid #dce8fb;font-size:9px;font-weight:950
+}
+.trip-locked{
+  background:linear-gradient(135deg,#fff,#f7faff);border:1px solid #e2e8f2;border-radius:22px;
+  padding:20px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;box-shadow:var(--shadow)
+}
+.trip-lock-icon{width:52px;height:52px;border-radius:16px;background:#eef3fb;display:grid;place-items:center;font-size:24px}
+.trip-locked h2{margin:0;font-size:19px}.trip-locked p{margin:5px 0;color:#748198;font-size:11px}
+.trip-progress{height:7px;background:#edf1f6;border-radius:999px;overflow:hidden;max-width:420px}
+.trip-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2f7df6,#61a0ff);border-radius:999px}
+.trip-form-card,.trip-summary-card,.trip-map-card,.trip-stops-card,.trip-alternatives-card{
+  background:#fff;border:1px solid #e5eaf2;border-radius:22px;box-shadow:0 12px 34px rgba(18,33,59,.06)
+}
+.trip-form-card{padding:17px}
+.trip-form-head,.trip-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.trip-form-head h2,.trip-card-head h2{margin:2px 0 0;font-size:19px;letter-spacing:-.025em}
+.trip-real-data{font-size:9px;font-weight:900;color:#23764a;background:#eaf8ef;border-radius:999px;padding:6px 9px}
+.trip-location-grid{display:grid;grid-template-columns:1.45fr 1.45fr .7fr 1fr;gap:9px;margin-top:14px}
+.trip-car-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:10px}
+.trip-field{display:grid;gap:5px}.trip-field>span{font-size:9px;font-weight:900;color:#57657b;text-transform:uppercase;letter-spacing:.045em}
+.trip-field small{font-size:8.5px;color:#8a96a8;line-height:1.35}
+.trip-field .input{min-height:48px;border-radius:13px;font-size:13px}
+.trip-input-row{display:grid;grid-template-columns:1fr auto;gap:6px}
+.trip-input-row .btn{min-height:48px;border-radius:13px;padding:8px 12px}
+.trip-unit-input{position:relative}.trip-unit-input .input{padding-right:68px;width:100%}
+.trip-unit-input b{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:9px;color:#7d899c}
+.trip-form-foot{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid #edf0f4}
+.trip-method-note{font-size:9.5px;color:#748198;line-height:1.4;max-width:700px}
+.trip-calc-btn{min-height:46px;border-radius:13px;padding:10px 18px;background:linear-gradient(135deg,#2f7df6,#5b9cff)}
+.trip-status{margin-top:9px;font-size:11px}
+.trip-summary-card{margin-top:14px;padding:18px;background:linear-gradient(135deg,#10213b,#17335b);color:#fff;border-color:#17335b}
+.trip-summary-main{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
+.trip-summary-main h2{font-size:24px;letter-spacing:-.035em;margin:3px 0 4px}
+.trip-summary-main p{font-size:10.5px;color:#bdcbe0;margin:0}
+.trip-saving-big{text-align:right}.trip-saving-big span{display:block;font-size:8px;color:#aebed4;text-transform:uppercase;letter-spacing:.05em}
+.trip-saving-big strong{display:block;font-size:31px;line-height:1.05;color:#83efb8;margin-top:3px}
+.trip-saving-big small{display:block;font-size:8px;color:#9fb1ca}
+.trip-kpis,.trip-savings-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.trip-kpis>div,.trip-savings-breakdown>div{padding:10px;border-radius:13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07)}
+.trip-kpis span,.trip-savings-breakdown span{display:block;font-size:8px;color:#aebed4}
+.trip-kpis strong,.trip-savings-breakdown strong{display:block;margin-top:4px;font-size:16px}
+.trip-savings-breakdown .net{background:rgba(62,207,142,.13);border-color:rgba(83,223,160,.2)}
+.trip-savings-breakdown .net strong{color:#83efb8}
+.trip-explain-btn{margin-top:10px;background:transparent;border:0;color:#a9c8ff;padding:0;font-size:9.5px;font-weight:900;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.trip-explain-box{margin-top:9px;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.06);font-size:9.5px;line-height:1.45;color:#c6d3e5}
+.trip-results-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(370px,.82fr);gap:13px;margin-top:13px}
+.trip-map-card,.trip-stops-card,.trip-alternatives-card{padding:13px}
+#tripMap{height:440px;border-radius:17px;margin-top:10px;background:#eef2f6}
+.trip-stops-list{display:grid;gap:9px;margin-top:10px}
+.trip-stop{
+  border:1px solid #e6ebf2;border-radius:15px;padding:11px;background:#fbfcff
+}
+.trip-stop-head{display:flex;justify-content:space-between;gap:9px}
+.trip-stop-index{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:9px;background:#152641;color:#fff;font-size:10px;font-weight:900}
+.trip-stop h3{font-size:13px;margin:0;letter-spacing:-.02em}.trip-stop-meta{font-size:9px;color:#7b879a;margin-top:3px;line-height:1.4}
+.trip-stop-price{font-size:18px;font-weight:950;white-space:nowrap}
+.trip-stop-plan{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.trip-stop-plan div{background:#f2f5f9;border-radius:10px;padding:7px}
+.trip-stop-plan span{display:block;font-size:7.5px;color:#8190a5}.trip-stop-plan strong{font-size:11px}
+.trip-stop-source{font-size:8px;color:#277a4c;font-weight:850;margin-top:7px}
+.trip-alternatives-card{margin-top:13px}
+.trip-alt-list{display:flex;gap:7px;overflow-x:auto;margin-top:10px;padding-bottom:3px;scrollbar-width:none}
+.trip-alt-list::-webkit-scrollbar{display:none}
+.trip-alt{min-width:180px;border:1px solid #e6ebf2;border-radius:13px;padding:9px;background:#fafcff}
+.trip-alt b{display:block;font-size:10px}.trip-alt strong{display:block;font-size:15px;margin-top:5px}.trip-alt small{display:block;font-size:8px;color:#8995a7;margin-top:3px}
+@media(max-width:1050px){
+  .trip-location-grid{grid-template-columns:1fr 1fr}
+  .trip-car-grid{grid-template-columns:repeat(3,1fr)}
+  .trip-results-grid{grid-template-columns:1fr}
+  #tripMap{height:360px}
+}
+@media(max-width:720px){
+  .bottom-nav{grid-template-columns:repeat(5,1fr)}
+  .bottom-nav.admin-enabled{grid-template-columns:repeat(6,1fr)}
+  .trip-hero{display:block}.trip-access-badge{display:inline-flex;margin-top:10px}
+  .trip-location-grid,.trip-car-grid{grid-template-columns:1fr}
+  .trip-form-foot{display:block}.trip-calc-btn{width:100%;margin-top:10px}
+  .trip-summary-main{grid-template-columns:1fr}.trip-saving-big{text-align:left}
+  .trip-kpis,.trip-savings-breakdown{grid-template-columns:1fr 1fr}
+  #tripMap{height:300px}
+}
+@media(max-width:430px){
+  .trip-kpis,.trip-savings-breakdown{grid-template-columns:1fr}
+  .trip-locked{grid-template-columns:auto 1fr}.trip-locked .btn{grid-column:1/-1;width:100%}
+  .trip-summary-card{padding:14px}
+}
+
 </style>
 </head>
 <body>
@@ -918,6 +1019,171 @@ body.guest-mode .bottom-nav{max-width:220px}
     </div>
   </section>
 
+  <section id="viagem" class="section trip-section">
+    <div class="trip-hero">
+      <div>
+        <div class="eyebrow">EXCLUSIVO · EXPLORADOR+</div>
+        <h1>Viagem Inteligente</h1>
+        <p>Planeie a ida e o regresso. A Bomba Certa cruza autonomia, consumo, percurso e preços reais para sugerir onde compensa abastecer.</p>
+      </div>
+      <span id="tripAccessBadge" class="trip-access-badge">A verificar acesso…</span>
+    </div>
+
+    <div id="tripLocked" class="trip-locked hidden">
+      <div class="trip-lock-icon">🔒</div>
+      <div>
+        <h2>Desbloqueia no nível Explorador</h2>
+        <p id="tripLockedText">Continue a contribuir para desbloquear o planeamento inteligente de viagens.</p>
+        <div class="trip-progress"><i id="tripUnlockProgress"></i></div>
+      </div>
+      <button id="tripGoProfileBtn" class="btn secondary" type="button">Ver progresso</button>
+    </div>
+
+    <div id="tripPlanner" class="hidden">
+      <div class="trip-form-card">
+        <div class="trip-form-head">
+          <div>
+            <div class="eyebrow">1 · DEFINA A VIAGEM</div>
+            <h2>Para onde vai?</h2>
+          </div>
+          <span class="trip-real-data">● preços reais</span>
+        </div>
+
+        <div class="trip-location-grid">
+          <label class="trip-field trip-origin-field">
+            <span>Origem</span>
+            <div class="trip-input-row">
+              <input id="tripOrigin" class="input" autocomplete="street-address" placeholder="Ex.: Espinho">
+              <button id="tripUseLocationBtn" class="btn secondary" type="button">⌖ Atual</button>
+            </div>
+          </label>
+
+          <label class="trip-field">
+            <span>Destino</span>
+            <input id="tripDestination" class="input" autocomplete="street-address" placeholder="Ex.: Lisboa">
+          </label>
+
+          <label class="trip-field">
+            <span>Viagem</span>
+            <select id="tripMode" class="input">
+              <option value="roundtrip" selected>Ida e volta</option>
+              <option value="oneway">Só ida</option>
+            </select>
+          </label>
+
+          <label class="trip-field">
+            <span>Combustível</span>
+            <select id="tripFuel" class="input">
+              <option value="Gasóleo simples">Gasóleo simples</option>
+              <option value="Gasóleo especial">Gasóleo aditivado / premium</option>
+              <option value="Gasolina simples 95">Gasolina simples 95</option>
+              <option value="Gasolina especial 95">Gasolina 95 aditivada / premium</option>
+              <option value="Gasolina 98">Gasolina 98</option>
+              <option value="Gasolina especial 98">Gasolina 98 aditivada / premium</option>
+              <option value="GPL Auto">GPL Auto</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="trip-car-grid">
+          <label class="trip-field">
+            <span>Autonomia atual</span>
+            <div class="trip-unit-input"><input id="tripAutonomy" class="input" type="number" min="10" max="1500" step="10" value="250"><b>km</b></div>
+            <small>Quantos quilómetros estima conseguir fazer agora.</small>
+          </label>
+          <label class="trip-field">
+            <span>Consumo médio</span>
+            <div class="trip-unit-input"><input id="tripConsumption" class="input" type="number" min="2" max="30" step="0.1" value="6.5"><b>L/100 km</b></div>
+          </label>
+          <label class="trip-field">
+            <span>Capacidade do depósito</span>
+            <div class="trip-unit-input"><input id="tripTank" class="input" type="number" min="15" max="150" step="1" value="55"><b>L</b></div>
+          </label>
+          <label class="trip-field">
+            <span>Reserva de segurança</span>
+            <div class="trip-unit-input"><input id="tripReserve" class="input" type="number" min="10" max="150" step="5" value="40"><b>km</b></div>
+          </label>
+          <label class="trip-field">
+            <span>Estratégia</span>
+            <select id="tripStrategy" class="input">
+              <option value="balanced" selected>Equilibrado</option>
+              <option value="cheapest">Mais barato</option>
+              <option value="fewer">Menos paragens</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="trip-form-foot">
+          <div class="trip-method-note">Apenas usamos postos com preço real publicado. Um posto sem preço não entra no cálculo económico.</div>
+          <button id="tripCalculateBtn" class="btn trip-calc-btn" type="button">Calcular viagem</button>
+        </div>
+        <div id="tripStatus" class="status trip-status" aria-live="polite"></div>
+      </div>
+
+      <div id="tripResults" class="hidden">
+        <div class="trip-summary-card">
+          <div class="trip-summary-main">
+            <div>
+              <div class="eyebrow">PLANO RECOMENDADO</div>
+              <h2 id="tripHeadline">—</h2>
+              <p id="tripHeadlineDetail">—</p>
+            </div>
+            <div class="trip-saving-big">
+              <span>Economia estimada</span>
+              <strong id="tripSaving">—</strong>
+              <small id="tripSavingBasis">vs. preço mediano da rota</small>
+            </div>
+          </div>
+
+          <div class="trip-kpis">
+            <div><span>Distância total</span><strong id="tripDistance">—</strong></div>
+            <div><span>Combustível da viagem</span><strong id="tripFuelNeeded">—</strong></div>
+            <div><span>Paragens</span><strong id="tripStopsCount">—</strong></div>
+            <div><span>Custo dos abastecimentos</span><strong id="tripFuelCost">—</strong></div>
+          </div>
+
+          <div class="trip-savings-breakdown">
+            <div><span>Preço mediano encontrado</span><strong id="tripMedianPrice">—</strong></div>
+            <div><span>Custo ao preço mediano</span><strong id="tripBaselineCost">—</strong></div>
+            <div><span>Custo extra dos desvios</span><strong id="tripDetourCost">—</strong></div>
+            <div class="net"><span>Economia líquida estimada</span><strong id="tripNetSaving">—</strong></div>
+          </div>
+
+          <button id="tripExplainBtn" class="trip-explain-btn" type="button">Como é calculada esta economia?</button>
+          <div id="tripExplainBox" class="trip-explain-box hidden">
+            Comparamos <b>os mesmos litros que o plano recomenda comprar</b> ao preço mediano dos postos reais encontrados junto à rota.
+            Depois retiramos o combustível estimado gasto nos desvios aos postos. Não comparamos com um preço inventado nem com o posto mais caro.
+          </div>
+        </div>
+
+        <div class="trip-results-grid">
+          <div class="trip-map-card">
+            <div class="trip-card-head">
+              <div><div class="eyebrow">PERCURSO</div><h2>Rota e paragens</h2></div>
+              <span id="tripRouteLabel" class="pill">—</span>
+            </div>
+            <div id="tripMap"></div>
+          </div>
+
+          <div class="trip-stops-card">
+            <div class="trip-card-head">
+              <div><div class="eyebrow">ABASTECIMENTOS</div><h2>Paragens recomendadas</h2></div>
+            </div>
+            <div id="tripStops" class="trip-stops-list"></div>
+          </div>
+        </div>
+
+        <div class="trip-alternatives-card">
+          <div class="trip-card-head">
+            <div><div class="eyebrow">TRANSPARÊNCIA</div><h2>Postos considerados na rota</h2></div>
+            <span id="tripCandidateCount" class="pill">0 postos</span>
+          </div>
+          <div id="tripAlternatives" class="trip-alt-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="perfil" class="section">
     <div class="rank-grid">
       
@@ -1059,6 +1325,7 @@ body.guest-mode .bottom-nav{max-width:220px}
 <nav class="bottom-nav" aria-label="Navegação principal">
   <button class="nav active" data-section="postos"><span>⌖</span>Mapa</button>
   <button class="nav" data-section="abastecimentos"><span>⛽</span>Abastecimentos</button>
+  <button id="tripNav" class="nav" data-section="viagem"><span>🧭</span>Viagem</button>
   <button class="nav" data-section="estatisticas"><span>📊</span>Estatísticas</button>
   <button class="nav" data-section="perfil"><span>👤</span>Perfil</button>
   <button id="adminNav" class="nav hidden" data-section="admin"><span>⚙️</span>Admin</button>
@@ -1394,6 +1661,432 @@ function errPT(e){
   if(m.includes('network')||m.includes('fetch'))return 'Não foi possível ligar ao serviço.';
   return e?.message||String(e||'Ocorreu um erro.')
 }
+
+let tripAccessAllowed=false;
+let tripMap=null,tripRouteLayer=null,tripStopMarkers=[];
+let tripOriginCoords=null,tripDestinationCoords=null;
+let lastTripPlan=null;
+
+function tripMoney(v){
+  return Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2})
+}
+function tripNum(v,d=1){
+  return Number(v||0).toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d})
+}
+function tripMedian(values){
+  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length)return 0;
+  const m=Math.floor(a.length/2);
+  return a.length%2?a[m]:(a[m-1]+a[m])/2
+}
+
+async function checkTripAccess(){
+  if(isGuestMode){
+    tripAccessAllowed=false;
+    $('tripPlanner')?.classList.add('hidden');
+    $('tripLocked')?.classList.remove('hidden');
+    $('tripAccessBadge').textContent='Conta necessária';
+    $('tripLockedText').textContent='Crie uma conta e alcance o nível Explorador para desbloquear esta funcionalidade.';
+    $('tripUnlockProgress').style.width='0%';
+    return false
+  }
+  try{
+    const {data:allowed,error}=await supabase.rpc('can_use_trip_planner');
+    if(error)throw error;
+    tripAccessAllowed=allowed===true;
+
+    let points=0,level='Novato';
+    const {data:progress}=await supabase.rpc('my_game_progress');
+    const row=Array.isArray(progress)?progress[0]:progress;
+    if(row){points=Number(row.points||0);level=row.level_name||'Novato'}
+
+    $('tripAccessBadge').textContent=tripAccessAllowed?`${level} · desbloqueado`:`${level} · bloqueado`;
+    $('tripAccessBadge').classList.toggle('unlocked',tripAccessAllowed);
+    $('tripPlanner').classList.toggle('hidden',!tripAccessAllowed);
+    $('tripLocked').classList.toggle('hidden',tripAccessAllowed);
+
+    if(!tripAccessAllowed){
+      const need=Math.max(0,50-points);
+      $('tripLockedText').textContent=`Tem ${points} pontos. Faltam ${need} para chegar a Explorador e desbloquear a Viagem Inteligente.`;
+      $('tripUnlockProgress').style.width=Math.min(100,points/50*100)+'%'
+    }
+    return tripAccessAllowed
+  }catch(e){
+    tripAccessAllowed=false;
+    $('tripPlanner')?.classList.add('hidden');
+    $('tripLocked')?.classList.remove('hidden');
+    $('tripAccessBadge').textContent='Acesso indisponível';
+    $('tripLockedText').textContent='Não foi possível confirmar o nível neste momento. Tente novamente dentro de instantes.';
+    return false
+  }
+}
+
+async function tripGeocode(query){
+  const q=String(query||'').trim();
+  if(!q)throw new Error('Indique a origem e o destino.');
+  const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q='+encodeURIComponent(q);
+  const r=await fetch(url,{headers:{Accept:'application/json'}});
+  if(!r.ok)throw new Error('Não foi possível localizar "'+q+'".');
+  const data=await r.json();
+  if(!data?.length)throw new Error('Não encontrei "'+q+'". Tente escrever uma localidade ou morada mais completa.');
+  return {lat:Number(data[0].lat),lon:Number(data[0].lon),label:data[0].display_name||q}
+}
+
+async function tripRoute(a,b){
+  const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson&steps=false`;
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('Não foi possível calcular a rota rodoviária.');
+  const j=await r.json();
+  const route=j?.routes?.[0];
+  if(!route)throw new Error('Não existe uma rota rodoviária disponível entre os locais indicados.');
+  return {distanceKm:Number(route.distance)/1000,durationSec:Number(route.duration),coords:route.geometry.coordinates.map(([lon,lat])=>({lat,lon}))}
+}
+
+function tripBuildPath(outbound,returnRoute){
+  const coords=[...outbound.coords];
+  if(returnRoute)coords.push(...returnRoute.coords.slice(1));
+  let km=0;
+  const points=[];
+  for(let i=0;i<coords.length;i++){
+    if(i)km+=haversine(coords[i-1].lat,coords[i-1].lon,coords[i].lat,coords[i].lon);
+    points.push({...coords[i],km})
+  }
+  return {points,totalKm:km}
+}
+
+function tripRouteSamples(path,max=420){
+  const pts=path.points||[];
+  if(pts.length<=max)return pts;
+  const step=Math.ceil(pts.length/max);
+  const out=[];
+  for(let i=0;i<pts.length;i+=step)out.push(pts[i]);
+  if(out[out.length-1]!==pts[pts.length-1])out.push(pts[pts.length-1]);
+  return out
+}
+
+function tripStationNearPath(row,samples){
+  const lat=Number(String(row.Latitude??'').replace(',','.'));
+  const lon=Number(String(row.Longitude??'').replace(',','.'));
+  const price=parsePrice(row.Preco);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||!price)return null;
+  let best=null,bestD=Infinity;
+  for(const p of samples){
+    const d=haversine(lat,lon,p.lat,p.lon);
+    if(d<bestD){bestD=d;best=p}
+  }
+  if(!best||bestD>8)return null;
+  return {
+    key:`dgeg:${row.Id}`,dgegId:Number(row.Id),name:row.Nome||'Posto',
+    brand:row.Marca||'',address:[row.Morada,row.Localidade,row.CodPostal].filter(Boolean).join(', '),
+    lat,lon,price:Number(price),updatedAt:row.DataAtualizacao||'',source:'DGEG',
+    routeKm:best.km,crossKm:bestD,routePoint:{lat:best.lat,lon:best.lon}
+  }
+}
+
+async function tripCommunityOverlay(candidates,fuel){
+  if(!candidates.length||isGuestMode)return candidates;
+  const minLat=Math.min(...candidates.map(s=>s.lat))-.05,maxLat=Math.max(...candidates.map(s=>s.lat))+.05;
+  const minLon=Math.min(...candidates.map(s=>s.lon))-.05,maxLon=Math.max(...candidates.map(s=>s.lon))+.05;
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  try{
+    const {data}=await supabase.from('fuel_price_reports')
+      .select('station_key,station_name,latitude,longitude,price,observed_at')
+      .eq('fuel_type',fuel).gte('observed_at',since)
+      .gte('latitude',minLat).lte('latitude',maxLat).gte('longitude',minLon).lte('longitude',maxLon)
+      .order('observed_at',{ascending:false}).limit(1500);
+
+    for(const r of (data||[])){
+      let s=candidates.find(x=>x.key===r.station_key);
+      if(!s){
+        let best=null,bestD=.35;
+        for(const x of candidates){
+          const d=haversine(x.lat,x.lon,Number(r.latitude),Number(r.longitude));
+          if(d<bestD){best=x;bestD=d}
+        }
+        s=best
+      }
+      if(s && !s._communityApplied){
+        s.price=Number(r.price);s.updatedAt=r.observed_at;s.source='Comunidade';s._communityApplied=true
+      }
+    }
+  }catch{}
+  return candidates
+}
+
+async function tripRefineDetours(stations){
+  const limited=stations.slice(0,30);
+  for(let i=0;i<limited.length;i+=5){
+    await Promise.all(limited.slice(i,i+5).map(async s=>{
+      try{
+        const a=s.routePoint,b={lat:s.lat,lon:s.lon};
+        const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+        const r=await fetch(url);if(!r.ok)return;
+        const j=await r.json();const km=Number(j?.routes?.[0]?.distance)/1000;
+        if(Number.isFinite(km))s.detourKm=km*2
+      }catch{}
+      if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2
+    }))
+  }
+  for(const s of stations)if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2;
+  return stations
+}
+
+function tripChooseStop(options,strategy,consumption,tankLiters,currentPos,safeMax){
+  if(!options.length)return null;
+  const prices=options.map(x=>x.price),minP=Math.min(...prices),maxP=Math.max(...prices);
+  const spanP=Math.max(.001,maxP-minP),spanD=Math.max(1,safeMax-currentPos);
+  const scored=options.map(s=>{
+    const priceN=(s.price-minP)/spanP;
+    const detourN=Math.min(1,(s.detourKm||0)/12);
+    const progressN=Math.max(0,Math.min(1,(s.routeKm-currentPos)/spanD));
+    let score;
+    if(strategy==='cheapest')score=priceN*.78+detourN*.17-progressN*.05;
+    else if(strategy==='fewer')score=-progressN*.75+priceN*.15+detourN*.10;
+    else score=priceN*.46+detourN*.24-progressN*.30;
+    return {s,score}
+  }).sort((a,b)=>a.score-b.score);
+  return scored[0]?.s||null
+}
+
+function tripNextCheaper(stations,from,fullRange,price,reserve,totalKm){
+  return stations.find(s=>s.routeKm>from+5 && s.routeKm<=Math.min(totalKm,from+fullRange-reserve) && s.price<price-.005)
+}
+
+function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy){
+  const fullRange=tank/consumption*100;
+  if(!Number.isFinite(fullRange)||fullRange<=reserve+20)throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia segura.');
+
+  const sorted=[...candidates].sort((a,b)=>a.routeKm-b.routeKm);
+  let pos=0,range=Math.min(Math.max(0,autonomy),Math.max(autonomy,fullRange));
+  const stops=[];
+  let guard=0;
+
+  while(pos+range<totalKm+reserve && guard++<20){
+    const safeMax=Math.min(totalKm,pos+range-reserve);
+    let opts=sorted.filter(s=>s.routeKm>pos+8 && s.routeKm<=safeMax);
+    if(!opts.length){
+      // tolerância de segurança: procurar até ao limite físico, mas marcar risco se necessário.
+      opts=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=Math.min(totalKm,pos+range-8))
+    }
+    if(!opts.length)throw new Error(`Não encontrei um posto com preço real dentro da autonomia segura disponível (${Math.round(range)} km).`);
+
+    const stop=tripChooseStop(opts,strategy,consumption,tank,pos,safeMax);
+    const roadSince=stop.routeKm-pos;
+    const toStation=(stop.detourKm||0)/2;
+    const arrivalRange=Math.max(0,range-roadSince-toStation);
+    const currentLiters=arrivalRange*consumption/100;
+
+    const cheaper=tripNextCheaper(sorted,stop.routeKm,fullRange,stop.price,reserve,totalKm);
+    const distanceTarget=cheaper ? (cheaper.routeKm-stop.routeKm)+(cheaper.detourKm||0)/2+reserve
+                                  : Math.min(fullRange,(totalKm-stop.routeKm)+reserve);
+    const targetLiters=Math.min(tank,Math.max(0,distanceTarget*consumption/100));
+    let buyLiters=Math.max(0,targetLiters-currentLiters);
+    if(buyLiters<3)buyLiters=Math.min(tank-currentLiters,Math.max(3,buyLiters));
+
+    const purchaseCost=buyLiters*stop.price;
+    const detourCost=(stop.detourKm||0)*consumption/100*stop.price;
+    const afterFillLiters=Math.min(tank,currentLiters+buyLiters);
+    const afterFillRange=afterFillLiters/consumption*100;
+    const returnToRoute=(stop.detourKm||0)/2;
+
+    stops.push({...stop,arrivalRange,buyLiters,purchaseCost,detourCost,afterFillRange});
+    range=Math.max(0,afterFillRange-returnToRoute);
+    pos=stop.routeKm
+  }
+
+  return {stops,fullRange}
+}
+
+function tripInitMap(){
+  if(tripMap)return;
+  tripMap=L.map('tripMap',{zoomControl:true}).setView([39.5,-8],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(tripMap)
+}
+
+function tripRenderMap(path,stops,origin,destination){
+  tripInitMap();
+  if(tripRouteLayer)tripMap.removeLayer(tripRouteLayer);
+  tripStopMarkers.forEach(m=>tripMap.removeLayer(m));tripStopMarkers=[];
+
+  const latlngs=path.points.map(p=>[p.lat,p.lon]);
+  tripRouteLayer=L.polyline(latlngs,{weight:5,opacity:.8}).addTo(tripMap);
+  tripStopMarkers.push(L.marker([origin.lat,origin.lon]).addTo(tripMap).bindPopup('<b>Origem</b>'));
+  tripStopMarkers.push(L.marker([destination.lat,destination.lon]).addTo(tripMap).bindPopup('<b>Destino</b>'));
+  stops.forEach((s,i)=>{
+    const m=L.marker([s.lat,s.lon]).addTo(tripMap).bindPopup(`<b>Paragem ${i+1}: ${esc(s.name)}</b><br>${Number(s.price).toFixed(3).replace('.',',')} €/L<br>Abastecer ${tripNum(s.buyLiters,1)} L`);
+    tripStopMarkers.push(m)
+  });
+  const bounds=L.latLngBounds(latlngs);
+  if(bounds.isValid())tripMap.fitBounds(bounds.pad(.08));
+  setTimeout(()=>tripMap.invalidateSize(),80)
+}
+
+function tripRenderPlan(plan){
+  lastTripPlan=plan;
+  const {path,stops,candidates,origin,destination,totalKm,consumption,fuel,mode}=plan;
+  const boughtLiters=stops.reduce((a,s)=>a+s.buyLiters,0);
+  const purchaseCost=stops.reduce((a,s)=>a+s.purchaseCost,0);
+  const detourCost=stops.reduce((a,s)=>a+s.detourCost,0);
+  const medianPrice=tripMedian(candidates.map(s=>s.price));
+  const baselineCost=boughtLiters*medianPrice;
+  const netSaving=Math.max(0,baselineCost-purchaseCost-detourCost);
+  const tripFuel=totalKm*consumption/100;
+
+  $('tripDistance').textContent=tripNum(totalKm,0)+' km';
+  $('tripFuelNeeded').textContent=tripNum(tripFuel,1)+' L';
+  $('tripStopsCount').textContent=String(stops.length);
+  $('tripFuelCost').textContent=tripMoney(purchaseCost);
+  $('tripMedianPrice').textContent=medianPrice?medianPrice.toFixed(3).replace('.',',')+' €/L':'—';
+  $('tripBaselineCost').textContent=tripMoney(baselineCost);
+  $('tripDetourCost').textContent=tripMoney(detourCost);
+  $('tripNetSaving').textContent=tripMoney(netSaving);
+  $('tripSaving').textContent=tripMoney(netSaving);
+  $('tripSavingBasis').textContent='vs. preço mediano dos postos reais encontrados';
+
+  $('tripHeadline').textContent=stops.length
+    ?`${stops.length} ${stops.length===1?'paragem recomendada':'paragens recomendadas'}`
+    :'A autonomia atual é suficiente';
+  $('tripHeadlineDetail').textContent=stops.length
+    ?`Plano ${$('tripStrategy').selectedOptions[0].textContent.toLowerCase()} para ${tripNum(totalKm,0)} km, usando apenas postos com preço real para ${fuel}.`
+    :`Com a autonomia indicada, não precisa de abastecer durante os ${tripNum(totalKm,0)} km da viagem.`;
+
+  $('tripRouteLabel').textContent=mode==='roundtrip'?'Ida e volta':'Só ida';
+  $('tripCandidateCount').textContent=`${candidates.length} postos`;
+
+  $('tripStops').innerHTML=stops.length?stops.map((s,i)=>`
+    <div class="trip-stop">
+      <div class="trip-stop-head">
+        <div style="display:flex;gap:8px;min-width:0">
+          <span class="trip-stop-index">${i+1}</span>
+          <div><h3>${esc(s.name)}</h3><div class="trip-stop-meta">${tripNum(s.routeKm,0)} km no percurso · desvio ${tripNum(s.detourKm||0,1)} km${s.address?' · '+esc(s.address):''}</div></div>
+        </div>
+        <div class="trip-stop-price">${s.price.toFixed(3).replace('.',',')} €</div>
+      </div>
+      <div class="trip-stop-plan">
+        <div><span>Autonomia à chegada</span><strong>${tripNum(s.arrivalRange,0)} km</strong></div>
+        <div><span>Abastecer</span><strong>${tripNum(s.buyLiters,1)} L</strong></div>
+        <div><span>Custo combustível</span><strong>${tripMoney(s.purchaseCost)}</strong></div>
+        <div><span>Custo estimado do desvio</span><strong>${tripMoney(s.detourCost)}</strong></div>
+      </div>
+      <div class="trip-stop-source">${esc(s.source)}${s.updatedAt?' · '+esc(sourceAgeLabel(s.updatedAt)):''}</div>
+    </div>`).join(''):'<div class="empty">Não são necessárias paragens com a autonomia indicada.</div>';
+
+  $('tripAlternatives').innerHTML=candidates.slice(0,24).map(s=>`
+    <div class="trip-alt">
+      <b>${esc(s.name)}</b>
+      <strong>${s.price.toFixed(3).replace('.',',')} €/L</strong>
+      <small>${tripNum(s.routeKm,0)} km no percurso · desvio ${tripNum(s.detourKm||s.crossKm*2,1)} km · ${esc(s.source)}</small>
+    </div>`).join('');
+
+  $('tripResults').classList.remove('hidden');
+  tripRenderMap(path,stops,origin,destination)
+}
+
+async function calculateTrip(){
+  if(!tripAccessAllowed){
+    await checkTripAccess();
+    if(!tripAccessAllowed)return
+  }
+
+  const autonomy=Number($('tripAutonomy').value),consumption=Number($('tripConsumption').value),
+        tank=Number($('tripTank').value),reserve=Number($('tripReserve').value),
+        strategy=$('tripStrategy').value,fuel=$('tripFuel').value,mode=$('tripMode').value;
+
+  if(!Number.isFinite(autonomy)||autonomy<10)throw new Error('Indique uma autonomia atual válida.');
+  if(!Number.isFinite(consumption)||consumption<2)throw new Error('Indique o consumo médio do veículo.');
+  if(!Number.isFinite(tank)||tank<15)throw new Error('Indique a capacidade aproximada do depósito.');
+  if(!Number.isFinite(reserve)||reserve<10)throw new Error('Indique uma reserva de segurança válida.');
+
+  $('tripStatus').textContent='A localizar origem e destino…';
+  $('tripCalculateBtn').disabled=true;
+
+  try{
+    const origin=tripOriginCoords || await tripGeocode($('tripOrigin').value);
+    const destination=tripDestinationCoords || await tripGeocode($('tripDestination').value);
+    tripOriginCoords=origin;tripDestinationCoords=destination;
+
+    $('tripStatus').textContent='A calcular a rota rodoviária…';
+    const outbound=await tripRoute(origin,destination);
+    let returnRoute=null;
+    if(mode==='roundtrip')returnRoute=await tripRoute(destination,origin);
+    const path=tripBuildPath(outbound,returnRoute);
+    const totalKm=outbound.distanceKm+(returnRoute?.distanceKm||0);
+
+    $('tripStatus').textContent='A pesquisar preços reais junto ao percurso…';
+    const officialRows=await dgegFuelNationalRows(fuel);
+    const samples=tripRouteSamples(path);
+    const candidates=[];
+    const seen=new Set();
+    for(const row of officialRows){
+      const s=tripStationNearPath(row,samples);
+      if(!s||seen.has(s.key))continue;
+      seen.add(s.key);candidates.push(s)
+    }
+    if(!candidates.length)throw new Error('Não encontrei postos com preço real publicado suficientemente próximos desta rota.');
+
+    await tripCommunityOverlay(candidates,fuel);
+    candidates.sort((a,b)=>a.routeKm-b.routeKm);
+
+    $('tripStatus').textContent=`Encontrados ${candidates.length} postos com preço real. A calcular desvios…`;
+    // Refina os postos mais relevantes ao longo do percurso. Primeiro reduzimos a um conjunto representativo.
+    const relevant=[...candidates].sort((a,b)=>{
+      const pa=a.price+(a.crossKm*.01),pb=b.price+(b.crossKm*.01);
+      return pa-pb
+    }).slice(0,30);
+    await tripRefineDetours(relevant);
+
+    // Garantir detour em todos os candidatos, usando aproximação apenas onde ainda não foi refinado.
+    for(const s of candidates)if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2;
+
+    $('tripStatus').textContent='A otimizar as paragens de abastecimento…';
+    const {stops}=tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy);
+
+    const plan={origin,destination,outbound,returnRoute,path,totalKm,stops,candidates,autonomy,consumption,tank,reserve,strategy,fuel,mode};
+    localStorage.setItem('bombaCerta:tripPrefs',JSON.stringify({autonomy,consumption,tank,reserve,strategy,fuel,mode}));
+    tripRenderPlan(plan);
+    $('tripStatus').textContent=`✓ Plano calculado com ${candidates.length} postos reais considerados.`
+  }finally{
+    $('tripCalculateBtn').disabled=false
+  }
+}
+
+$('tripCalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
+  $('tripStatus').textContent=errPT(e)
+}));
+$('tripUseLocationBtn')?.addEventListener('click',async()=>{
+  try{
+    $('tripStatus').textContent='A obter a localização atual…';
+    let lat=currentLat,lon=currentLon;
+    if(lat==null||lon==null){
+      const pos=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:12000,maximumAge:60000}));
+      lat=pos.coords.latitude;lon=pos.coords.longitude
+    }
+    tripOriginCoords={lat:Number(lat),lon:Number(lon),label:'Localização atual'};
+    $('tripOrigin').value='Localização atual';
+    $('tripStatus').textContent='✓ Origem definida pela localização atual.'
+  }catch{
+    $('tripStatus').textContent='Não foi possível obter a localização. Escreva a origem manualmente.'
+  }
+});
+$('tripOrigin')?.addEventListener('input',()=>{tripOriginCoords=null});
+$('tripDestination')?.addEventListener('input',()=>{tripDestinationCoords=null});
+$('tripExplainBtn')?.addEventListener('click',()=>{
+  const box=$('tripExplainBox');const open=!box.classList.toggle('hidden');
+  $('tripExplainBtn').textContent=open?'Fechar explicação':'Como é calculada esta economia?'
+});
+$('tripGoProfileBtn')?.addEventListener('click',()=>showSection('perfil'));
+
+try{
+  const prefs=JSON.parse(localStorage.getItem('bombaCerta:tripPrefs')||'{}');
+  if(prefs.autonomy)$('tripAutonomy').value=prefs.autonomy;
+  if(prefs.consumption)$('tripConsumption').value=prefs.consumption;
+  if(prefs.tank)$('tripTank').value=prefs.tank;
+  if(prefs.reserve)$('tripReserve').value=prefs.reserve;
+  if(prefs.strategy)$('tripStrategy').value=prefs.strategy;
+  if(prefs.fuel)$('tripFuel').value=prefs.fuel;
+  if(prefs.mode)$('tripMode').value=prefs.mode
+}catch{}
+
 function showSection(id){
   document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
@@ -1401,6 +2094,9 @@ function showSection(id){
   document.querySelector(`.nav[data-section="${id}"]`)?.classList.add('active');
   if(id==='abastecimentos'||id==='estatisticas')loadFillups();
   if(id==='perfil')loadLeaderboard();
+  if(id==='viagem'){
+    checkTripAccess().then(ok=>{if(ok&&tripMap)setTimeout(()=>tripMap.invalidateSize(),80)});
+  }
   if(id==='admin'&&isAdminUser){loadAdminSummary();loadAdminUsers();loadAdminReports();}
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
@@ -1775,6 +2471,7 @@ async function enterApp(){
   await checkAdmin();
 
   loadLeaderboard().catch(()=>{});
+  checkTripAccess().catch(()=>{});
   if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
     loadAdminSummary().catch(()=>{});
     loadAdminUsers().catch(()=>{});
@@ -3426,7 +4123,7 @@ async function hydrateTopProfile(){
 }
 
 const UNLOCKS=[
-  {points:50,level:'Explorador',icon:'🔔',name:'Alertas pessoais',desc:'Acesso preparado para alertas e notificações de preço.'},
+  {points:50,level:'Explorador',icon:'🧭',name:'Viagem Inteligente',desc:'Planeie viagens e descubra as paragens de abastecimento mais económicas ao longo da rota.'},
   {points:150,level:'Guia',icon:'📈',name:'Análise avançada',desc:'Nível preparado para comparações e histórico mais detalhado.'},
   {points:400,level:'Especialista',icon:'🧭',name:'Rotas de poupança',desc:'Acesso preparado para ferramentas avançadas de rota e custo.'},
   {points:800,level:'Embaixador',icon:'👑',name:'Área Embaixador',desc:'Nível máximo da comunidade e benefícios exclusivos.'}

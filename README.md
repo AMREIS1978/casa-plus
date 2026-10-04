@@ -1,41 +1,65 @@
-# Bomba Certa v8.5 — Preços reais + cálculo corrigido
+# Bomba Certa v8.6 — Viagem Inteligente
 
-## O que foi corrigido
+## Acesso
+Funcionalidade exclusiva para **Explorador ou superior**.
 
-### 1. Preços
-A aplicação deixa de depender do combustível selecionado para tentar preencher os cartões.
+O acesso não é apenas visual: foi criada no Supabase a função:
+`public.can_use_trip_planner()`
 
-Além da função backend, existe agora um fallback direto à API oficial da DGEG que:
-- pesquisa os 7 combustíveis;
-- percorre todas as páginas necessárias;
-- filtra apenas os postos no raio do utilizador;
-- agrega os preços por ID oficial do posto;
-- mantém a Comunidade como fonte prioritária quando existe uma atualização comunitária mais recente.
+Características:
+- `SECURITY INVOKER`;
+- usa o perfil do próprio utilizador;
+- `anon` sem permissão;
+- `authenticated` com execução;
+- desbloqueia a partir de 50 pontos ou Editor de confiança.
 
-Não são criados valores artificiais.
+## Planeamento
+O utilizador indica:
+- origem;
+- destino;
+- ida e volta / só ida;
+- combustível;
+- autonomia atual;
+- consumo médio;
+- capacidade do depósito;
+- reserva de segurança;
+- estratégia: Equilibrado / Mais barato / Menos paragens.
 
-### 2. Frescura
-Cada preço pode indicar:
-- DGEG / Comunidade;
-- há quanto tempo foi atualizado;
-- aviso “desatualizado na fonte” quando tem mais de 21 dias.
+## Dados
+A rota usa OSRM.
+A geocodificação usa OpenStreetMap/Nominatim.
+Os preços usados no cálculo são reais:
+- DGEG;
+- Comunidade recente quando existe e pode ser associada ao posto.
 
-Isto evita apresentar um preço antigo como se fosse atual.
+Postos sem preço real para o combustível selecionado não entram no cálculo económico.
 
-### 3. Melhor Escolha
-O cálculo foi refeito.
+## Algoritmo
+1. Calcula a rota rodoviária.
+2. Pesquisa postos DGEG até 8 km do corredor da rota.
+3. Associa a posição de cada posto ao percurso.
+4. Refina o desvio rodoviário de postos relevantes com OSRM.
+5. Respeita autonomia e reserva mínima.
+6. Seleciona paragens de acordo com a estratégia.
+7. Quando existe um posto mais barato alcançável, recomenda apenas o combustível necessário para lá chegar com reserva; caso contrário, abastece o necessário para avançar com segurança.
 
-Para cada posto:
-- custo no posto = litros × preço por litro;
-- custo para chegar = distância até ao posto × consumo médio / 100 × preço por litro;
-- custo total = custo no posto + custo para chegar.
+## Economia
+A economia não é comparada com um valor inventado.
 
-Sempre que possível, a distância usada é a distância rodoviária obtida por OSRM, e não a distância em linha reta.
+Referência:
+**os mesmos litros recomendados × preço mediano dos postos reais encontrados junto à rota**.
 
-A “vantagem líquida estimada” compara a Melhor Escolha com o posto com preço conhecido mais próximo e mostra separadamente:
-- poupança no abastecimento;
-- custo extra de deslocação;
-- vantagem líquida.
+Depois é descontado o custo estimado dos desvios.
 
-## Importante
-Nem todas as estações vendem todos os combustíveis e algumas fontes oficiais podem estar desatualizadas. Nesses casos a aplicação assinala a ausência/frescura em vez de inventar um valor.
+Mostra:
+- preço mediano encontrado;
+- custo dos abastecimentos recomendados;
+- custo dos desvios;
+- economia líquida estimada.
+
+## Responsive
+A nova área adapta-se a:
+- desktop;
+- portátil/tablet;
+- telemóvel;
+- ecrãs muito pequenos.
