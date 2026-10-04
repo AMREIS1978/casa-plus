@@ -1,58 +1,21 @@
-# Bomba Certa v7.5 — atualização comunitária de preços
+# Bomba Certa v7.6 — rodapé a passar em rotação contínua
 
-## Todos os utilizadores autenticados podem atualizar preços
+## Alteração pedida
+O rodapé da comunidade deixou de funcionar por mensagens estáticas a rodar uma a uma.
 
-Foi consolidado um fluxo único de publicação através da RPC:
+Agora passa em **formato contínuo de roda-pé**, como uma fita informativa.
 
-`public.submit_fuel_price(...)`
+## O que mudou
+- foi criada uma zona `community-activity-marquee`;
+- as mensagens recentes são concatenadas numa única linha;
+- o conteúdo é duplicado para permitir scroll contínuo sem quebra;
+- a animação é feita em CSS com `@keyframes communityTicker`;
+- em telemóvel a velocidade é ligeiramente ajustada.
 
-A função:
-- exige sessão autenticada;
-- usa automaticamente `auth.uid()`;
-- valida o posto;
-- valida o combustível;
-- valida preços entre 0,50 € e 5,00 €/L;
-- cria um novo registo comunitário sem permitir a um utilizador alterar diretamente o registo histórico de outro.
+## Exemplo visual
+`João alterou Gasóleo simples em Posto X de 1,729 €/L para 1,699 €/L · há 2 min • Maria alterou GPL Auto em Posto Y para 0,899 €/L · agora mesmo • …`
 
-Isto mantém histórico e responsabilidade por cada alteração.
-
-## Alterar qualquer combustível
-
-O modal `Atualizar preço` tem agora um seletor próprio de combustível.
-O utilizador pode atualizar diretamente:
-- Gasóleo simples
-- Gasóleo aditivado / premium
-- Gasolina simples 95
-- Gasolina 95 aditivada / premium
-- Gasolina 98
-- Gasolina 98 aditivada / premium
-- GPL Auto
-
-## Rodapé de atividade comunitária
-
-Foi acrescentado um rodapé persistente, imediatamente acima da navegação.
-
-Exemplo:
-
-`● Comunidade · João alterou Gasóleo simples em Posto X de 1,729 €/L para 1,699 €/L · há 2 min`
-
-Quando não existe preço anterior:
-
-`Maria alterou Gasolina simples 95 em Posto Y para 1,759 €/L`
-
-O rodapé:
-- mostra as últimas 12 alterações;
-- roda automaticamente as mensagens;
-- atualiza em Realtime quando entra uma nova alteração.
-
-## Privacidade
-
-O feed não expõe email, user_id, password ou contacto de recuperação.
-Mostra apenas:
-- nome público;
-- posto;
-- combustível;
-- preço;
-- momento da atualização.
-
-A consulta é feita por uma RPC `SECURITY DEFINER` que expõe apenas estes campos.
+## Comportamento
+- se não existir atividade, o rodapé mostra uma mensagem simples;
+- quando entram novas alterações, o conteúdo é reconstruído e volta a arrancar;
+- mantém-se imediatamente acima da navegação inferior.

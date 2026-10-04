@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v7.5 — preços comunitários e atividade</title>
+<title>Bomba Certa v7.6 — rodapé em rotação contínua</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -224,16 +224,27 @@ header{
   flex:0 0 auto;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.06em;
   color:#86efac;white-space:nowrap
 }
-.community-activity-text{
-  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  font-size:11px;font-weight:700
+.community-activity-marquee{
+  flex:1 1 auto;min-width:0;overflow:hidden;position:relative
 }
-.community-activity-text .when{font-weight:500;color:#d0d5dd;margin-left:5px}
+.community-activity-text{
+  display:inline-flex;align-items:center;gap:26px;white-space:nowrap;
+  font-size:11px;font-weight:700;min-width:max-content;
+  animation:communityTicker 38s linear infinite;
+  will-change:transform
+}
+.community-activity-item{display:inline-flex;align-items:center;gap:6px}
+.community-activity-item .sep{opacity:.55;margin-left:12px}
+.community-activity-text .when{font-weight:500;color:#d0d5dd}
+@keyframes communityTicker{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
 .app{padding-bottom:132px}
 @media(max-width:560px){
   .community-activity-footer{bottom:66px;min-height:44px;padding-top:7px;padding-bottom:7px}
   .community-activity-label{font-size:9px}
-  .community-activity-text{font-size:10.5px}
+  .community-activity-text{font-size:10.5px;gap:20px;animation-duration:32s}
   .app{padding-bottom:136px}
 }
 </style>
@@ -578,7 +589,9 @@ header{
 
 <div id="communityActivityFooter" class="community-activity-footer" aria-live="polite">
   <div class="community-activity-label">● Comunidade</div>
-  <div id="communityActivityText" class="community-activity-text">A carregar as últimas atualizações de preços…</div>
+  <div class="community-activity-marquee">
+    <div id="communityActivityText" class="community-activity-text">A carregar as últimas atualizações de preços…</div>
+  </div>
 </div>
 
 <nav class="bottom-nav" aria-label="Navegação principal">
@@ -2135,28 +2148,34 @@ $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
 
 
 let recentPriceActivity=[];
-let recentPriceActivityIndex=0;
-let recentPriceActivityTimer=null;
 
 function activityPrice(v){
   const n=Number(v);
   return Number.isFinite(n)?n.toFixed(3).replace('.',',')+' €/L':'—'
 }
 
-function showPriceActivityItem(){
+function renderCommunityTicker(){
   const el=$('communityActivityText');
   if(!el)return;
+
   if(!recentPriceActivity.length){
-    el.textContent='Ainda não existem alterações de preços feitas pela comunidade.';
+    el.style.animation='none';
+    el.innerHTML='<span class="community-activity-item">Ainda não existem alterações de preços feitas pela comunidade.</span>';
     return
   }
-  const a=recentPriceActivity[recentPriceActivityIndex%recentPriceActivity.length];
-  recentPriceActivityIndex++;
-  const prev=a.previous_price!=null && Number(a.previous_price)!==Number(a.price)
-    ? ` de ${activityPrice(a.previous_price)} para ${activityPrice(a.price)}`
-    : ` para ${activityPrice(a.price)}`;
-  const when=a.changed_at?` · ${relativeTime(a.changed_at)}`:'';
-  el.innerHTML=`<b>${esc(a.display_name||'Utilizador')}</b> alterou ${esc(a.fuel_type||'combustível')} em <b>${esc(a.station_name||'posto')}</b>${esc(prev)}<span class="when">${esc(when)}</span>`
+
+  const items=recentPriceActivity.map(a=>{
+    const prev=a.previous_price!=null && Number(a.previous_price)!==Number(a.price)
+      ? ` de ${activityPrice(a.previous_price)} para ${activityPrice(a.price)}`
+      : ` para ${activityPrice(a.price)}`;
+    const when=a.changed_at?relativeTime(a.changed_at):'agora mesmo';
+    return `<span class="community-activity-item"><b>${esc(a.display_name||'Utilizador')}</b> alterou ${esc(a.fuel_type||'combustível')} em <b>${esc(a.station_name||'posto')}</b>${esc(prev)} <span class="when">· ${esc(when)}</span><span class="sep">•</span></span>`
+  }).join('');
+
+  el.style.animation='none';
+  void el.offsetWidth;
+  el.innerHTML=items+items;
+  el.style.animation='';
 }
 
 async function loadRecentPriceActivity(){
@@ -2164,16 +2183,14 @@ async function loadRecentPriceActivity(){
     const {data,error}=await supabase.rpc('community_recent_price_activity',{p_limit:12});
     if(error)throw error;
     recentPriceActivity=Array.isArray(data)?data:[];
-    recentPriceActivityIndex=0;
-    showPriceActivityItem();
-    clearInterval(recentPriceActivityTimer);
-    if(recentPriceActivity.length>1){
-      recentPriceActivityTimer=setInterval(showPriceActivityItem,6500)
-    }
+    renderCommunityTicker();
   }catch(e){
     console.warn('Atividade da comunidade indisponível:',e);
     const el=$('communityActivityText');
-    if(el)el.textContent='Atividade da comunidade temporariamente indisponível.'
+    if(el){
+      el.style.animation='none';
+      el.innerHTML='<span class="community-activity-item">Atividade da comunidade temporariamente indisponível.</span>'
+    }
   }
 }
 
