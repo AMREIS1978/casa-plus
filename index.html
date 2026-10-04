@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.7 — Interações Facebook</title>
+<title>Bomba Certa v9.8 — Mobile e Mapa Um Toque</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1459,6 +1459,96 @@ body{padding-bottom:78px!important}
   .reaction-picker button{width:36px!important;height:36px!important;font-size:23px!important}
 }
 
+
+/* ===== v9.8 · Marca mobile garantida + mapa ao primeiro toque ===== */
+.mobile-brand-row{display:none}
+
+@media(max-width:900px){
+  /* Uma linha exclusivamente para a marca: nunca compete com menu ou perfil. */
+  .mobile-brand-row{
+    display:flex!important;
+    min-height:43px;
+    align-items:center;
+    padding:7px 12px 5px;
+    background:rgba(255,255,255,.98);
+    border-bottom:1px solid #edf0f4;
+    position:relative;
+    z-index:4
+  }
+  .mobile-brand-wordmark{
+    display:block!important;
+    font-size:19px;
+    line-height:1;
+    font-weight:950;
+    letter-spacing:-.045em;
+    color:#10213b;
+    white-space:nowrap
+  }
+  .mobile-brand-wordmark span{
+    color:#2f7df6;
+    font-weight:800
+  }
+
+  /* A marca original fica reservada ao desktop para não haver duas marcas. */
+  .header-in>.brand{display:none!important}
+
+  .header-in{
+    min-height:45px!important;
+    grid-template-columns:1fr auto!important;
+    display:grid!important;
+    padding-top:4px!important;
+    padding-bottom:4px!important
+  }
+  .header-actions{
+    grid-column:2!important;
+    justify-self:end!important
+  }
+
+  /* O mapa passa a reagir imediatamente ao toque. */
+  #fuelMap{
+    pointer-events:auto!important;
+    touch-action:none!important;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    isolation:isolate
+  }
+  #fuelMap .leaflet-pane,
+  #fuelMap .leaflet-marker-icon,
+  #fuelMap .leaflet-control{
+    pointer-events:auto!important
+  }
+  #fuelMap .leaflet-marker-icon{
+    touch-action:none!important
+  }
+}
+
+@media(max-width:560px){
+  .mobile-brand-row{
+    min-height:40px;
+    padding:6px 10px 4px
+  }
+  .mobile-brand-wordmark{font-size:18px}
+  .header-in{
+    min-height:40px!important;
+    padding:3px 8px!important
+  }
+  .top-profile-btn{
+    width:34px!important;
+    min-width:34px!important;
+    height:34px!important
+  }
+  .top-profile-avatar{
+    width:29px!important;
+    height:29px!important
+  }
+}
+
+@media(max-width:390px){
+  .mobile-brand-wordmark{font-size:17px}
+  .mobile-brand-row{padding-left:9px}
+}
+
 </style>
 </head>
 <body>
@@ -1533,6 +1623,9 @@ body{padding-bottom:78px!important}
 
 <div id="appShell" class="hidden">
 <header>
+  <div class="mobile-brand-row" aria-label="Bomba Certa">
+    <div class="mobile-brand-wordmark">Bomba <span>Certa</span></div>
+  </div>
   <div class="header-in">
     <div class="brand">Bomba <span>Certa</span></div>
     <nav class="bottom-nav" aria-label="Navegação principal">
@@ -4125,9 +4218,53 @@ function bindFuelMapResize(){
 
 function ensureMap(){
   if(map)return;
-  map=L.map('fuelMap').setView([39.5,-8],6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap',updateWhenIdle:true,keepBuffer:2}).addTo(map)
+  const isTouch=window.matchMedia?.('(pointer:coarse)')?.matches || ('ontouchstart' in window);
+  map=L.map('fuelMap',{
+    zoomControl:true,
+    dragging:true,
+    touchZoom:true,
+    scrollWheelZoom:!isTouch,
+    doubleClickZoom:!isTouch,
+    boxZoom:!isTouch,
+    keyboard:!isTouch,
+    tapHold:false,
+    zoomSnap:1
+  }).setView([39.5,-8],6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,
+    attribution:'© OpenStreetMap',
+    updateWhenIdle:true,
+    keepBuffer:2
+  }).addTo(map);
+
+  const el=map.getContainer();
+  el.setAttribute('role','application');
+  el.setAttribute('aria-label','Mapa interativo de postos de combustível');
+
+  // Em ecrãs tácteis o mapa recebe o gesto logo no primeiro toque.
+  if(isTouch){
+    el.style.touchAction='none';
+    el.addEventListener('pointerdown',()=>{
+      if(document.activeElement!==el){
+        try{el.focus({preventScroll:true})}catch{el.focus()}
+      }
+    },{passive:true});
+  }
+
   bindFuelMapResize();
+}
+
+function makeFuelMarker(lat,lon,popupHtml){
+  const m=L.marker([lat,lon]).addTo(map).bindPopup(popupHtml,{maxWidth:340,minWidth:250});
+
+  // Leaflet já abre no click. Estes eventos eliminam a sensação de "primeiro toque para ativar".
+  m.on('click',()=>m.openPopup());
+  m.on('touchstart',()=>{
+    requestAnimationFrame(()=>m.openPopup())
+  });
+
+  return m
 }
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
@@ -4376,6 +4513,7 @@ async function searchStations(){
   if(map){
     if(userMarker)map.removeLayer(userMarker);
     userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
     map.setView([currentLat,currentLon],13,{animate:false})
   }
 
@@ -5154,8 +5292,9 @@ function renderBasicStations(){
     stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
     if(userMarker)map.removeLayer(userMarker);
     userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
     for(const s of rows){
-      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(mapStationPopupHTML(s),{maxWidth:340,minWidth:250});
+      const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s));
       stationMarkers.push(m)
     }
     if(rows.length){
@@ -5230,8 +5369,9 @@ async function renderStations(){
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
+    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
   for(const s of nearbyStations){
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(mapStationPopupHTML(s),{maxWidth:340,minWidth:250});
+    const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s));
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});

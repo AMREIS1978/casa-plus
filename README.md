@@ -1,39 +1,24 @@
-# Bomba Certa v9.7 — Interações estilo Facebook
+# Bomba Certa v9.8 — Mobile + Mapa ao Primeiro Toque
 
-## Correção funcional
-Os botões de Gosto, Comentário e Partilha não respondiam corretamente porque a chave do posto era injetada diretamente nos atributos `onclick` com aspas incompatíveis.
+## Nome da app no telemóvel
+Foi criada uma linha mobile dedicada exclusivamente ao wordmark **Bomba Certa**.
 
-Foi substituída por uma chave codificada segura (`encodeURIComponent`) e todos os handlers descodificam a chave antes de agir.
+Isto elimina a competição de espaço entre:
+- nome da app;
+- navegação;
+- perfil;
+- ações do cabeçalho.
 
-## Três botões à esquerda
-Tal como no exemplo:
-- 👍 Reagir
-- 💬 Comentar
-- ↗ Partilhar
+Em PC continua a ser usada a marca original do cabeçalho. Em tablet/telemóvel aparece sempre a nova marca dedicada.
 
-Ficam compactos e alinhados à esquerda.
+## Mapa
+O mapa foi ajustado para interação imediata em dispositivos tácteis:
 
-## Reações
-Ao clicar em Gosto abre uma barra flutuante com:
-- 👍 Gosto
-- ❤️ Adoro
-- 🥰 Carinho
-- 😆 Riso
-- 😮 Surpresa
-- 😢 Triste
-- 😡 Zangado
+- `touch-action: none` apenas dentro do mapa;
+- foco no primeiro `pointerdown`;
+- duplo clique/box zoom desativados em touch;
+- scroll wheel desativado em touch;
+- marcadores abrem popup também em `touchstart`;
+- função única `makeFuelMarker()` garante o mesmo comportamento em todas as renderizações.
 
-A reação escolhida substitui o ícone de Gosto. Repetir a mesma reação remove-a.
-
-## Comentários
-O botão abre os comentários do posto e permite:
-- escrever;
-- inserir emojis;
-- publicar com Enter;
-- eliminar os próprios comentários.
-
-## Partilha
-Usa a partilha nativa do dispositivo quando disponível. Em PC copia o posto e o link para a área de transferência como fallback.
-
-## Backend
-O backend Supabase foi atualizado para aceitar as sete reações acima. As RPCs continuam exclusivas para utilizadores autenticados.
+Resultado esperado: um único toque num posto abre imediatamente o respetivo popup, sem ser necessário “ativar” primeiro o mapa.
