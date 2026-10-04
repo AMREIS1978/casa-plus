@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.7 — Viagem Inteligente Essencial</title>
+<title>Bomba Certa v8.8 — Rotas e Partilha</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -745,6 +745,42 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
   .trip-summary-actions .btn{width:100%}
 }
 
+
+/* ===== v8.8 · Mais rápida por defeito + rota económica + partilha ===== */
+.trip-route-choice-wrap{grid-column:span 2;display:grid;gap:5px}
+.trip-route-choice-label{font-size:9px;font-weight:900;color:#57657b;text-transform:uppercase;letter-spacing:.045em}
+.trip-route-choice{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.route-choice-card{
+  position:relative;display:flex;align-items:center;gap:9px;min-height:56px;padding:9px 10px;
+  border:1px solid #e3e8f0;border-radius:14px;background:#fbfcfe;cursor:pointer
+}
+.route-choice-card input{position:absolute;opacity:0;pointer-events:none}
+.route-choice-icon{font-size:18px}
+.route-choice-card span:last-child{display:grid;gap:2px;min-width:0}
+.route-choice-card b{font-size:10px;color:#27364d}.route-choice-card small{font-size:8px;color:#7c899d;line-height:1.25}
+.route-choice-card:has(input:checked){border-color:#96bffc;background:#edf4ff;box-shadow:0 0 0 2px rgba(47,125,246,.08)}
+.route-choice-card:has(input:checked) b{color:#185fae}
+.trip-share-btn{min-height:44px;border-radius:13px;background:#fff;color:#184b8a;border:1px solid #d9e5f5}
+.trip-route-comparison{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px;
+  padding-top:9px;border-top:1px solid rgba(255,255,255,.09)
+}
+.trip-route-comparison>div{padding:9px;border-radius:12px;background:rgba(255,255,255,.055)}
+.trip-route-comparison span{display:block;font-size:7.5px;color:#9fb1ca}
+.trip-route-comparison strong{display:block;font-size:12px;margin-top:3px}
+@media(max-width:1050px){
+  .trip-route-choice-wrap{grid-column:1/-1}
+}
+@media(max-width:720px){
+  .trip-route-choice{grid-template-columns:1fr}
+  .trip-summary-actions{grid-template-columns:1fr 1fr}
+  .trip-summary-actions .trip-share-btn{grid-column:1/-1}
+  .trip-route-comparison{grid-template-columns:1fr 1fr}
+}
+@media(max-width:430px){
+  .trip-route-comparison{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1129,8 +1165,23 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
             <span>Reserva de segurança</span>
             <div class="trip-unit-input"><input id="tripReserve" class="input" type="number" min="10" max="150" step="5" value="40"><b>km</b></div>
           </label>
+          <div class="trip-route-choice-wrap">
+            <span class="trip-route-choice-label">Tipo de percurso</span>
+            <div class="trip-route-choice">
+              <label class="route-choice-card">
+                <input type="radio" name="tripRouteMode" value="fastest" checked>
+                <span class="route-choice-icon">⚡</span>
+                <span><b>Mais rápida</b><small>Predefinida · menor tempo estimado</small></span>
+              </label>
+              <label class="route-choice-card">
+                <input type="radio" name="tripRouteMode" value="eco">
+                <span class="route-choice-icon">💶</span>
+                <span><b>Mais económica</b><small>Compara alternativas, distância, tempo e relevo quando disponível</small></span>
+              </label>
+            </div>
+          </div>
           <label class="trip-field">
-            <span>Estratégia</span>
+            <span>Escolha do posto</span>
             <select id="tripStrategy" class="input">
               <option value="balanced" selected>Equilibrado</option>
               <option value="cheapest">Mais barato nas paragens necessárias</option>
@@ -1167,6 +1218,12 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
             <div><span>Paragens</span><strong id="tripStopsCount">—</strong></div>
             <div><span>Custo dos abastecimentos</span><strong id="tripFuelCost">—</strong></div>
           </div>
+          <div id="tripRouteComparison" class="trip-route-comparison hidden">
+            <div><span>Rota escolhida</span><strong id="tripChosenRouteType">Mais rápida</strong></div>
+            <div><span>Tempo estimado</span><strong id="tripDuration">—</strong></div>
+            <div><span>Subida acumulada</span><strong id="tripElevationGain">—</strong></div>
+            <div><span>Diferença para a mais rápida</span><strong id="tripRouteTradeoff">—</strong></div>
+          </div>
 
           <div class="trip-savings-breakdown">
             <div><span>Preço mediano encontrado</span><strong id="tripMedianPrice">—</strong></div>
@@ -1177,6 +1234,7 @@ body.guest-mode .nav[data-section="viagem"]{display:none!important}
 
           <div class="trip-summary-actions">
             <button id="tripStartRouteBtn" class="btn trip-start-route-btn" type="button">▶ Iniciar rota</button>
+            <button id="tripShareBtn" class="btn trip-share-btn" type="button">↗ Partilhar percurso</button>
             <button id="tripRecalculateBtn" class="btn secondary" type="button">↻ Recalcular</button>
           </div>
           <button id="tripExplainBtn" class="trip-explain-btn" type="button">Como é calculado o plano?</button>
@@ -1762,14 +1820,93 @@ async function tripGeocode(query){
   return {lat:Number(data[0].lat),lon:Number(data[0].lon),label:data[0].display_name||q}
 }
 
-async function tripRoute(a,b){
-  const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson&steps=false`;
+
+function tripSampleCoords(coords,max=90){
+  if(coords.length<=max)return coords;
+  const step=Math.ceil(coords.length/max);
+  const out=[];
+  for(let i=0;i<coords.length;i+=step)out.push(coords[i]);
+  if(out[out.length-1]!==coords[coords.length-1])out.push(coords[coords.length-1]);
+  return out
+}
+
+async function tripElevationGain(coords){
+  const sample=tripSampleCoords(coords,90);
+  if(sample.length<2)return {gain:null,loss:null};
+  try{
+    const lat=sample.map(p=>p.lat.toFixed(5)).join(',');
+    const lon=sample.map(p=>p.lon.toFixed(5)).join(',');
+    const r=await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`);
+    if(!r.ok)throw new Error('elevation');
+    const j=await r.json();
+    const e=Array.isArray(j?.elevation)?j.elevation.map(Number):[];
+    if(e.length!==sample.length)return {gain:null,loss:null};
+    let gain=0,loss=0;
+    for(let i=1;i<e.length;i++){
+      const d=e[i]-e[i-1];
+      if(d>0)gain+=d; else loss+=Math.abs(d)
+    }
+    return {gain,loss}
+  }catch{
+    return {gain:null,loss:null}
+  }
+}
+
+function tripRouteFuelEstimate(route,baseConsumption){
+  const km=Number(route.distanceKm||0);
+  const hours=Math.max(.1,Number(route.durationSec||0)/3600);
+  const avgSpeed=km/hours;
+  let speedFactor=1;
+  if(avgSpeed>105)speedFactor+=Math.min(.22,(avgSpeed-105)*.004);
+  else if(avgSpeed<35)speedFactor+=Math.min(.18,(35-avgSpeed)*.006);
+
+  const base=km*(baseConsumption/100)*speedFactor;
+  // Aproximação física conservadora sem conhecer massa/cx do veículo:
+  // penalização pequena por subida acumulada, usada apenas para comparar rotas.
+  const climbPenalty=Number.isFinite(route.elevationGain)?(route.elevationGain/100)*0.11:0;
+  return base+climbPenalty
+}
+
+async function tripRouteOptions(a,b,preference='fastest',baseConsumption=6.5){
+  const alt=preference==='eco'?'true':'false';
+  const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson&steps=false&alternatives=${alt}`;
   const r=await fetch(url);
   if(!r.ok)throw new Error('Não foi possível calcular a rota rodoviária.');
   const j=await r.json();
-  const route=j?.routes?.[0];
-  if(!route)throw new Error('Não existe uma rota rodoviária disponível entre os locais indicados.');
-  return {distanceKm:Number(route.distance)/1000,durationSec:Number(route.duration),coords:route.geometry.coordinates.map(([lon,lat])=>({lat,lon}))}
+  const raw=Array.isArray(j?.routes)?j.routes:[];
+  if(!raw.length)throw new Error('Não existe uma rota rodoviária disponível entre os locais indicados.');
+
+  const routes=raw.slice(0,3).map(route=>({
+    distanceKm:Number(route.distance)/1000,
+    durationSec:Number(route.duration),
+    coords:route.geometry.coordinates.map(([lon,lat])=>({lat,lon})),
+    elevationGain:null,
+    elevationLoss:null
+  }));
+
+  if(preference==='eco' && routes.length>1){
+    await Promise.all(routes.map(async route=>{
+      const elev=await tripElevationGain(route.coords);
+      route.elevationGain=elev.gain;
+      route.elevationLoss=elev.loss;
+      route.estimatedLiters=tripRouteFuelEstimate(route,baseConsumption)
+    }));
+  }else{
+    routes[0].estimatedLiters=tripRouteFuelEstimate(routes[0],baseConsumption)
+  }
+
+  const fastest=[...routes].sort((x,y)=>x.durationSec-y.durationSec)[0];
+  let chosen=fastest;
+  if(preference==='eco' && routes.length>1){
+    chosen=[...routes].sort((x,y)=>
+      (x.estimatedLiters??Infinity)-(y.estimatedLiters??Infinity)
+    )[0]
+  }
+  chosen.fastestDurationSec=fastest.durationSec;
+  chosen.fastestDistanceKm=fastest.distanceKm;
+  chosen.routePreference=preference;
+  chosen.alternativesEvaluated=routes.length;
+  return chosen
 }
 
 function tripBuildPath(outbound,returnRoute){
@@ -1984,7 +2121,7 @@ function tripRenderMap(path,stops,origin,destination){
 
 function tripRenderPlan(plan){
   lastTripPlan=plan;
-  const {path,stops,candidates,origin,destination,totalKm,consumption,fuel,mode}=plan;
+  const {path,stops,candidates,origin,destination,totalKm,consumption,fuel,mode,routePreference,outbound,returnRoute}=plan;
   const boughtLiters=stops.reduce((a,s)=>a+s.buyLiters,0);
   const purchaseCost=stops.reduce((a,s)=>a+s.purchaseCost,0);
   const detourCost=stops.reduce((a,s)=>a+s.detourCost,0);
@@ -1992,6 +2129,16 @@ function tripRenderPlan(plan){
   const baselineCost=boughtLiters*medianPrice;
   const netSaving=Math.max(0,baselineCost-purchaseCost-detourCost);
   const tripFuel=totalKm*consumption/100;
+
+  const durationSec=Number(outbound?.durationSec||0)+Number(returnRoute?.durationSec||0);
+  const fastestSec=Number(outbound?.fastestDurationSec||outbound?.durationSec||0)+Number(returnRoute?.fastestDurationSec||returnRoute?.durationSec||0);
+  const totalGain=(Number.isFinite(outbound?.elevationGain)?outbound.elevationGain:0)+(Number.isFinite(returnRoute?.elevationGain)?returnRoute.elevationGain:0);
+  const extraMin=Math.max(0,Math.round((durationSec-fastestSec)/60));
+  $('tripChosenRouteType').textContent=routePreference==='eco'?'Mais económica':'Mais rápida';
+  $('tripDuration').textContent=durationSec?`${Math.floor(durationSec/3600)}h ${Math.round((durationSec%3600)/60)}min`:'—';
+  $('tripElevationGain').textContent=(outbound?.elevationGain!=null || returnRoute?.elevationGain!=null)?`${tripNum(totalGain,0)} m`:'não disponível';
+  $('tripRouteTradeoff').textContent=routePreference==='eco'?(extraMin?`+${extraMin} min`:'sem tempo adicional'):'referência';
+  $('tripRouteComparison').classList.remove('hidden');
 
   $('tripDistance').textContent=tripNum(totalKm,0)+' km';
   $('tripFuelNeeded').textContent=tripNum(tripFuel,1)+' L';
@@ -2008,7 +2155,7 @@ function tripRenderPlan(plan){
     ?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}`
     :'A autonomia atual é suficiente';
   $('tripHeadlineDetail').textContent=stops.length
-    ?`Só incluímos paragens indispensáveis para manter autonomia segura. Dentro dessas zonas, escolhemos os postos mais vantajosos para ${fuel}.`
+    ?`${routePreference==='eco'?'Rota económica':'Rota mais rápida'} · só incluímos paragens indispensáveis para manter autonomia segura. Dentro dessas zonas, escolhemos os postos mais vantajosos para ${fuel}.`
     :`Com a autonomia indicada, não precisa de abastecer durante os ${tripNum(totalKm,0)} km da viagem.`;
 
   $('tripRouteLabel').textContent=mode==='roundtrip'?'Ida e volta':'Só ida';
@@ -2053,7 +2200,8 @@ async function calculateTrip(){
 
   const autonomy=Number($('tripAutonomy').value),consumption=Number($('tripConsumption').value),
         tank=Number($('tripTank').value),reserve=Number($('tripReserve').value),
-        strategy=$('tripStrategy').value,fuel=$('tripFuel').value,mode=$('tripMode').value;
+        strategy=$('tripStrategy').value,fuel=$('tripFuel').value,mode=$('tripMode').value,
+        routePreference=(document.querySelector('input[name="tripRouteMode"]:checked')?.value||'fastest');
 
   if(!Number.isFinite(autonomy)||autonomy<10)throw new Error('Indique uma autonomia atual válida.');
   if(!Number.isFinite(consumption)||consumption<2)throw new Error('Indique o consumo médio do veículo.');
@@ -2069,9 +2217,9 @@ async function calculateTrip(){
     tripOriginCoords=origin;tripDestinationCoords=destination;
 
     $('tripStatus').textContent='A calcular a rota rodoviária…';
-    const outbound=await tripRoute(origin,destination);
+    const outbound=await tripRouteOptions(origin,destination,routePreference,consumption);
     let returnRoute=null;
-    if(mode==='roundtrip')returnRoute=await tripRoute(destination,origin);
+    if(mode==='roundtrip')returnRoute=await tripRouteOptions(destination,origin,routePreference,consumption);
     const path=tripBuildPath(outbound,returnRoute);
     const totalKm=outbound.distanceKm+(returnRoute?.distanceKm||0);
 
@@ -2104,8 +2252,8 @@ async function calculateTrip(){
     $('tripStatus').textContent='A otimizar as paragens de abastecimento…';
     const {stops}=tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy);
 
-    const plan={origin,destination,outbound,returnRoute,path,totalKm,stops,candidates,autonomy,consumption,tank,reserve,strategy,fuel,mode};
-    localStorage.setItem('bombaCerta:tripPrefs',JSON.stringify({autonomy,consumption,tank,reserve,strategy,fuel,mode}));
+    const plan={origin,destination,outbound,returnRoute,path,totalKm,stops,candidates,autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference};
+    localStorage.setItem('bombaCerta:tripPrefs',JSON.stringify({autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference}));
     tripRenderPlan(plan);
     $('tripStatus').textContent=`✓ Plano calculado com ${candidates.length} postos reais considerados.`
   }finally{
@@ -2155,6 +2303,49 @@ function tripGoogleMapsUrl(plan){
   return `https://www.google.com/maps/dir/?${params.toString()}`
 }
 
+
+function tripShareText(plan){
+  if(!plan)return '';
+  const stops=[...(plan.stops||[])].sort((a,b)=>a.routeKm-b.routeKm);
+  const routeName=plan.routePreference==='eco'?'mais económica':'mais rápida';
+  const lines=[
+    '🧭 Bomba Certa — Viagem Inteligente',
+    `${plan.origin.label||'Origem'} → ${plan.destination.label||'Destino'}${plan.mode==='roundtrip'?' → regresso':''}`,
+    `Rota: ${routeName} · ${tripNum(plan.totalKm,0)} km`,
+    stops.length?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}:`:'Sem paragens de abastecimento necessárias.'
+  ];
+  stops.forEach((s,i)=>lines.push(`${i+1}. ${s.name} — ${s.price.toFixed(3).replace('.',',')} €/L — abastecer ${tripNum(s.buyLiters,1)} L`));
+  return lines.join('\n')
+}
+
+async function shareTripRoute(){
+  if(!lastTripPlan){
+    $('tripStatus').textContent='Calcule primeiro a viagem.';
+    return
+  }
+  const url=tripGoogleMapsUrl(lastTripPlan);
+  const text=tripShareText(lastTripPlan);
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title:'Bomba Certa — Viagem Inteligente',
+        text,
+        url
+      });
+      $('tripStatus').textContent='✓ Percurso partilhado.'
+      return
+    }
+  }catch(e){
+    if(e?.name==='AbortError')return
+  }
+  try{
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    $('tripStatus').textContent='✓ Percurso copiado. Pode agora enviar aos seus amigos.'
+  }catch{
+    window.prompt('Copie este percurso para partilhar:',`${text}\n${url}`)
+  }
+}
+
 function startTripRoute(){
   if(!lastTripPlan){
     $('tripStatus').textContent='Calcule primeiro a viagem.';
@@ -2169,6 +2360,7 @@ function startTripRoute(){
 }
 
 $('tripStartRouteBtn')?.addEventListener('click',startTripRoute);
+$('tripShareBtn')?.addEventListener('click',shareTripRoute);
 $('tripRecalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
   $('tripStatus').textContent=errPT(e)
 }));
@@ -2207,7 +2399,11 @@ try{
   if(prefs.reserve)$('tripReserve').value=prefs.reserve;
   if(prefs.strategy)$('tripStrategy').value=prefs.strategy;
   if(prefs.fuel)$('tripFuel').value=prefs.fuel;
-  if(prefs.mode)$('tripMode').value=prefs.mode
+  if(prefs.mode)$('tripMode').value=prefs.mode;
+  if(prefs.routePreference){
+    const r=document.querySelector(`input[name="tripRouteMode"][value="${prefs.routePreference}"]`);
+    if(r)r.checked=true
+  }
 }catch{}
 
 function showSection(id){

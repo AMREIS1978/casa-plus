@@ -1,19 +1,31 @@
-# Bomba Certa v8.7 — Viagem Inteligente Essencial
+# Bomba Certa v8.8 — Mais rápida + Mais económica + Partilha
 
-A Viagem Inteligente foi simplificada para fazer apenas o que interessa:
+## Percurso
+A opção predefinida é **⚡ Mais rápida**.
 
-- zero paragens se a autonomia atual chegar ao fim da viagem com reserva;
-- quando é necessário parar, procura o posto mais avançado possível dentro da autonomia segura;
-- o preço só decide entre postos nessa zona necessária;
-- um posto barato demasiado cedo já não cria uma paragem extra;
-- abastece apenas o necessário para concluir a próxima etapa ou maximizar a etapa seguinte;
-- cada paragem explica porque é necessária.
+Foi acrescentada uma alternativa **💶 Mais económica**. Nesta opção a app pede rotas alternativas ao motor OSRM e compara:
+- distância;
+- duração;
+- estimativa de consumo;
+- relevo/subida acumulada quando a fonte de elevação responde.
 
-## Iniciar rota
-Novo botão principal **▶ Iniciar rota**.
-Abre o Google Maps com origem, destino, paragens recomendadas e regresso à origem quando a viagem é ida e volta.
+A rota económica é uma estimativa e não substitui dados reais de consumo do veículo. O consumo indicado pelo utilizador continua a ser a base.
 
-Cada paragem permite também **Abrir este posto na navegação**.
+## Paragens
+Mantém-se a regra da v8.7: só são criadas paragens quando a autonomia obriga a parar. A escolha de rota não cria abastecimentos desnecessários.
 
-## UX
-A área recebeu um visual mais forte e simples, CTA “Criar plano de viagem”, resumo mais claro e botões de navegação mais visíveis.
+## Partilhar
+Novo botão **↗ Partilhar percurso**.
+
+Em dispositivos compatíveis usa a partilha nativa do sistema. O conteúdo inclui:
+- origem/destino;
+- tipo de rota;
+- distância;
+- paragens necessárias;
+- posto, preço e litros recomendados;
+- link da rota no Google Maps.
+
+Se a partilha nativa não estiver disponível, copia o plano e o link para a área de transferência.
+
+## Navegação
+O botão **▶ Iniciar rota** mantém origem, destino, paragens e regresso quando aplicável.
