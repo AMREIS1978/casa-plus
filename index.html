@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v8.2 — melhor escolha inteligente</title>
+<title>Bomba Certa v8.3 — visitante e critério transparente</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -566,6 +566,27 @@ header{
   .smart-choice-actions button{width:100%}
 }
 
+
+/* ===== v8.3 · Critério claro + modo visitante ===== */
+.guest-entry-btn{background:#10213a;color:#fff;border:1px solid #10213a;min-height:50px;border-radius:14px;font-weight:900}
+.smart-choice-explain-btn{margin-top:10px;padding:0;border:0;background:transparent;color:#a9c8ff;font-size:10px;font-weight:900;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.smart-choice-explain{margin-top:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)}
+.smart-choice-explain-title{font-size:11px;font-weight:900;margin-bottom:10px}
+.smart-choice-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.smart-choice-steps>div{display:flex;gap:8px;align-items:flex-start}
+.smart-choice-steps b{width:23px;height:23px;display:grid;place-items:center;flex:0 0 23px;border-radius:8px;background:#fff;color:#173760;font-size:10px}
+.smart-choice-steps span{display:grid;gap:2px}.smart-choice-steps strong{font-size:9.5px}
+.smart-choice-steps small{font-size:8.5px;line-height:1.35;color:#b8c8dc}
+.smart-choice-baseline{margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.09);font-size:9.5px;color:#d9e4f2}
+body.guest-mode #profileAdminBtn,body.guest-mode #adminTopBtn,
+body.guest-mode .nav[data-section="abastecimentos"],
+body.guest-mode .nav[data-section="estatisticas"],
+body.guest-mode .nav[data-section="perfil"]{display:none!important}
+body.guest-mode .bottom-nav{max-width:220px}
+.guest-cta{margin-top:8px;padding:10px 12px;border-radius:13px;background:#f6f9ff;border:1px solid #e3ebf8;font-size:10px;line-height:1.45;color:#526078}
+@media(max-width:760px){.smart-choice-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){.smart-choice-steps{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -583,6 +604,7 @@ header{
     </div>
     <button id="loginBtn" class="btn">Entrar</button>
     <button id="openSignupBtn" class="btn secondary" type="button">Criar conta grátis</button>
+    <button id="guestBtn" class="btn guest-entry-btn" type="button">Continuar como visitante</button>
 <button id="forgotPasswordBtn" class="btn secondary" type="button">🔐 Recuperar acesso à conta</button>
     <div class="tiny muted" style="margin-top:2px">Pode entrar com o username escolhido ou, em alternativa, com o email associado à conta.</div><div id="authStatus" class="status"></div>
   </div>
@@ -719,12 +741,24 @@ header{
           <strong id="smartChoiceTravelCost">—</strong>
         </div>
         <div class="smart-choice-stat saving">
-          <span>Poupança estimada</span>
+          <span>Poupa vs. posto mais próximo</span>
           <strong id="smartChoiceSaving">—</strong>
         </div>
       </div>
 
       <div id="smartChoiceWhy" class="smart-choice-why"></div>
+
+      <button id="smartChoiceExplainBtn" class="smart-choice-explain-btn" type="button">Como calculamos esta escolha?</button>
+      <div id="smartChoiceExplain" class="smart-choice-explain hidden">
+        <div class="smart-choice-explain-title">É simples: procuramos o menor custo total.</div>
+        <div class="smart-choice-steps">
+          <div><b>1</b><span><strong>Preço</strong><small>Quanto custa cada litro.</small></span></div>
+          <div><b>2</b><span><strong>Abastecimento</strong><small>Preço × litros que quer abastecer.</small></span></div>
+          <div><b>3</b><span><strong>Deslocação</strong><small>Estimamos o combustível gasto para ir e voltar ao posto.</small></span></div>
+          <div><b>4</b><span><strong>Escolha final</strong><small>Ganha o posto com menor custo total estimado.</small></span></div>
+        </div>
+        <div class="smart-choice-baseline"><b>Poupança:</b> compara a Melhor Escolha com o posto disponível mais próximo.</div>
+      </div>
 
       <div class="smart-choice-actions">
         <button id="smartChoiceRouteBtn" class="btn smart-route-btn" type="button">↗ Ver rota</button>
@@ -1224,6 +1258,7 @@ function fuelMatchesLabel(apiLabel,selected){
 
 
 let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[],currentAuthUserId=null;
+let isGuestMode=false;
 let currentStation=null,currentPriceStation=null,fillups=[],monthlyChart=null,priceChart=null,fuelChannel=null,dgegFuelTypes=[];
 
 
@@ -1672,16 +1707,24 @@ async function enterApp(){
   $('authScreen').classList.add('hidden');
   $('appShell').classList.remove('hidden');
 
-  // Primeiro: mapa, pesquisa, atividade comunitária e Realtime global.
-  // O Realtime arranca logo após o login para que qualquer alteração feita
-  // por um utilizador fique visível a toda a comunidade autenticada,
-  // mesmo que outro utilizador ainda não tenha autorizado a localização.
   ensureMap();
-  subscribeRealtime();
+  if(!isGuestMode){
+    subscribeRealtime();
+    loadRecentPriceActivity().catch(()=>{});
+  }
   setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
-  loadRecentPriceActivity().catch(()=>{});
 
-  // Confirmar identidade antes de decidir permissões administrativas.
+  if(isGuestMode){
+    currentAuthUserId=null;
+    hideAdminUI();
+    document.body.classList.add('guest-mode');
+    if($('topName'))$('topName').textContent='Visitante';
+    if($('topLevel'))$('topLevel').textContent='Consulta';
+    if($('logoutBtn'))$('logoutBtn').textContent='Sair';
+    return
+  }
+
+  document.body.classList.remove('guest-mode');
   try{
     const {data:{user}}=await supabase.auth.getUser();
     currentAuthUserId=user?.id||null;
@@ -1691,11 +1734,8 @@ async function enterApp(){
     currentAuthUserId=null
   }
 
-  // Perfil visual pode carregar em paralelo.
   hydrateTopProfile().catch(()=>{});
   await safeEnsureFuelProfile();
-
-  // O papel administrativo é prioritário e não fica dependente do ranking/perfil.
   await checkAdmin();
 
   loadLeaderboard().catch(()=>{});
@@ -1960,6 +2000,11 @@ function showSignupPane(){
   setSignupStatus('');setTimeout(()=>$('signupName').focus(),40)
 }
 $('openSignupBtn').onclick=showSignupPane;
+$('guestBtn').onclick=async()=>{
+  isGuestMode=true;
+  await enterApp()
+};
+
 $('backLoginBtn').onclick=showLoginPane;
 $('toggleSignupPassword').onclick=()=>{
   const p=$('signupPassword');p.type=p.type==='password'?'text':'password';
@@ -2071,7 +2116,10 @@ $('signupBtn').onclick=async()=>{
   }
 };
 
-$('logoutBtn').onclick=async()=>{await supabase.auth.signOut();location.reload()};
+$('logoutBtn').onclick=async()=>{
+  if(isGuestMode){isGuestMode=false;document.body.classList.remove('guest-mode');location.reload();return}
+  await supabase.auth.signOut();location.reload()
+};
 
 
 
@@ -2361,7 +2409,7 @@ async function searchStations(){
   Promise.allSettled([
     officialPriceCache(currentLat,currentLon,r),
     registryStations(currentLat,currentLon,r),
-    communityStations(currentLat,currentLon,r)
+    isGuestMode?Promise.resolve([]):communityStations(currentLat,currentLon,r)
   ]).then(async results=>{
     const fast=mergeStations(results.filter(x=>x.status==='fulfilled').map(x=>x.value||[]))
       .filter(s=>s.distance<=r/1000);
@@ -2398,7 +2446,7 @@ async function searchStations(){
       // Por último entram validações, autor, denúncias, etc.
       try{await renderStations()}catch{}
 
-      remember(nearbyStations).catch(()=>{});
+      if(!isGuestMode)remember(nearbyStations).catch(()=>{});
       $('fastLocationInfo').classList.add('hidden');
       const pricedCount=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
       $('fuelStatus').textContent=nearbyStations.length
@@ -2432,7 +2480,7 @@ function relativeTime(ts){
 }
 
 async function communityData(){
-  if(currentLat==null)return {reports:[],validations:[],contributors:[],statuses:[]};
+  if(isGuestMode || currentLat==null)return {reports:[],validations:[],contributors:[],statuses:[]};
   const km=Number($('fuelRadius').value)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(currentLat*Math.PI/180)));
   const since=new Date(Date.now()-7*86400000).toISOString();
   const {data:reports}=await supabase.from('fuel_price_reports').select('*').eq('fuel_type',$('fuelType').value).gte('observed_at',since).gte('latitude',currentLat-dy).lte('latitude',currentLat+dy).gte('longitude',currentLon-dx).lte('longitude',currentLon+dx);
@@ -2476,7 +2524,7 @@ function updatePriceCoverage(){
   const priced=nearbyStations.filter(s=>Number(s.displayPrice??s.officialPrice)>0).length;
   if(!total){$('priceCoverage').textContent='';return}
   const pct=Math.round(priced/total*100);
-  $('priceCoverage').innerHTML=`<b>${priced}</b> de ${total} postos com preço (${pct}%) · <span>prioridade aos postos com preço disponível</span>`
+  $('priceCoverage').innerHTML=`<b>${priced}</b> de ${total} postos com preço (${pct}%) · <span>${isGuestMode?'modo visitante: preços oficiais disponíveis':'prioridade aos postos com preço disponível'}</span>`
 }
 
 
@@ -2516,19 +2564,20 @@ async function loadMultiFuelMatrix(stations){
   if(!keys.length)return {};
 
   const since=new Date(Date.now()-7*86400000).toISOString();
-  const [{data:official},{data:community}]=await Promise.all([
-    supabase.from('fuel_official_prices')
+  const officialPromise=supabase.from('fuel_official_prices')
       .select('station_key,fuel_type,price,fetched_at')
       .in('station_key',keys)
       .order('fetched_at',{ascending:false})
-      .limit(1500),
-    supabase.from('fuel_price_reports')
+      .limit(1500);
+  const communityPromise=isGuestMode
+    ? Promise.resolve({data:[]})
+    : supabase.from('fuel_price_reports')
       .select('station_key,fuel_type,price,observed_at')
       .in('station_key',keys)
       .gte('observed_at',since)
       .order('observed_at',{ascending:false})
-      .limit(1500)
-  ]);
+      .limit(1500);
+  const [{data:official},{data:community}]=await Promise.all([officialPromise,communityPromise]);
 
   const matrix={};
   for(const row of (official||[])){
@@ -2675,8 +2724,9 @@ function renderBasicStations(){
       ${stationFuelGridHTML(s,$('fuelType').value)}
       <div class="station-actions">
         <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
-        <button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button>
-        <button onclick="openFill('${s.key}')">⛽ Abastecimento</button>
+        ${isGuestMode
+          ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
+          : `<button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>`}
       </div>
     </div>`
   }).join(''):'<div class="empty">Ainda não encontrei postos nesta zona.</div>';
@@ -2751,10 +2801,9 @@ async function renderStations(){
       ${stationFuelGridHTML(s,$('fuelType').value)}
       <div class="station-actions">
         <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
-        <button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button>
-        <button onclick="openFill('${s.key}')">⛽ Abastecimento</button>
-        ${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}
-        <button onclick="reportClosed('${s.key}')">⚠ Encerrado</button>
+        ${isGuestMode
+          ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
+          : `<button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Encerrado</button>`}
       </div>
     </div>`
   }).join(''):'<div class="empty">Não foram encontrados postos neste raio.</div>';
@@ -2840,6 +2889,23 @@ $('smartTankLiters')?.addEventListener('input',saveSmartChoicePrefs);
 $('smartConsumption')?.addEventListener('input',saveSmartChoicePrefs);
 $('smartChoiceRouteBtn')?.addEventListener('click',()=>{
   if(smartChoiceStationKey)startRoute(smartChoiceStationKey)
+});
+
+
+function promptGuestSignup(){
+  isGuestMode=false;
+  document.body.classList.remove('guest-mode');
+  $('appShell').classList.add('hidden');
+  $('authScreen').classList.remove('hidden');
+  showSignupPane();
+  $('authLead').textContent='Crie uma conta grátis para atualizar preços, validar informação e guardar abastecimentos.'
+}
+window.promptGuestSignup=promptGuestSignup;
+
+$('smartChoiceExplainBtn')?.addEventListener('click',()=>{
+  const box=$('smartChoiceExplain');
+  const isOpen=!box.classList.toggle('hidden');
+  $('smartChoiceExplainBtn').textContent=isOpen?'Fechar explicação':'Como calculamos esta escolha?'
 });
 
 window.openPrice=key=>{
