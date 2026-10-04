@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v9.2 — Navegação premium</title>
+<title>Bomba Certa v9.3 — Interface polida</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -931,6 +931,91 @@ body.guest-mode .nav{min-height:60px}
   .community-activity-footer{bottom:78px;width:calc(100% - 12px)}
 }
 
+
+
+/* ===== v9.3 · Interface polida, mapa com preços e scroll natural ===== */
+html{scroll-behavior:smooth}
+body{overflow-y:scroll;overscroll-behavior-y:auto}
+.premium-layout{gap:18px}
+.premium-map-card,.premium-stations-panel{
+  border-color:#e2e8f0;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 14px 38px rgba(15,23,42,.07);
+}
+.premium-stations-panel{min-width:0}
+.station{border-color:#e4eaf2;box-shadow:0 8px 22px rgba(15,23,42,.04)}
+.station:hover{box-shadow:0 16px 36px rgba(15,23,42,.075)}
+
+/* Combustíveis: scroll horizontal próprio, mas sem bloquear o scroll vertical da página. */
+.fuel-price-grid{
+  overscroll-behavior-x:contain;
+  overscroll-behavior-y:auto;
+  touch-action:pan-x pan-y;
+  scrollbar-width:thin;
+  scrollbar-color:#b9c7da transparent;
+  padding-bottom:5px;
+}
+.fuel-price-grid::-webkit-scrollbar{height:5px;display:block}
+.fuel-price-grid::-webkit-scrollbar-track{background:transparent}
+.fuel-price-grid::-webkit-scrollbar-thumb{background:#c4d0df;border-radius:999px}
+.fuel-price-grid::-webkit-scrollbar-thumb:hover{background:#9eb0c7}
+
+/* Popups do mapa: preços reais visíveis no próprio marcador. */
+.leaflet-popup-content-wrapper{border-radius:18px;box-shadow:0 18px 48px rgba(15,23,42,.2)}
+.leaflet-popup-content{margin:12px 13px;min-width:250px}
+.map-popup-card{font-family:inherit;color:#12213a}
+.map-popup-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding-bottom:8px;border-bottom:1px solid #edf1f5}
+.map-popup-head b{display:block;font-size:13px;line-height:1.25}
+.map-popup-head small{display:block;margin-top:3px;color:#7b8798;font-size:8.5px;line-height:1.35}
+.map-popup-head>span{white-space:nowrap;font-size:9px;font-weight:850;color:#5f6f84;background:#f4f7fb;border-radius:999px;padding:5px 7px}
+.map-popup-fuels{display:grid;gap:5px;margin-top:8px;max-height:210px;overflow:auto;padding-right:2px}
+.map-fuel-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center;padding:7px 8px;border-radius:10px;background:#f7f9fc;border:1px solid #edf1f5}
+.map-fuel-row.selected{background:#edf4ff;border-color:#cfe0ff}
+.map-fuel-row span{font-size:8.5px;color:#66758a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-fuel-row strong{font-size:11px;color:#10213b;white-space:nowrap}
+.map-fuel-row small{font-size:7px;color:#8190a5;white-space:nowrap}
+.map-popup-route{width:100%;margin-top:8px;min-height:36px;border:0;border-radius:11px;background:#2f7df6;color:#fff;font-size:10px;font-weight:900;cursor:pointer}
+
+/* Segundo ponto publicitário, discreto e claramente identificado. */
+.premium-ad-secondary{
+  margin:14px 0 0;
+  min-height:64px;
+  background:linear-gradient(135deg,#f8fbff,#f3f7fd);
+  border:1px solid #dfe8f3;
+  box-shadow:none;
+}
+.premium-ad-secondary .ad-title{font-size:12px}
+.premium-ad-secondary .ad-copy{font-size:10px}
+.premium-ad-secondary .ad-cta{background:#fff}
+
+@media(max-width:1000px){
+  .premium-layout{gap:13px}
+  .premium-map-card,.premium-stations-panel{box-shadow:0 10px 28px rgba(15,23,42,.055)}
+}
+@media(max-width:720px){
+  .premium-layout{display:flex;flex-direction:column}
+  .premium-map-card{order:1}
+  .premium-stations-panel{order:2}
+  .station{padding:12px}
+  .fuel-price-grid{
+    display:flex!important;
+    overflow-x:auto;
+    overflow-y:visible;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:8px;
+    margin-right:-2px;
+  }
+  .fuel-price-chip{scroll-snap-align:start;flex:0 0 108px;min-width:108px}
+  .premium-ad-secondary{padding:10px 12px;min-height:58px}
+  .premium-ad-secondary .ad-copy{display:none}
+}
+@media(max-width:430px){
+  .leaflet-popup-content{min-width:220px;max-width:250px}
+  .map-fuel-row{grid-template-columns:minmax(0,1fr) auto}
+  .map-fuel-row small{grid-column:1/-1;margin-top:-2px}
+}
+
 </style>
 </head>
 <body>
@@ -1150,6 +1235,15 @@ body.guest-mode .nav{min-height:60px}
         </div>
         <div id="stationList" class="station-list"><div class="empty">Faça uma pesquisa para ver os postos próximos.</div></div>
       </div>
+    </div>
+
+    <div class="ad premium-ad premium-ad-secondary" aria-label="Publicidade">
+      <div class="premium-ad-secondary-copy">
+        <div class="ad-badge">Publicidade</div>
+        <div class="ad-title">Espaço recomendado para parceiro local</div>
+        <div class="ad-copy">Seguros, oficinas, cartões de combustível, manutenção ou mobilidade.</div>
+      </div>
+      <div class="ad-cta">Patrocinado</div>
     </div>
 
     <div class="premium-community-strip">
@@ -4223,6 +4317,39 @@ function saveSmartChoicePrefs(){
   renderSmartChoice()
 }
 
+
+function mapStationPopupHTML(s){
+  const selected=$('fuelType')?.value||'';
+  const matrix={...(s.multiFuelPrices||{})};
+  if(selected && s.displayPrice!=null && !matrix[selected]){
+    matrix[selected]={price:s.displayPrice,source:s.priceSource||'official',updatedAt:s.lastUpdated||null}
+  }
+  const ordered=[selected,...MULTI_FUEL_ORDER.filter(f=>f!==selected)]
+    .filter((f,i,a)=>f&&a.indexOf(f)===i);
+  const known=ordered.filter(f=>Number.isFinite(Number(matrix[f]?.price)));
+  const fuels=known.length?known:ordered.slice(0,1);
+  const chips=fuels.map(f=>{
+    const info=matrix[f];
+    const price=Number(info?.price);
+    const has=Number.isFinite(price);
+    const src=info?.source==='community'?'Comunidade':info?.source==='official'?'DGEG':'';
+    return `<div class="map-fuel-row ${f===selected?'selected':''}">
+      <span>${esc(shortFuelName(f))}</span>
+      <strong>${has?price.toFixed(3).replace('.',',')+' €':'—'}</strong>
+      <small>${has?esc(src):'sem preço'}</small>
+    </div>`
+  }).join('');
+  const meta=[s.brand,s.address].filter(Boolean).map(esc).join(' · ');
+  return `<div class="map-popup-card">
+    <div class="map-popup-head">
+      <div><b>${esc(s.name)}</b>${meta?`<small>${meta}</small>`:''}</div>
+      <span>${Number.isFinite(Number(s.distance))?kmFmt(s.distance)+' km':''}</span>
+    </div>
+    <div class="map-popup-fuels">${chips}</div>
+    <button class="map-popup-route" onclick="startRoute('${String(s.key).replace(/'/g,"\\'")}')">↗ Ver rota</button>
+  </div>`
+}
+
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
     const ap=a.displayPrice??a.officialPrice, bp=b.displayPrice??b.officialPrice;
@@ -4267,9 +4394,7 @@ function renderBasicStations(){
     if(userMarker)map.removeLayer(userMarker);
     userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
     for(const s of rows){
-      const p=s.displayPrice??s.officialPrice;
-      const src=s.priceSource==='community'?' · Comunidade':(s.officialPrice!=null?' · DGEG':'');
-      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${p!=null?Number(p).toFixed(3).replace('.',',')+' €/L · '+esc($('fuelType').value)+src:'Preço a atualizar'}<br><button onclick="startRoute('${s.key}')">Ver rota</button>`);
+      const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(mapStationPopupHTML(s),{maxWidth:340,minWidth:250});
       stationMarkers.push(m)
     }
     if(rows.length){
@@ -4343,8 +4468,7 @@ async function renderStations(){
   if(userMarker)map.removeLayer(userMarker);
   userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
   for(const s of nearbyStations){
-    const upd=s.lastUpdated?`<br><span style="font-size:11px;color:#667085">${s.priceSource==='community'?'Atualizado pela comunidade':'Atualização DGEG'} · ${relativeTime(s.lastUpdated)}</span>`:'';
-    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.name)}</b><br>${s.displayPrice?Number(s.displayPrice).toFixed(3).replace('.',',')+' €/L · '+esc($('fuelType').value):'Sem preço'}${upd}<br><button onclick="startRoute('${s.key}')">Ver rota</button>`);
+    const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(mapStationPopupHTML(s),{maxWidth:340,minWidth:250});
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
