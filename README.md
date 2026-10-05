@@ -1,19 +1,15 @@
-# MyGGas — Top Visual Rebrand
+# MyGGas — top visual ajustado
 
-Esta versão usa como base o ficheiro funcional fornecido pelo utilizador e altera
-apenas a apresentação do topo da aplicação.
+Versão atualizada com correções visuais do topo, sem alterar a lógica principal da app.
 
-## Alterações visuais
-- logótipo MyGGas no cabeçalho;
-- cabeçalho branco arredondado no desktop;
-- navegação existente com aspeto corporate;
-- hero com imagem rodoviária MyGGas;
-- slogan e headline MyGGas;
-- pesquisa visualmente integrada no hero;
-- adaptação responsive para tablet e telemóvel;
-- logótipo MyGGas no ecrã de autenticação.
+## Correções aplicadas
+- logomarca MyGGas embebida diretamente no HTML (deixa de falhar quando faltam assets);
+- imagem hero embebida diretamente no HTML;
+- cabeçalho ajustado para coincidir com o exemplo enviado;
+- logótipo com melhor escala em desktop e mobile;
+- hero com imagem, headline e pesquisa melhor alinhadas;
+- preservação das funcionalidades já existentes.
 
-## Preservado
-Não foram alterados IDs, `data-section`, eventos, autenticação, pesquisa de postos,
-mapa, preços, perfil, social, abastecimentos, viagem, análise, administração ou
-funções JavaScript da versão-base.
+## Ficheiros
+- `index.html` — versão pronta a publicar;
+- `README.md` — notas da versão.
