@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>MyGGas v10.9 — Como Chegar</title>
+<title>MyGGas — Preços de combustível</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2987,53 +2987,322 @@ input,select,textarea,button{max-width:100%}
 }
 
 
-/* ===== MyGGas · rebrand mínimo sobre a versão estável ===== */
+/* ==========================================================================
+   MyGGas — visual patch apenas para cabeçalho + hero + pesquisa
+   Base funcional preservada.
+   ========================================================================== */
+
+:root{
+  --myggas-navy:#0b2d6b;
+  --myggas-blue:#2477e8;
+  --myggas-soft:#f4f8fd;
+  --myggas-line:#e2eaf4;
+}
+
+/* Cabeçalho: mesmo comportamento/IDs, apenas visual. */
+header{
+  background:rgba(246,249,253,.92)!important;
+  border-bottom:0!important;
+  padding:8px 8px 0!important;
+  backdrop-filter:blur(18px)!important;
+}
+.header-in{
+  max-width:1460px!important;
+  min-height:68px!important;
+  padding:8px 18px!important;
+  margin:0 auto!important;
+  border:1px solid var(--myggas-line)!important;
+  border-radius:22px!important;
+  background:rgba(255,255,255,.97)!important;
+  box-shadow:0 10px 32px rgba(19,43,78,.065)!important;
+}
 .header-in>.brand{
   display:flex!important;
   align-items:center!important;
-  min-width:96px!important;
-  height:46px!important;
+  min-width:190px!important;
+  height:48px!important;
   overflow:visible!important;
 }
 .header-in>.brand img{
   display:block!important;
   width:auto!important;
-  height:44px!important;
-  max-width:128px!important;
+  height:46px!important;
+  max-width:205px!important;
   object-fit:contain!important;
   object-position:left center!important;
 }
+.header-actions{
+  gap:7px!important;
+}
+.top-profile-btn{
+  border:0!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+.top-profile-btn:hover{
+  background:#f7faff!important;
+}
+
+/* Desktop: transforma a navegação já existente no aspeto do mockup,
+   sem alterar data-section, IDs ou event handlers. */
+@media(min-width:901px){
+  .bottom-nav{
+    top:14px!important;
+    width:min(650px,calc(100vw - 520px))!important;
+    min-width:510px!important;
+    gap:3px!important;
+  }
+  .nav{
+    min-height:48px!important;
+    flex-direction:row!important;
+    gap:7px!important;
+    padding:6px 10px!important;
+    border-radius:999px!important;
+    color:#526985!important;
+  }
+  .nav-icon{
+    width:auto!important;
+    height:auto!important;
+    min-width:18px!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    font-size:14px!important;
+  }
+  .nav-label{
+    font-size:9px!important;
+    font-weight:850!important;
+  }
+  .nav.active{
+    background:#edf4ff!important;
+    color:var(--myggas-navy)!important;
+  }
+  .nav.active .nav-icon{
+    background:transparent!important;
+    color:var(--myggas-blue)!important;
+  }
+  .nav.active::after{display:none!important}
+}
+
+/* Hero: mesma secção e mesmos controlos, agora com a imagem aprovada. */
+.premium-home{
+  padding-top:10px!important;
+}
+.premium-hero{
+  position:relative!important;
+  min-height:285px!important;
+  margin:0 0 0!important;
+  padding:32px 34px 112px!important;
+  overflow:hidden!important;
+  border:1px solid #dfe9f5!important;
+  border-radius:22px!important;
+  background:
+    linear-gradient(90deg,rgba(235,246,255,.98) 0%,rgba(235,246,255,.94) 36%,rgba(235,246,255,.48) 56%,rgba(235,246,255,.06) 76%),
+    url('assets/myggas-hero.jpg') center/cover no-repeat!important;
+  box-shadow:0 10px 30px rgba(19,43,78,.055)!important;
+}
+.premium-hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0));
+}
+.premium-hero>*{
+  position:relative;
+  z-index:2;
+}
+.premium-hero .eyebrow{
+  max-width:700px!important;
+  font-size:9px!important;
+  letter-spacing:.22em!important;
+  color:#49688f!important;
+  font-weight:900!important;
+}
+.premium-hero h1{
+  max-width:650px!important;
+  margin:10px 0 6px!important;
+  font-size:43px!important;
+  line-height:1.02!important;
+  letter-spacing:-.05em!important;
+  color:#071d52!important;
+}
+.premium-hero h1 span{
+  color:#0a5fd0!important;
+}
+.premium-hero p{
+  max-width:650px!important;
+  margin:0!important;
+  font-size:14px!important;
+  line-height:1.48!important;
+  color:#435b7b!important;
+}
+
+/* Pesquisa: mesma lógica e mesmos IDs; apenas colocada visualmente dentro do hero. */
+.premium-search-shell{
+  position:relative!important;
+  z-index:20!important;
+  width:min(930px,calc(100% - 68px))!important;
+  margin:-96px 0 18px 34px!important;
+  padding:10px!important;
+  background:rgba(255,255,255,.97)!important;
+  border:1px solid #dfe8f2!important;
+  border-radius:18px!important;
+  box-shadow:0 12px 30px rgba(11,45,107,.11)!important;
+  backdrop-filter:blur(16px)!important;
+}
+.premium-search-row{
+  grid-template-columns:1.15fr 1fr .9fr!important;
+  gap:8px!important;
+}
+.premium-field{
+  gap:3px!important;
+  padding:7px 11px!important;
+  border:1px solid #e3eaf3!important;
+  border-radius:13px!important;
+  background:#f9fbfe!important;
+}
+.premium-field>span{
+  padding-left:0!important;
+  font-size:7.5px!important;
+  line-height:1!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  color:#5a6f8b!important;
+}
+.premium-field .input{
+  min-height:30px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  font-size:11px!important;
+  color:#10294e!important;
+}
+.premium-primary{
+  min-height:51px!important;
+  border-radius:13px!important;
+  background:linear-gradient(135deg,#1476eb,#075fd2)!important;
+  box-shadow:0 8px 20px rgba(20,118,235,.22)!important;
+  font-size:11px!important;
+}
+.premium-search-meta{
+  padding:6px 4px 0!important;
+}
+.price-source-legend{
+  margin-top:5px!important;
+  padding-top:5px!important;
+  font-size:7.5px!important;
+}
+#fuelStatus,.quick-load,#priceCoverage{
+  font-size:8.5px!important;
+}
+
+/* Logo no ecrã de entrada sem alterar o fluxo de autenticação. */
 .auth-logo{
   display:flex!important;
   align-items:center!important;
-  justify-content:flex-start!important;
-  min-height:112px!important;
-  font-size:0!important;
 }
-.auth-logo::after{display:none!important}
 .auth-logo img{
-  display:block!important;
-  width:150px!important;
-  height:150px!important;
+  width:auto!important;
+  height:76px!important;
+  max-width:260px!important;
   object-fit:contain!important;
-  object-position:center!important;
 }
+
+/* Tablet e mobile: preserva a navegação inferior já estável. */
 @media(max-width:900px){
+  header{
+    padding:5px 6px 0!important;
+  }
+  .header-in{
+    min-height:54px!important;
+    border-radius:15px!important;
+    padding:5px 9px!important;
+  }
   .header-in>.brand{
     display:flex!important;
-    height:42px!important;
-    min-width:76px!important;
+    height:39px!important;
+    min-width:0!important;
   }
   .header-in>.brand img{
-    height:40px!important;
-    max-width:104px!important;
+    height:36px!important;
+    max-width:135px!important;
+  }
+  .premium-home{
+    padding-top:7px!important;
+  }
+  .premium-hero{
+    min-height:235px!important;
+    padding:22px 16px 92px!important;
+    border-radius:17px!important;
+    background-position:64% center!important;
+  }
+  .premium-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:linear-gradient(90deg,rgba(237,247,255,.98) 0%,rgba(237,247,255,.94) 55%,rgba(237,247,255,.20) 100%);
+    pointer-events:none;
+  }
+  .premium-hero h1{
+    font-size:28px!important;
+    max-width:78%!important;
+  }
+  .premium-hero p{
+    font-size:10px!important;
+    max-width:76%!important;
+  }
+  .premium-hero .eyebrow{
+    font-size:7px!important;
+    letter-spacing:.14em!important;
+  }
+  .premium-search-shell{
+    width:calc(100% - 20px)!important;
+    margin:-75px 10px 13px!important;
+    padding:8px!important;
+    border-radius:15px!important;
+  }
+  .premium-search-row{
+    grid-template-columns:1fr 1fr!important;
+    gap:7px!important;
+  }
+  .premium-primary{
+    grid-column:1/-1!important;
+    min-height:43px!important;
   }
 }
-@media(max-width:560px){
-  .header-in>.brand{height:38px!important;min-width:68px!important}
-  .header-in>.brand img{height:36px!important;max-width:92px!important}
-  .auth-logo{justify-content:center!important;min-height:96px!important}
-  .auth-logo img{width:118px!important;height:118px!important}
+
+/* Telemóveis pequenos */
+@media(max-width:520px){
+  .premium-hero{
+    min-height:218px!important;
+    padding:18px 13px 88px!important;
+    background-position:68% center!important;
+  }
+  .premium-hero h1{
+    font-size:24px!important;
+    max-width:82%!important;
+  }
+  .premium-hero p{
+    max-width:82%!important;
+    font-size:9px!important;
+  }
+  .premium-search-shell{
+    margin-top:-69px!important;
+  }
+  .premium-field{
+    padding:6px 8px!important;
+  }
+  .premium-field .input{
+    font-size:10px!important;
+  }
+  .auth-logo img{
+    height:62px!important;
+    max-width:215px!important;
+  }
 }
 
 </style>
@@ -3111,7 +3380,7 @@ input,select,textarea,button{max-width:100%}
 <div id="appShell" class="hidden">
 <header>
 <div class="header-in">
-    <div class="brand">Bomba <span>Certa</span></div>
+    <div class="brand"><img src="assets/myggas-logo.png" alt="MyGGas"></div>
 <div class="header-actions">
       <button id="profileTopBtn" class="top-profile-btn" aria-label="Abrir perfil">
         <img id="topAvatar" class="top-profile-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' rx='22' fill='%23eef2f6'/%3E%3Ctext x='50' y='64' text-anchor='middle' font-size='42'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" alt="Fotografia de perfil">
@@ -3156,9 +3425,9 @@ input,select,textarea,button{max-width:100%}
 <main class="app">
   <section id="postos" class="section active premium-home">
     <div class="hero premium-hero">
-      <div class="eyebrow">MYGGAS · PREÇOS EM TEMPO REAL</div>
-      <h1>Encontre o combustível <span>certo.</span></h1>
-      <p>Compare preços, descubra postos perto de si e ajude a comunidade a manter a informação atualizada.</p>
+      <div class="eyebrow">COMBUSTÍVEIS MAIS BARATOS, VIAGENS MAIS LIVRES</div>
+      <h1>Poupe em cada viagem<br>com o <span>myggas</span></h1>
+      <p>Compare preços de combustíveis perto de si e encontre sempre o melhor preço.</p>
     </div>
 
     <div class="premium-search-shell">
@@ -3176,7 +3445,7 @@ input,select,textarea,button{max-width:100%}
           </select>
         </label>
         <label class="premium-field">
-          <span>Raio</span>
+          <span>Raio de pesquisa</span>
           <select id="fuelRadius" class="input">
             <option value="3000">3 km</option>
             <option value="5000" selected>5 km</option>
@@ -3188,7 +3457,7 @@ input,select,textarea,button{max-width:100%}
             <option value="100000">100 km</option>
           </select>
         </label>
-        <button id="locateBtn" class="btn premium-primary">⌖ Procurar perto de mim</button>
+        <button id="locateBtn" class="btn premium-primary">⌕ Pesquisar</button>
       </div>
       <div class="premium-search-meta">
         <div id="fuelStatus" class="status">A preparar postos próximos…</div>
@@ -6490,7 +6759,7 @@ async function osmStations(lat,lon,radius){
 async function registryStations(lat,lon,radius){
   const km=Number(radius)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
   const {data}=await supabase.from('fuel_station_registry').select('*').gte('latitude',lat-dy).lte('latitude',lat+dy).gte('longitude',lon-dx).lte('longitude',lon+dx);
-  return (data||[]).map(s=>({key:s.source_key,dgegId:s.dgeg_id||null,name:s.name,brand:s.brand||'',address:s.address||'',lat:Number(s.latitude),lon:Number(s.longitude),officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base Bomba Certa':s.source,distance:haversine(lat,lon,Number(s.latitude),Number(s.longitude))})).filter(s=>s.distance<=km)
+  return (data||[]).map(s=>({key:s.source_key,dgegId:s.dgeg_id||null,name:s.name,brand:s.brand||'',address:s.address||'',lat:Number(s.latitude),lon:Number(s.longitude),officialPrice:null,officialUpdated:'',source:s.source==='Verificado'?'Base MyGGas':s.source,distance:haversine(lat,lon,Number(s.latitude),Number(s.longitude))})).filter(s=>s.distance<=km)
 }
 async function communityStations(lat,lon,radius){
   const km=Number(radius)/1000,dy=km/111,dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
@@ -6498,7 +6767,7 @@ async function communityStations(lat,lon,radius){
   return (data||[]).map(s=>({key:`community:${s.id}`,name:s.name,brand:'',address:s.address||'',lat:Number(s.latitude),lon:Number(s.longitude),officialPrice:null,officialUpdated:'',source:'Comunidade',distance:haversine(lat,lon,Number(s.latitude),Number(s.longitude))})).filter(s=>s.distance<=km)
 }
 function mergeStations(lists){
-  const pri={DGEG:0,'Base Bomba Certa':1,OpenStreetMap:2,Comunidade:3};
+  const pri={DGEG:0,'Base MyGGas':1,OpenStreetMap:2,Comunidade:3};
   const all=lists.flat().sort((a,b)=>(pri[a.source]??9)-(pri[b.source]??9)),out=[];
   for(const s of all){
     const dup=out.find(x=>haversine(x.lat,x.lon,s.lat,s.lon)<.16 || ((norm(x.name).includes(norm(s.name))||norm(s.name).includes(norm(x.name)))&&haversine(x.lat,x.lon,s.lat,s.lon)<.7));
@@ -6523,7 +6792,7 @@ async function enrichDetail(s){
   }catch{}
 }
 async function remember(stations){
-  const payload=stations.slice(0,120).map(s=>({source_key:s.key,source:s.source==='Base Bomba Certa'?'Verificado':s.source,name:s.name,brand:s.brand||'',address:s.address||'',latitude:s.lat,longitude:s.lon,dgeg_id:s.dgegId||null})).filter(x=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(x.source));
+  const payload=stations.slice(0,120).map(s=>({source_key:s.key,source:s.source==='Base MyGGas'?'Verificado':s.source,name:s.name,brand:s.brand||'',address:s.address||'',latitude:s.lat,longitude:s.lon,dgeg_id:s.dgegId||null})).filter(x=>['DGEG','OpenStreetMap','Comunidade','Verificado'].includes(x.source));
   if(payload.length)await supabase.rpc('remember_fuel_stations',{p_stations:payload})
 }
 async function searchStations(){

@@ -1,21 +1,19 @@
-# MyGGas v10.9 — Como Chegar
+# MyGGas — Top Visual Rebrand
 
-## Alteração de nome
-`Ver rota` foi substituído por **Como chegar**.
+Esta versão usa como base o ficheiro funcional fornecido pelo utilizador e altera
+apenas a apresentação do topo da aplicação.
 
-É mais intuitivo porque descreve diretamente o que o utilizador pretende fazer.
+## Alterações visuais
+- logótipo MyGGas no cabeçalho;
+- cabeçalho branco arredondado no desktop;
+- navegação existente com aspeto corporate;
+- hero com imagem rodoviária MyGGas;
+- slogan e headline MyGGas;
+- pesquisa visualmente integrada no hero;
+- adaptação responsive para tablet e telemóvel;
+- logótipo MyGGas no ecrã de autenticação.
 
-## Correção funcional
-O botão agora:
-1. tenta usar a localização já conhecida;
-2. se ainda não existir, pede a geolocalização;
-3. calcula o percurso dentro da MyGGas com OSRM;
-4. apresenta distância e tempo;
-5. disponibiliza **Iniciar navegação** no Google Maps;
-6. se o cálculo interno falhar, mantém sempre o fallback para Google Maps.
-
-As chaves dos postos também passam a ser codificadas nos botões inline para evitar falhas com caracteres especiais.
-
-
-## Rebrand MyGGas
-A aplicação mantém a mesma base funcional desta versão. Foi alterado apenas o nome para **MyGGas** e aplicada a logomarca fornecida no ecrã de entrada e no cabeçalho, sem alterar a lógica da aplicação.
+## Preservado
+Não foram alterados IDs, `data-section`, eventos, autenticação, pesquisa de postos,
+mapa, preços, perfil, social, abastecimentos, viagem, análise, administração ou
+funções JavaScript da versão-base.
