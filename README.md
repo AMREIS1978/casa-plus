@@ -1,47 +1,48 @@
-# Bomba Certa v10.1 — Perfil + Publicidade Analytics
+# Bomba Certa v10.2 — Localização + Criar Posto + Publicidade
 
-## Cabeçalho
-A barra inferior mantém-se fixa no telemóvel.
+## A sua localização
+O marcador do utilizador deixa de ser igual aos postos.
 
-Ao lado da fotografia passam a aparecer:
-- nome público;
-- categoria/nível.
+Novo marcador:
+- azul;
+- pulsante;
+- com orientação visual própria;
+- prioridade visual superior aos postos;
+- popup próprio “A sua localização”.
 
-O conjunto é compacto e responsivo, incluindo ecrãs pequenos.
+Assim o utilizador distingue imediatamente:
+**eu** vs. **posto de combustível**.
+
+## Criar posto
+Foi corrigida a lógica de abertura do modal.
+
+Existe agora uma única função:
+`window.openAddStation()`
+
+É usada tanto por:
+- `+ Posto`;
+- `Adicionar posto` na coluna lateral.
+
+A janela:
+- abre acima do mapa e navegação;
+- limpa dados antigos;
+- pré-preenche latitude/longitude quando já existe localização;
+- envia visitantes para criação de conta;
+- apresenta feedback caso a geolocalização falhe.
 
 ## Publicidade
-Todas as áreas principais têm espaço publicitário:
-- Mapa/Postos;
+Todas as páginas continuam a ter publicidade e as páginas longas passam a ter um segundo espaço no rodapé:
+- Postos/Mapa;
 - Abastecimentos;
 - Viagem;
 - Análise;
 - Perfil;
 - Administração.
 
-No Mapa existe ainda uma segunda posição lateral/feed em desktop.
-
-## Medição
-Foi criado tracking real no Supabase:
-- impressão;
+Todos os novos espaços usam o mesmo tracking de:
+- impressão real;
 - clique;
-- página/posição do anúncio;
-- data/hora;
-- utilizador quando autenticado.
+- CTR;
+- página/posição.
 
-Uma impressão só é registada quando pelo menos 50% do anúncio fica visível durante cerca de 650 ms.
-
-## Painel Admin
-Novo quadro Publicidade com:
-- visualizações totais;
-- cliques totais;
-- CTR global;
-- vistas/cliques hoje;
-- resultados por posição;
-- CTR por posição.
-
-Backend:
-- `public.app_ad_events`
-- `public.record_ad_event(...)`
-- `public.admin_ad_analytics()`
-
-RLS está ativo. Visitantes/utilizadores podem apenas inserir eventos válidos; apenas administrador pode consultar os registos agregados.
+Esses dados aparecem no painel de Administração > Publicidade.

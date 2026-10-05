@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.1 — Perfil e Publicidade Analytics</title>
+<title>Bomba Certa v10.2 — Localização e Publicidade</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -1955,6 +1955,103 @@ header{
   .top-profile-copy{max-width:84px!important}
 }
 
+
+/* ===== v10.2 · Localização distinta + criação de posto robusta ===== */
+.user-location-marker-shell{
+  background:transparent!important;
+  border:0!important;
+  position:relative!important
+}
+.user-location-pulse{
+  position:absolute;
+  left:2px;top:2px;
+  width:34px;height:34px;
+  border-radius:50%;
+  background:rgba(47,125,246,.18);
+  border:1px solid rgba(47,125,246,.2);
+  animation:userLocationPulse 1.8s ease-out infinite
+}
+.user-location-dot{
+  position:absolute;
+  left:8px;top:8px;
+  width:22px;height:22px;
+  border-radius:50% 50% 50% 10px;
+  transform:rotate(-45deg);
+  display:grid;place-items:center;
+  background:#1677ff;
+  border:3px solid #fff;
+  box-shadow:0 3px 12px rgba(17,92,194,.35)
+}
+.user-location-arrow{
+  transform:rotate(45deg);
+  color:#fff;
+  font-size:8px;
+  line-height:1;
+  margin-top:-1px
+}
+@keyframes userLocationPulse{
+  0%{transform:scale(.75);opacity:.8}
+  75%{transform:scale(1.2);opacity:.15}
+  100%{transform:scale(1.25);opacity:0}
+}
+.user-location-popup{
+  display:grid;
+  gap:4px;
+  min-width:205px
+}
+.user-location-popup b{
+  color:#145fc5;
+  font-size:12px
+}
+.user-location-popup span{
+  color:#667085;
+  font-size:9px;
+  line-height:1.4
+}
+
+/* Diferenciar visualmente posto vs utilizador. */
+#fuelMap .leaflet-marker-icon:not(.user-location-marker-shell){
+  filter:drop-shadow(0 3px 4px rgba(15,23,42,.2))
+}
+
+/* Criar posto: modal mais claro e acima do mapa/nav. */
+#stationModal{
+  z-index:2200!important
+}
+#stationModal .modal-card{
+  width:min(520px,calc(100% - 20px));
+  border-radius:20px;
+  box-shadow:0 24px 70px rgba(15,23,42,.22)
+}
+#stationModal .form{
+  gap:9px
+}
+#stationModal .actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px
+}
+
+/* Segundo espaço publicitário nas páginas longas. */
+.managed-ad-footer{
+  margin-top:16px!important;
+  margin-bottom:4px!important;
+  background:linear-gradient(135deg,#fff,#f8fafc)!important
+}
+
+@media(max-width:620px){
+  .user-location-pulse{
+    animation-duration:2.1s
+  }
+  #stationModal .actions{
+    grid-template-columns:1fr
+  }
+  #stationModal .modal-card{
+    width:calc(100% - 14px);
+    border-radius:18px
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2322,7 +2419,16 @@ header{
       <div class="section-title"><h2>Histórico</h2><span class="pill">Só seu</span></div>
       <div id="fillHistory" class="empty">Ainda não existem abastecimentos registados.</div>
     </div>
-  </section>
+  
+    <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="abastecimentos_bottom" data-ad-section="abastecimentos">
+      <div class="managed-ad-copy">
+        <span class="managed-ad-label">PUBLICIDADE</span>
+        <strong>Serviços para o seu automóvel</strong>
+        <small>Espaço complementar para parceiros de manutenção, seguros ou mobilidade.</small>
+      </div>
+      <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
+    </div>
+</section>
 
   <section id="estatisticas" class="section">
     <div class="section-title"><h2>Estatísticas</h2><span class="pill">Histórico pessoal</span></div>
@@ -2346,7 +2452,16 @@ header{
       <div class="card"><div class="section-title"><h2>Gasto mensal</h2></div><div class="chart"><canvas id="monthlyChart"></canvas></div></div>
       <div class="card"><div class="section-title"><h2>Evolução do preço/L</h2></div><div class="chart"><canvas id="priceChart"></canvas></div></div>
     </div>
-  </section>
+  
+    <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="estatisticas_bottom" data-ad-section="estatisticas">
+      <div class="managed-ad-copy">
+        <span class="managed-ad-label">PUBLICIDADE</span>
+        <strong>Parceiro Bomba Certa</strong>
+        <small>Publicidade discreta depois da análise, sem interferir com os gráficos.</small>
+      </div>
+      <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
+    </div>
+</section>
 
   <section id="viagem" class="section trip-section">
     <div class="trip-hero">
@@ -2548,7 +2663,16 @@ header{
         </div>
       </div>
     </div>
-  </section>
+  
+    <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="viagem_bottom" data-ad-section="viagem">
+      <div class="managed-ad-copy">
+        <span class="managed-ad-label">PUBLICIDADE</span>
+        <strong>Parceiro de estrada</strong>
+        <small>Espaço para assistência em viagem, seguros, hotéis ou restauração.</small>
+      </div>
+      <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
+    </div>
+</section>
 
   <section id="perfil" class="section">
 
@@ -2625,7 +2749,16 @@ header{
         <div class="kpi"><small>Posto encerrado</small><strong>+4</strong></div>
       </div>
     </div>
-  </section>
+  
+    <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="perfil_bottom" data-ad-section="perfil">
+      <div class="managed-ad-copy">
+        <span class="managed-ad-label">PUBLICIDADE</span>
+        <strong>Vantagens da comunidade</strong>
+        <small>Espaço para campanhas e benefícios exclusivos para membros.</small>
+      </div>
+      <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
+    </div>
+</section>
 
   <section id="admin" class="section">
     <div class="section-title"><h2>Administração</h2><span class="pill">Acesso reservado</span></div>
@@ -2722,6 +2855,15 @@ header{
         <div class="actions"><span id="pendingReportsBadge" class="pill">0 pendentes</span><button id="refreshReportsBtn" class="btn secondary">Atualizar</button></div>
       </div>
       <div id="adminReports" class="empty">Ainda não existem denúncias.</div>
+    </div>
+
+    <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="admin_bottom" data-ad-section="admin">
+      <div class="managed-ad-copy">
+        <span class="managed-ad-label">PUBLICIDADE</span>
+        <strong>Parceiro institucional</strong>
+        <small>Segundo espaço publicitário disponível na área de administração.</small>
+      </div>
+      <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
     </div>
 </section>
 
@@ -3902,7 +4044,7 @@ function showSection(id){
   if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
 }
 document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
-$('railAddStationBtn')?.addEventListener('click',()=>openAddStation());
+$('railAddStationBtn')?.addEventListener('click',()=>window.openAddStation());
 $('railInviteBtn')?.addEventListener('click',()=>$('shareAppBtn')?.click());
 $('railLevelsBtn')?.addEventListener('click',()=>{
   showSection('perfil');
@@ -4033,7 +4175,12 @@ function adPlacementLabel(key){
     viagem_top:'Viagem',
     estatisticas_top:'Análise',
     perfil_top:'Perfil',
-    admin_top:'Administração'
+    admin_top:'Administração · topo',
+    abastecimentos_bottom:'Abastecimentos · rodapé',
+    estatisticas_bottom:'Análise · rodapé',
+    viagem_bottom:'Viagem · rodapé',
+    perfil_bottom:'Perfil · rodapé',
+    admin_bottom:'Administração · rodapé'
   })[key]||key
 }
 
@@ -4759,8 +4906,7 @@ async function autoSearchOnOpen(){
     currentLat=cached.lat;currentLon=cached.lon;
     if(map){
       map.setView([currentLat,currentLon],13,{animate:false});
-      if(userMarker)map.removeLayer(userMarker);
-      userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('Última localização conhecida')
+      makeUserLocationMarker(currentLat,currentLon,'Última localização conhecida')
     }
     renderFastCache(currentLat,currentLon);
     $('fuelStatus').textContent='A atualizar automaticamente…';
@@ -4823,6 +4969,48 @@ function bindFuelMapResize(){
     if(map)requestAnimationFrame(()=>map.invalidateSize({pan:false}))
   });
   fuelMapResizeObserver.observe(el)
+}
+
+
+function makeUserLocationMarker(lat,lon,label='A sua localização'){
+  ensureMap();
+
+  if(userMarker){
+    try{map.removeLayer(userMarker)}catch{}
+    userMarker=null
+  }
+
+  const icon=L.divIcon({
+    className:'user-location-marker-shell',
+    html:`<div class="user-location-pulse"></div>
+          <div class="user-location-dot">
+            <span class="user-location-arrow">▲</span>
+          </div>`,
+    iconSize:[38,38],
+    iconAnchor:[19,19],
+    popupAnchor:[0,-18]
+  });
+
+  const marker=L.marker([lat,lon],{
+    icon,
+    zIndexOffset:1200,
+    keyboard:true,
+    riseOnHover:true,
+    title:label
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="user-location-popup">
+      <b>📍 ${esc(label)}</b>
+      <span>Posição usada para calcular distâncias e postos próximos.</span>
+    </div>
+  `,{closeButton:true,autoPan:true});
+
+  marker.on('click',()=>marker.openPopup());
+  marker.on('touchstart',()=>requestAnimationFrame(()=>marker.openPopup()));
+
+  userMarker=marker;
+  return marker
 }
 
 function ensureMap(){
@@ -5120,9 +5308,7 @@ async function searchStations(){
 
   ensureMap();
   if(map){
-    if(userMarker)map.removeLayer(userMarker);
-    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
-    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
+    makeUserLocationMarker(currentLat,currentLon,'A sua localização')
     map.setView([currentLat,currentLon],13,{animate:false})
   }
 
@@ -6013,9 +6199,7 @@ function renderBasicStations(){
   ensureMap();
   if(map && currentLat!=null){
     stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
-    if(userMarker)map.removeLayer(userMarker);
-    userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
-    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
+    makeUserLocationMarker(currentLat,currentLon,'A sua localização')
     for(const s of rows){
       const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s));
       stationMarkers.push(m)
@@ -6090,9 +6274,7 @@ async function renderStations(){
 
   loadStationSocialSummaries(nearbyStations.map(s=>s.key)).catch(()=>{});
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
-  if(userMarker)map.removeLayer(userMarker);
-  userMarker=L.marker([currentLat,currentLon]).addTo(map).bindPopup('A sua localização');
-    userMarker.on('touchstart',()=>requestAnimationFrame(()=>userMarker.openPopup()));
+  makeUserLocationMarker(currentLat,currentLon,'A sua localização')
   for(const s of nearbyStations){
     const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s));
     stationMarkers.push(m)
@@ -6349,14 +6531,56 @@ window.startRoute=async key=>{
   }catch{$('routeBox').innerHTML=`<b>Não foi possível desenhar a rota aqui.</b><div class="status">Tente novamente ou abra o percurso no Google Maps.</div>`}
 };
 
-$('addStationBtn').onclick=()=>{$('stationModal').classList.add('open');$('stationStatus').textContent=''};
+window.openAddStation=()=>{
+  if(isGuestMode){
+    promptGuestSignup();
+    return
+  }
+
+  const modal=$('stationModal');
+  if(!modal)return;
+
+  $('stationStatus').textContent='';
+  $('newStationName').value='';
+  $('newStationAddress').value='';
+
+  if(Number.isFinite(Number(currentLat))&&Number.isFinite(Number(currentLon))){
+    $('newStationLat').value=Number(currentLat).toFixed(6);
+    $('newStationLon').value=Number(currentLon).toFixed(6);
+  }else{
+    $('newStationLat').value='';
+    $('newStationLon').value='';
+  }
+
+  modal.classList.add('open');
+  setTimeout(()=>$('newStationName')?.focus(),80)
+};
+
+$('addStationBtn')?.addEventListener('click',window.openAddStation);
 $('findAddressBtn').onclick=async()=>{
   const q=$('newStationAddress').value.trim();if(q.length<4){$('stationStatus').textContent='Escreva uma morada.';return}
   const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=pt&q=${encodeURIComponent(q)}`),j=await r.json();
   if(!j.length){$('stationStatus').textContent='Morada não encontrada.';return}
   $('newStationLat').value=Number(j[0].lat).toFixed(6);$('newStationLon').value=Number(j[0].lon).toFixed(6);$('stationStatus').textContent='Localização encontrada.'
 };
-$('useLocationBtn').onclick=()=>navigator.geolocation?.getCurrentPosition(p=>{$('newStationLat').value=p.coords.latitude.toFixed(6);$('newStationLon').value=p.coords.longitude.toFixed(6)});
+$('useLocationBtn').onclick=()=>{
+  if(!navigator.geolocation){
+    $('stationStatus').textContent='A localização não está disponível neste dispositivo.';
+    return
+  }
+  $('stationStatus').textContent='A obter localização…';
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      $('newStationLat').value=p.coords.latitude.toFixed(6);
+      $('newStationLon').value=p.coords.longitude.toFixed(6);
+      $('stationStatus').textContent='✓ Localização preenchida.'
+    },
+    ()=>{
+      $('stationStatus').textContent='Não foi possível obter a localização. Pode indicar a morada ou preencher as coordenadas.'
+    },
+    {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
+  )
+};
 $('saveStationBtn').onclick=async()=>{
   const name=$('newStationName').value.trim(),lat=Number($('newStationLat').value),lon=Number($('newStationLon').value);
   if(name.length<2||!Number.isFinite(lat)||!Number.isFinite(lon)){$('stationStatus').textContent='Preencha nome e localização.';return}
