@@ -1,21 +1,24 @@
-# MyGGas — Mobile Perfeito
+# MyGGas — Dashboard Refinado
 
-Versão focada na utilização em telemóvel, mantendo integralmente a lógica da versão funcional.
+Atualização visual da zona inferior inspirada no mockup aprovado, mantendo a funcionalidade existente.
 
-## Ajustes móveis
-- elimina overflow horizontal;
-- cabeçalho MyGGas compacto;
-- logótipo e perfil sempre dentro do ecrã;
-- hero e pesquisa reajustados;
-- pesquisa em 2 colunas + botão a toda a largura;
-- mapa redimensionado;
-- cartões de postos adaptados;
-- preços com scroll horizontal próprio;
-- botões com grelha 2x;
-- Viagem, Perfil, Análise e Admin responsivos;
-- modais adaptados ao viewport;
-- ticker acima da navegação;
-- navegação inferior fixa e sempre visível;
-- regras específicas para 430 px e 350 px.
+## Desktop
+- lista de postos compacta em cartões horizontais;
+- identificação visual de cada posto;
+- preços secundários compactos;
+- botão “Como chegar” destacado;
+- mapa em cartão lateral;
+- publicidade integrada no painel lateral;
+- layout mais próximo de uma dashboard de mobilidade.
 
-Nenhum fluxo funcional foi removido.
+## Mobile
+- mantém layout de uma coluna;
+- mapa e lista totalmente ajustados ao viewport;
+- cartões compactos e legíveis;
+- preços com scroll horizontal local;
+- ações em grelha;
+- nenhuma alteração aos IDs, dados ou fluxos principais.
+
+## Preservado
+Login, registo, mapa, pesquisa, preços reais, social, perfil, abastecimentos,
+viagem inteligente, análise, administração e restantes funções da versão-base.
