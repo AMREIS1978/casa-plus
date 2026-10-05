@@ -1,26 +1,17 @@
-# MyGGas v12.1 — Corporate Stable
+# Bomba Certa v10.9 — Como Chegar
 
-Versão reconstruída sobre a última base com autenticação funcional.
+## Alteração de nome
+`Ver rota` foi substituído por **Como chegar**.
 
-## Correção principal
-A versão anterior tinha perdido o bloco JavaScript responsável por:
-- `authCheck()`
-- botão **Entrar**
-- login por username/email através de `public-login`
-- criação de conta
-- modo visitante
-- recuperação de acesso
+É mais intuitivo porque descreve diretamente o que o utilizador pretende fazer.
 
-Esta versão volta a incluir integralmente esse fluxo.
+## Correção funcional
+O botão agora:
+1. tenta usar a localização já conhecida;
+2. se ainda não existir, pede a geolocalização;
+3. calcula o percurso dentro da Bomba Certa com OSRM;
+4. apresenta distância e tempo;
+5. disponibiliza **Iniciar navegação** no Google Maps;
+6. se o cálculo interno falhar, mantém sempre o fallback para Google Maps.
 
-## Estrutura
-- `index.html`
-- `assets/myggas-logo.png`
-- `assets/myggas-hero.jpg`
-
-## Mantido
-Mapa, postos, preços, social, perfil, apagar perfil, abastecimentos, viagem inteligente,
-análise, navegação fixa, “Como chegar” e restantes funcionalidades da base estável.
-
-## MyGGas Market
-O painel nacional é compacto e consulta a função `dgeg-national-average`.
+As chaves dos postos também passam a ser codificadas nos botões inline para evitar falhas com caracteres especiais.
