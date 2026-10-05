@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v11.1 — Média Nacional Inteligente</title>
+<title>Bomba Certa v11.2 — Média Nacional Sempre Visível</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -3328,6 +3328,18 @@ input,select,textarea,button{max-width:100%}
   .market-mini-probs>div{padding:5px}
 }
 
+
+/* v11.2 — ainda mais discreto */
+.market-mini-summary{min-height:34px!important;padding:5px 9px!important}
+.market-mini-left strong{font-size:12px!important}
+.market-mini-label{font-size:7.5px!important}
+.market-mini-trend{font-size:7.6px!important}
+.market-mini-confidence{font-size:6.7px!important}
+@media(max-width:560px){
+  .market-mini-summary{min-height:32px!important}
+  .market-mini-details{padding:7px 8px 8px!important}
+}
+
 </style>
 </head>
 <body>
@@ -4630,6 +4642,49 @@ function localForecastFromSeries(series){
   const label=R>F&&R>S?'Subida provável':F>R&&F>S?'Descida provável':'Tendência estável';
   return {rise:R,stable:S,fall:F,label,confidence,trendPerDay:trend}
 }
+
+function observedNationalAverageFromRows(rows){
+  const vals=(rows||[])
+    .map(r=>parsePrice(r?.Preco))
+    .filter(v=>Number.isFinite(v)&&v>.5&&v<5);
+  if(!vals.length)return null;
+  vals.sort((a,b)=>a-b);
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const median=vals[Math.floor(vals.length/2)];
+  const dates=(rows||[]).map(r=>String(r?.DataAtualizacao||'')).filter(Boolean).sort();
+  const latestRaw=dates.at(-1)||'';
+  let date='';
+  const m=latestRaw.match(/(\d{4})[-/](\d{2})[-/](\d{2})/);
+  if(m)date=`${m[1]}-${m[2]}-${m[3]}`;
+  else{
+    const p=latestRaw.match(/(\d{2})[-/](\d{2})[-/](\d{4})/);
+    if(p)date=`${p[3]}-${p[2]}-${p[1]}`
+  }
+  return {avg,median,count:vals.length,date}
+}
+
+async function liveObservedNationalMarket(fuel){
+  try{
+    const rows=await dgegFuelNationalRows(fuel);
+    const stat=observedNationalAverageFromRows(rows);
+    if(!stat)return null;
+
+    const fb=fallbackMarketData(fuel);
+    return {
+      fuel,
+      latest:{date:stat.date||fb?.latest?.date||'',price:Number(stat.avg.toFixed(3))},
+      series:fb?.series||[],
+      forecast:fb?.forecast||localForecastFromSeries([]),
+      source:`DGEG · média observada em ${stat.count} postos`,
+      sourceMode:'observed_station_mean',
+      observedCount:stat.count,
+      median:Number(stat.median.toFixed(3))
+    }
+  }catch{
+    return null
+  }
+}
+
 function fallbackMarketData(fuel){
   const raw=NATIONAL_MARKET_FALLBACK[fuel];
   if(!raw?.length)return null;
@@ -4657,7 +4712,10 @@ function marketInsight(data){
 function applyMarketData(data,sourceLabel='DGEG'){
   const f=data?.forecast||localForecastFromSeries(data?.series||[]);
   $('nationalAveragePrice').textContent=nationalPriceFmt(data.latest?.price);
-  $('nationalAverageDate').textContent=nationalDateFmt(data.latest?.date,sourceLabel);
+  const sourceText=data?.sourceMode==='observed_station_mean'
+    ? `${sourceLabel} · ${data.observedCount||0} postos`
+    : sourceLabel;
+  $('nationalAverageDate').textContent=nationalDateFmt(data.latest?.date,sourceText);
   $('nationalTrendLabel').textContent=f.label||'Tendência estável';
   $('marketConfidence').textContent=f.confidence?`conf. ${f.confidence}%`:'';
   setProbability('probRise',f.rise);
@@ -4695,31 +4753,54 @@ async function loadNationalMarket(){
 
   const cached=readNationalMarketCache(fuel);
   const fallback=fallbackMarketData(fuel);
+
+  // Nunca deixar o bloco vazio: primeiro mostra o último valor oficial conhecido.
   if(cached)applyMarketData(cached,'DGEG · cache');
   else if(fallback)applyMarketData(fallback,'DGEG · último oficial');
 
+  // 1) Tenta média oficial diária via backend.
   try{
     const endpoint=`${SUPABASE_URL}/functions/v1/${NATIONAL_AVERAGE_FUNCTION}?fuel=${encodeURIComponent(fuel)}`;
     const r=await fetch(endpoint,{cache:'no-store'});
     if(seq!==nationalMarketRequestSeq)return;
-    if(!r.ok)throw new Error(`HTTP ${r.status}`);
-    const data=await r.json();
-    if(!data?.latest || !Number.isFinite(Number(data.latest.price)))throw new Error('Sem preço válido');
-    const forecast=data.forecast||localForecastFromSeries(data.series||[]);
-    const normalized={...data,forecast};
-    applyMarketData(normalized,'DGEG');
-    writeNationalMarketCache(fuel,normalized);
-  }catch(e){
-    if(seq!==nationalMarketRequestSeq)return;
-    if(!cached && !fallback){
-      $('nationalAveragePrice').textContent='—';
-      $('nationalTrendLabel').textContent='Dados indisponíveis';
-      $('nationalAverageDate').textContent='DGEG sem resposta';
-      $('nationalMarketInsight').textContent='Sem dados oficiais disponíveis neste momento.'
+    if(r.ok){
+      const data=await r.json();
+      if(data?.latest && Number.isFinite(Number(data.latest.price))){
+        const forecast=data.forecast||localForecastFromSeries(data.series||[]);
+        const normalized={...data,forecast};
+        applyMarketData(normalized,'DGEG');
+        writeNationalMarketCache(fuel,normalized);
+        card.classList.remove('loading');
+        return
+      }
     }
-  }finally{
-    if(seq===nationalMarketRequestSeq)card.classList.remove('loading')
+  }catch{}
+
+  // 2) Se a página da média oficial falhar, calcula em tempo real a média
+  // aritmética dos preços nacionais publicados pela própria API DGEG.
+  const observed=await liveObservedNationalMarket(fuel);
+  if(seq!==nationalMarketRequestSeq)return;
+  if(observed){
+    applyMarketData(observed,'DGEG · média observada');
+    writeNationalMarketCache(fuel,observed);
+    $('nationalMarketInsight').textContent=
+      `${marketInsight(observed)} Média calculada agora a partir de ${observed.observedCount} preços nacionais publicados pela DGEG.`;
+    card.classList.remove('loading');
+    return
   }
+
+  // 3) Último fallback oficial conhecido. Nunca mostrar 0% / "Indisponível"
+  // quando existe um valor oficial anterior.
+  if(fallback){
+    applyMarketData(fallback,'DGEG · último oficial');
+    $('nationalMarketInsight').textContent=
+      `${marketInsight(fallback)} Último valor oficial disponível guardado pela Bomba Certa.`;
+  }else{
+    $('nationalAveragePrice').textContent='—';
+    $('nationalTrendLabel').textContent='Sem dados';
+    $('nationalAverageDate').textContent='DGEG';
+  }
+  card.classList.remove('loading')
 }
 
 $('marketMiniToggle')?.addEventListener('click',()=>{

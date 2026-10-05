@@ -1,29 +1,19 @@
-# Bomba Certa v11.1 — Média Nacional Inteligente
+# Bomba Certa v11.2 — Média Nacional Sempre Visível
 
-## Interface mais discreta
-O bloco grande foi substituído por uma linha compacta:
+Corrige o problema do bloco aparecer sem informação.
 
-`Média PT 2,221 €/L · Subida provável · conf. 74%`
+## Nova lógica de dados
+A app nunca fica dependente de uma única chamada:
 
-Ao tocar na linha são mostrados os três cenários:
-- subir;
-- manter;
-- descer.
+1. tenta o preço médio diário oficial;
+2. se essa chamada falhar, calcula em tempo real uma **média nacional observada** com os preços dos postos publicados pela API DGEG;
+3. se a API nacional também falhar, mostra o último valor oficial DGEG guardado.
 
-## Mais robusta
-A leitura usa três níveis:
-1. consulta em tempo real da Edge Function DGEG;
-2. último valor oficial bem-sucedido guardado localmente;
-3. snapshot oficial DGEG de 24/09/2026 como fallback, claramente identificado como “último oficial”.
+Nunca apresenta 0% ou “Indisponível” quando existe informação oficial anterior.
 
-A aplicação nunca inventa um preço atual.
+## Transparência
+- “DGEG” = média diária oficial quando disponível;
+- “DGEG · média observada” = média aritmética calculada dos preços nacionais dos postos DGEG;
+- “DGEG · último oficial” = último valor oficial conhecido.
 
-## Tendência
-A estimativa pondera:
-- variações dos últimos dias;
-- maior peso nos dias recentes;
-- volatilidade;
-- consistência da direção;
-- nível de confiança.
-
-Não é uma previsão oficial da DGEG.
+A tendência/probabilidade continua identificada como estimativa Bomba Certa, não previsão oficial.
