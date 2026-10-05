@@ -1,12 +1,18 @@
-# Bomba Certa v10.5 — Navegação fixa mobile
+# Bomba Certa v10.6 — Responsive Perfeito
 
-## Melhorias
-- navegação principal sempre fixa e visível no telemóvel;
-- barra inferior mais simples, elegante e intuitiva;
-- comportamento mais próximo de apps sociais/mobile;
-- mais espaço inferior na página para evitar sobreposição de conteúdo;
-- ticker da comunidade reposicionado acima da navegação.
+## Correção estrutural
+Foi acrescentada uma camada de proteção responsiva para impedir qualquer página, cartão, grelha, mapa, tabela ou painel de ultrapassar a largura real do ecrã.
 
-## Compatibilidade
-- mantém desktop com navegação atual;
-- em mobile a navegação fica sempre acessível no fundo do ecrã.
+## Mobile
+- todas as páginas passam para uma coluna;
+- nenhum contentor pode ultrapassar 100% do viewport;
+- tabelas largas fazem scroll dentro do próprio componente;
+- combustíveis mantêm scroll horizontal local;
+- mapas ajustam a 100% da largura;
+- KPIs e grelhas reorganizam-se automaticamente;
+- cabeçalho adapta nome + perfil;
+- navegação de páginas permanece fixa e sempre visível em baixo;
+- safe-area de iPhone respeitada.
+
+## Ecrãs muito pequenos
+Abaixo de 330 px, labels e perfil compactam automaticamente para evitar cortes e scroll lateral.

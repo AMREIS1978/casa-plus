@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.5 — Navegação fixa mobile</title>
+<title>Bomba Certa v10.6 — Responsive Perfeito</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2408,6 +2408,245 @@ header{
   .community-activity-footer{bottom:78px !important}
 }
 
+
+
+/* ===== v10.6 · Responsive guard: nada pode sair do ecrã ===== */
+html{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:hidden!important;
+}
+#appShell,main,.app,.section,.section.active,
+.card,.station,.premium-home,.premium-layout,.premium-stations-panel,.premium-map-card,
+.social-layout,.social-feed-panel,.social-map-rail,.rank-grid,.grid2,.community-game,
+.trip-section,.trip-form-card,.trip-summary-card,.trip-results-grid,
+.admin-create-row,.admin-daily-views,.kpis,.history,.unlock-grid{
+  min-width:0!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+img,svg,canvas,video{max-width:100%;height:auto}
+input,select,textarea,button{max-width:100%}
+*{overflow-wrap:anywhere}
+
+/* Elementos que podem ser largos fazem scroll dentro deles, nunca na página. */
+.admin-ad-table-wrap,.fuel-price-grid,.trip-alt-list,.social-reactor-tabs,.history,.chart{
+  max-width:100%!important;
+}
+.admin-ad-table-wrap,.history{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+
+@media(max-width:900px){
+  /* Uma coluna real em qualquer página. */
+  .app{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  .section,.section.active{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  .grid2,.rank-grid,.community-game,.trip-results-grid,
+  .premium-layout,.social-layout,.trip-location-grid,.trip-car-grid,
+  .admin-create-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-areas:none!important;
+    width:100%!important;
+    gap:10px!important;
+  }
+  .premium-stations-panel,.premium-map-card,.social-feed-panel,.social-map-rail,
+  .trip-map-card,.trip-stops-card{
+    grid-area:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+  .social-left-rail{display:none!important}
+
+  /* Cartões e conteúdo sempre ocupam a largura útil. */
+  .card,.station,.trip-form-card,.trip-summary-card,.trip-map-card,.trip-stops-card,
+  .trip-alternatives-card,.managed-ad,.managed-ad-horizontal,.unlock-teaser,
+  .community-live,.game-card{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+  .station{
+    display:block!important;
+  }
+  .station-main{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px!important;
+    width:100%!important;
+  }
+  .station-main>div:first-child{min-width:0!important}
+  .station .price{min-width:0!important;white-space:nowrap!important}
+
+  /* Preços dos combustíveis: scroll horizontal local, página continua vertical. */
+  .fuel-price-grid{
+    display:flex!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    gap:7px!important;
+    padding-bottom:5px!important;
+    scroll-snap-type:x proximity;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .fuel-price-chip{
+    flex:0 0 118px!important;
+    min-width:118px!important;
+    max-width:118px!important;
+  }
+
+  /* Mapas sempre dentro do viewport. */
+  #fuelMap,#tripMap{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .premium-map-card,.social-map-rail{
+    position:relative!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+
+  /* KPIs não esmagam a página. */
+  .kpis,.trip-kpis,.trip-savings-breakdown,.admin-ad-kpis{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    width:100%!important;
+  }
+  .admin-daily-views{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .unlock-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+
+  /* Cabeçalho nunca empurra a página lateralmente. */
+  header,.header-in{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .header-in{
+    padding-left:10px!important;
+    padding-right:10px!important;
+    gap:7px!important;
+  }
+  .header-in>.brand{
+    flex:0 1 auto!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    font-size:18px!important;
+  }
+  .header-actions{
+    min-width:0!important;
+    flex:0 1 auto!important;
+  }
+  .top-profile-btn{
+    min-width:0!important;
+    max-width:150px!important;
+  }
+  .top-profile-copy{min-width:0!important;max-width:98px!important}
+
+  /* Barra principal sempre fixa e visível. */
+  .bottom-nav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    top:auto!important;
+    transform:none!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    border-left:0!important;
+    border-right:0!important;
+    border-bottom:0!important;
+    border-radius:16px 16px 0 0!important;
+    padding:5px max(4px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left))!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:2px!important;
+    background:rgba(255,255,255,.985)!important;
+    box-shadow:0 -6px 22px rgba(15,23,42,.12)!important;
+    z-index:1500!important;
+  }
+  .bottom-nav.admin-enabled{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  .nav{
+    min-width:0!important;
+    min-height:50px!important;
+    padding:4px 1px 6px!important;
+    gap:2px!important;
+  }
+  .nav-icon{width:26px!important;height:26px!important;font-size:15px!important}
+  .nav-label{
+    width:100%!important;
+    max-width:100%!important;
+    font-size:7.5px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+  }
+  .community-activity-footer{
+    left:6px!important;
+    right:6px!important;
+    width:auto!important;
+    max-width:calc(100% - 12px)!important;
+    bottom:76px!important;
+    overflow:hidden!important;
+  }
+
+  body{padding-bottom:92px!important}
+  .app{padding-bottom:150px!important}
+}
+
+@media(max-width:430px){
+  .app{padding-left:8px!important;padding-right:8px!important}
+  .header-in{padding-left:8px!important;padding-right:7px!important}
+  .header-in>.brand{font-size:16.5px!important}
+  .top-profile-btn{max-width:125px!important}
+  .top-profile-copy{max-width:74px!important}
+  .top-profile-copy strong{font-size:8px!important}
+  .top-profile-copy .top-profile-level{font-size:6.8px!important}
+  .fuel-price-chip{flex-basis:108px!important;min-width:108px!important;max-width:108px!important}
+  .kpis,.trip-kpis,.trip-savings-breakdown,.admin-ad-kpis{grid-template-columns:1fr 1fr!important}
+  .managed-ad-horizontal{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important}
+  .nav-label{font-size:7px!important}
+}
+
+@media(max-width:330px){
+  .header-in>.brand{font-size:15px!important}
+  .top-profile-copy{display:none!important}
+  .top-profile-btn{width:34px!important;min-width:34px!important;padding:0!important}
+  .nav-label{font-size:6.5px!important}
+  .nav-icon{width:24px!important;height:24px!important;font-size:14px!important}
+  .bottom-nav{gap:0!important}
+  .kpis,.trip-kpis,.trip-savings-breakdown,.admin-ad-kpis,.unlock-grid{grid-template-columns:1fr!important}
+}
+
 </style>
 </head>
 <body>
@@ -3592,6 +3831,14 @@ function initAdTracking(){
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
 
 const $=id=>document.getElementById(id);
+
+function syncViewportWidth(){
+  const w=Math.max(280,Math.round(window.visualViewport?.width||window.innerWidth||document.documentElement.clientWidth||320));
+  document.documentElement.style.setProperty('--actual-vw',w+'px');
+}
+syncViewportWidth();
+window.addEventListener('resize',syncViewportWidth,{passive:true});
+window.visualViewport?.addEventListener('resize',syncViewportWidth,{passive:true});
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const money=v=>Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
 const kmFmt=v=>Number(v||0).toLocaleString('pt-PT',{maximumFractionDigits:1});
