@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.7 — Texto Dinâmico Centrado</title>
+<title>Bomba Certa v10.8 — Rodapé e Perfil</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2733,6 +2733,243 @@ input,select,textarea,button{max-width:100%}
   }
 }
 
+
+/* ===== v10.8 · Rodapé dinâmico a toda a largura ===== */
+.community-activity-footer{
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  width:100vw!important;
+  max-width:none!important;
+  margin:0!important;
+  transform:none!important;
+  border-radius:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  display:grid!important;
+  grid-template-columns:max-content minmax(0,1fr)!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  column-gap:12px!important;
+  min-height:42px!important;
+  height:42px!important;
+  padding:0 14px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.community-activity-label{
+  height:42px!important;
+  min-height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  padding:0!important;
+  margin:0!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+.community-activity-marquee{
+  width:100%!important;
+  min-width:0!important;
+  height:42px!important;
+  min-height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  overflow:hidden!important;
+  padding:0!important;
+  margin:0!important;
+}
+.community-activity-text{
+  min-width:max-content!important;
+  height:42px!important;
+  min-height:42px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  line-height:1!important;
+  padding:0!important;
+  margin:0!important;
+}
+.community-activity-item{
+  height:42px!important;
+  min-height:42px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  margin:0!important;
+}
+
+@media(max-width:560px){
+  .community-activity-footer{
+    left:0!important;
+    right:0!important;
+    width:100vw!important;
+    grid-template-columns:max-content minmax(0,1fr)!important;
+    column-gap:8px!important;
+    padding:0 8px!important;
+    height:38px!important;
+    min-height:38px!important;
+  }
+  .community-activity-label{
+    height:38px!important;
+    min-height:38px!important;
+    font-size:7.5px!important;
+    white-space:nowrap!important;
+    line-height:1!important;
+  }
+  .community-activity-marquee,
+  .community-activity-text,
+  .community-activity-item{
+    height:38px!important;
+    min-height:38px!important;
+  }
+  .community-activity-text{
+    font-size:9px!important;
+    line-height:1!important;
+  }
+}
+
+/* ===== Perfil: conta e segurança ===== */
+.profile-account-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #edf0f4
+}
+.profile-account-btn{
+  min-height:58px;
+  padding:9px 11px;
+  border-radius:13px;
+  border:1px solid #e3e8ef;
+  background:#fff;
+  color:#344054;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  text-align:left;
+  cursor:pointer
+}
+.profile-account-btn>span:first-child{
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:#f2f5f8;
+  font-size:14px
+}
+.profile-account-btn>span:last-child{
+  display:grid;
+  gap:2px
+}
+.profile-account-btn b{
+  font-size:10px
+}
+.profile-account-btn small{
+  font-size:8px;
+  line-height:1.35;
+  color:#7d8999
+}
+.profile-account-btn:hover{
+  background:#f8fafc
+}
+.profile-account-btn.danger{
+  border-color:#f2d1d1;
+  background:#fffafa
+}
+.profile-account-btn.danger>span:first-child{
+  background:#fff0f0
+}
+.profile-account-btn.danger b{
+  color:#b42318
+}
+
+.delete-profile-card{
+  width:min(520px,100%)
+}
+.delete-profile-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:10px;
+  border-bottom:1px solid #edf0f4
+}
+.delete-profile-head h2{
+  margin:2px 0 0;
+  font-size:20px
+}
+.delete-profile-warning{
+  margin-top:14px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #fecaca;
+  background:#fff7f7;
+  display:flex;
+  align-items:flex-start;
+  gap:10px
+}
+.delete-profile-icon{
+  width:30px;height:30px;flex:0 0 30px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  background:#d92d20;
+  color:#fff;
+  font-size:14px;
+  font-weight:950
+}
+.delete-profile-warning strong{
+  font-size:11px;
+  color:#9f1c14
+}
+.delete-profile-warning p{
+  margin:3px 0 0;
+  font-size:9px;
+  line-height:1.5;
+  color:#7a4b49
+}
+.delete-profile-confirm{
+  display:grid;
+  gap:6px;
+  margin-top:13px
+}
+.delete-profile-confirm span{
+  font-size:9px;
+  color:#667085
+}
+.delete-profile-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px
+}
+.delete-profile-btn{
+  background:#d92d20!important;
+  color:#fff!important;
+  border-color:#d92d20!important
+}
+.delete-profile-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+
+@media(max-width:560px){
+  .profile-account-actions{
+    grid-template-columns:1fr
+  }
+  .delete-profile-actions{
+    grid-template-columns:1fr
+  }
+  .delete-profile-card{
+    border-radius:20px 20px 0 0!important
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3395,8 +3632,19 @@ input,select,textarea,button{max-width:100%}
         <div class="quick-profile-actions">
           <button id="editNameBtn" class="btn secondary" type="button">✏️ Alterar nome</button>
           <button id="changePhotoBtn" class="btn secondary" type="button">📷 Alterar fotografia</button>
-<button id="changePasswordBtn" class="btn secondary" type="button">🔐 Alterar palavra-passe</button>
-<button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
+          <button id="changePasswordBtn" class="btn secondary" type="button">🔐 Alterar palavra-passe</button>
+          <button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
+        </div>
+
+        <div class="profile-account-actions">
+          <button id="profileLogoutBtn" class="profile-account-btn logout" type="button">
+            <span>↪</span>
+            <span><b>Sair</b><small>Terminar sessão neste dispositivo</small></span>
+          </button>
+          <button id="deleteProfileBtn" class="profile-account-btn danger" type="button">
+            <span>🗑</span>
+            <span><b>Apagar perfil</b><small>Eliminar permanentemente a conta e os dados associados</small></span>
+          </button>
         </div>
 
         <div id="profileEditArea" class="form hidden" style="margin-top:12px">
@@ -3686,6 +3934,39 @@ input,select,textarea,button{max-width:100%}
 </div>
 
 <!-- Modal fotografia de perfil -->
+
+<div id="deleteProfileModal" class="modal">
+  <div class="modal-card delete-profile-card">
+    <div class="delete-profile-head">
+      <div>
+        <div class="eyebrow">CONTA</div>
+        <h2>Apagar perfil</h2>
+      </div>
+      <button class="btn secondary compact-btn" data-close="deleteProfileModal" type="button">Fechar</button>
+    </div>
+
+    <div class="delete-profile-warning">
+      <div class="delete-profile-icon">!</div>
+      <div>
+        <strong>Esta ação é permanente.</strong>
+        <p>Serão eliminados a conta, perfil, abastecimentos, comentários, reações e contribuições associadas ao utilizador.</p>
+      </div>
+    </div>
+
+    <label class="delete-profile-confirm">
+      <span>Para confirmar, escreva <b>APAGAR</b></span>
+      <input id="deleteProfileConfirmText" class="input" autocomplete="off" placeholder="APAGAR">
+    </label>
+
+    <div id="deleteProfileStatus" class="status"></div>
+
+    <div class="delete-profile-actions">
+      <button class="btn secondary" data-close="deleteProfileModal" type="button">Cancelar</button>
+      <button id="confirmDeleteProfileBtn" class="btn delete-profile-btn" type="button" disabled>Apagar definitivamente</button>
+    </div>
+  </div>
+</div>
+
 <div id="avatarModal" class="modal">
   <div class="modal-card">
     <div class="section-title"><h2>Fotografia de perfil</h2><button class="btn secondary" data-close="avatarModal">Fechar</button></div>
@@ -5616,6 +5897,70 @@ $('logoutBtn').onclick=async()=>{
   if(isGuestMode){isGuestMode=false;document.body.classList.remove('guest-mode');location.reload();return}
   await supabase.auth.signOut();location.reload()
 };
+
+$('profileLogoutBtn')?.addEventListener('click',async()=>{
+  if(isGuestMode){
+    isGuestMode=false;
+    document.body.classList.remove('guest-mode');
+    location.reload();
+    return
+  }
+  $('profileStatus').textContent='A terminar sessão…';
+  await supabase.auth.signOut();
+  location.reload()
+});
+
+$('deleteProfileBtn')?.addEventListener('click',()=>{
+  if(isGuestMode){
+    promptGuestSignup();
+    return
+  }
+  if(isAdminUser){
+    alert('A conta de administração/proprietário está protegida contra autoeliminação.');
+    return
+  }
+  $('deleteProfileConfirmText').value='';
+  $('deleteProfileStatus').textContent='';
+  $('confirmDeleteProfileBtn').disabled=true;
+  $('deleteProfileModal').classList.add('open');
+  setTimeout(()=>$('deleteProfileConfirmText')?.focus(),100)
+});
+
+$('deleteProfileConfirmText')?.addEventListener('input',()=>{
+  $('confirmDeleteProfileBtn').disabled=$('deleteProfileConfirmText').value.trim()!=='APAGAR'
+});
+
+$('confirmDeleteProfileBtn')?.addEventListener('click',async()=>{
+  if($('deleteProfileConfirmText').value.trim()!=='APAGAR')return;
+  const btn=$('confirmDeleteProfileBtn');
+  btn.disabled=true;
+  const old=btn.textContent;
+  btn.textContent='A apagar…';
+  $('deleteProfileStatus').textContent='A eliminar a conta e os dados associados…';
+
+  try{
+    const {data,error}=await supabase.functions.invoke('delete-my-account',{body:{confirm:'APAGAR'}});
+    if(error){
+      const msg=String(error?.context?.body?.error||error?.message||'');
+      if(msg.includes('admin_account_protected')){
+        throw new Error('A conta de administração/proprietário está protegida.')
+      }
+      throw error
+    }
+    if(!data?.ok)throw new Error('Não foi possível concluir a eliminação da conta.');
+
+    try{await supabase.auth.signOut()}catch{}
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Perfil eliminado com sucesso.');
+    location.reload()
+  }catch(e){
+    $('deleteProfileStatus').textContent='Não foi possível apagar o perfil: '+errPT(e);
+    btn.disabled=false;
+    btn.textContent=old
+  }
+});
+
 
 
 
