@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.9 — Como Chegar</title>
+<title>Bomba Certa v11.0 — Média Nacional e Tendência</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2986,6 +2986,193 @@ input,select,textarea,button{max-width:100%}
   font-weight:900!important
 }
 
+
+/* ===== v11.0 · Mercado nacional DGEG + tendência ===== */
+.national-market-card{
+  margin:12px 0 14px;
+  padding:14px;
+  border:1px solid #e1e8f1;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(47,125,246,.10),transparent 34%),
+    linear-gradient(180deg,#fff,#fbfdff);
+  box-shadow:0 10px 28px rgba(15,23,42,.055);
+}
+.national-market-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.national-market-kicker{
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.12em;
+  color:#2f7df6;
+}
+.national-market-head h2{
+  margin:3px 0 2px;
+  font-size:16px;
+  line-height:1.1;
+  color:#152238;
+}
+.national-market-fuel{
+  font-size:9px;
+  font-weight:800;
+  color:#667085;
+}
+.national-market-main{
+  flex:0 0 auto;
+  text-align:right;
+  display:grid;
+  grid-template-columns:auto auto;
+  align-items:baseline;
+  justify-content:end;
+  column-gap:3px;
+}
+.national-market-main strong{
+  font-size:26px;
+  line-height:1;
+  letter-spacing:-.045em;
+  color:#10213b;
+}
+.national-market-main>span{
+  font-size:9px;
+  font-weight:900;
+  color:#667085;
+}
+.national-market-main small{
+  grid-column:1/-1;
+  margin-top:4px;
+  font-size:8px;
+  color:#98a2b3;
+}
+.national-market-forecast{
+  margin-top:12px;
+  padding-top:11px;
+  border-top:1px solid #edf1f5;
+}
+.national-forecast-title{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+.national-forecast-title>div{
+  display:grid;
+  gap:2px;
+}
+.national-forecast-title span{
+  font-size:8px;
+  color:#667085;
+  font-weight:800;
+}
+.national-forecast-title strong{
+  font-size:11px;
+  color:#1d2939;
+}
+.national-forecast-title small{
+  font-size:7.5px;
+  color:#98a2b3;
+}
+.national-prob-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.national-prob-card{
+  padding:8px 9px;
+  border:1px solid #e8edf3;
+  border-radius:12px;
+  background:#fff;
+}
+.national-prob-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  font-size:8px;
+  font-weight:850;
+  color:#667085;
+}
+.national-prob-top strong{
+  font-size:11px;
+  color:#344054;
+}
+.national-prob-track{
+  display:block;
+  width:100%;
+  height:4px;
+  margin-top:6px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#edf1f5;
+}
+.national-prob-track i{
+  display:block;
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  transition:width .35s ease;
+}
+.national-prob-card.up .national-prob-track i{background:#e04f5f}
+.national-prob-card.stable .national-prob-track i{background:#e8a527}
+.national-prob-card.down .national-prob-track i{background:#20a36a}
+.national-market-insight{
+  margin-top:9px;
+  padding:8px 9px;
+  border-radius:10px;
+  background:#f5f8fc;
+  font-size:8.5px;
+  line-height:1.45;
+  color:#475467;
+}
+.national-market-source{
+  margin-top:6px;
+  font-size:7px;
+  line-height:1.4;
+  color:#98a2b3;
+}
+.national-market-card.loading{
+  opacity:.72;
+}
+.national-market-card.unavailable .national-market-main strong{
+  font-size:15px;
+  letter-spacing:0;
+  color:#667085;
+}
+
+@media(max-width:560px){
+  .national-market-card{
+    margin:9px 0 11px;
+    padding:11px;
+    border-radius:15px;
+  }
+  .national-market-head{
+    gap:10px;
+  }
+  .national-market-head h2{
+    font-size:14px;
+  }
+  .national-market-main strong{
+    font-size:22px;
+  }
+  .national-prob-grid{
+    gap:5px;
+  }
+  .national-prob-card{
+    padding:7px 6px;
+    border-radius:10px;
+  }
+  .national-prob-top{
+    font-size:7px;
+  }
+  .national-prob-top strong{
+    font-size:9px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3152,6 +3339,52 @@ input,select,textarea,button{max-width:100%}
       </div>
     </div>
 
+    <section id="nationalMarketCard" class="national-market-card" aria-live="polite">
+      <div class="national-market-head">
+        <div>
+          <div class="national-market-kicker">PORTUGAL CONTINENTAL · DGEG</div>
+          <h2>Preço médio nacional</h2>
+          <div id="nationalMarketFuel" class="national-market-fuel">Gasóleo simples</div>
+        </div>
+        <div class="national-market-main">
+          <strong id="nationalAveragePrice">—</strong>
+          <span>€/L</span>
+          <small id="nationalAverageDate">A atualizar…</small>
+        </div>
+      </div>
+
+      <div class="national-market-forecast">
+        <div class="national-forecast-title">
+          <div>
+            <span>Próxima tendência</span>
+            <strong id="nationalTrendLabel">A calcular…</strong>
+          </div>
+          <small>Estimativa Bomba Certa</small>
+        </div>
+
+        <div class="national-prob-grid">
+          <div class="national-prob-card up">
+            <div class="national-prob-top"><span>↑ Subir</span><strong id="probRise">—</strong></div>
+            <div class="national-prob-track"><i id="probRiseBar"></i></div>
+          </div>
+          <div class="national-prob-card stable">
+            <div class="national-prob-top"><span>→ Manter</span><strong id="probStable">—</strong></div>
+            <div class="national-prob-track"><i id="probStableBar"></i></div>
+          </div>
+          <div class="national-prob-card down">
+            <div class="national-prob-top"><span>↓ Descer</span><strong id="probFall">—</strong></div>
+            <div class="national-prob-track"><i id="probFallBar"></i></div>
+          </div>
+        </div>
+
+        <div id="nationalMarketInsight" class="national-market-insight">
+          Baseada na evolução recente do preço médio diário oficial.
+        </div>
+        <div class="national-market-source">
+          Fonte: DGEG · Preço Médio Diário (Continente). A probabilidade é uma estimativa estatística da Bomba Certa e não uma previsão oficial.
+        </div>
+      </div>
+    </section>
 
     <div class="managed-ad managed-ad-horizontal" data-ad-key="postos_top" data-ad-section="postos">
       <div class="managed-ad-copy">
@@ -4212,6 +4445,87 @@ function initAdTracking(){
 
 
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
+
+const NATIONAL_AVERAGE_FUNCTION='dgeg-national-average';
+let nationalMarketRequestSeq=0;
+
+function nationalPriceFmt(v){
+  const n=Number(v);
+  return Number.isFinite(n)?n.toFixed(3).replace('.',','):'—'
+}
+function nationalDateFmt(iso){
+  if(!iso)return 'Data não disponível';
+  const d=new Date(`${iso}T12:00:00`);
+  if(Number.isNaN(d.getTime()))return iso;
+  return `DGEG · ${d.toLocaleDateString('pt-PT',{day:'2-digit',month:'short',year:'numeric'})}`
+}
+function setProbability(id,value){
+  const n=Math.max(0,Math.min(100,Number(value)||0));
+  const txt=$(id);
+  const bar=$(`${id}Bar`);
+  if(txt)txt.textContent=`${Math.round(n)}%`;
+  if(bar)bar.style.width=`${n}%`
+}
+function marketInsight(data){
+  const f=data?.forecast||{};
+  const series=Array.isArray(data?.series)?data.series:[];
+  const latest=series.at(-1), prev=series.at(-2);
+  let change='';
+  if(latest&&prev){
+    const d=Number(latest.price)-Number(prev.price);
+    const cents=Math.abs(d*100);
+    if(Math.abs(d)<0.0005) change='O preço médio manteve-se praticamente inalterado face ao valor anterior.';
+    else change=`O último preço médio publicado ${d>0?'subiu':'desceu'} ${cents.toFixed(1).replace('.',',')} cênt./L.`;
+  }
+  const lead=[
+    ['subida',Number(f.rise)||0],
+    ['manutenção',Number(f.stable)||0],
+    ['descida',Number(f.fall)||0]
+  ].sort((a,b)=>b[1]-a[1])[0];
+  return `${change}${change?' ':''}O cenário com maior peso estatístico é ${lead[0]} (${Math.round(lead[1])}%).`
+}
+async function loadNationalMarket(){
+  const card=$('nationalMarketCard');
+  if(!card)return;
+  const seq=++nationalMarketRequestSeq;
+  const fuel=$('fuelType')?.value||'Gasóleo simples';
+  $('nationalMarketFuel').textContent=fuel;
+  $('nationalAveragePrice').textContent='—';
+  $('nationalAverageDate').textContent='A atualizar…';
+  $('nationalTrendLabel').textContent='A calcular…';
+  setProbability('probRise',0);
+  setProbability('probStable',0);
+  setProbability('probFall',0);
+  card.classList.add('loading');
+  card.classList.remove('unavailable');
+
+  try{
+    const endpoint=`${SUPABASE_URL}/functions/v1/${NATIONAL_AVERAGE_FUNCTION}?fuel=${encodeURIComponent(fuel)}`;
+    const r=await fetch(endpoint,{headers:{'apikey':SUPABASE_KEY}});
+    if(seq!==nationalMarketRequestSeq)return;
+    if(!r.ok)throw new Error(`DGEG ${r.status}`);
+    const data=await r.json();
+    if(!data?.latest || !Number.isFinite(Number(data.latest.price)))throw new Error('Preço médio indisponível');
+
+    $('nationalAveragePrice').textContent=nationalPriceFmt(data.latest.price);
+    $('nationalAverageDate').textContent=nationalDateFmt(data.latest.date);
+    $('nationalTrendLabel').textContent=data.forecast?.label||'Tendência em análise';
+    setProbability('probRise',data.forecast?.rise);
+    setProbability('probStable',data.forecast?.stable);
+    setProbability('probFall',data.forecast?.fall);
+    $('nationalMarketInsight').textContent=marketInsight(data);
+  }catch(e){
+    if(seq!==nationalMarketRequestSeq)return;
+    card.classList.add('unavailable');
+    $('nationalAveragePrice').textContent='Indisponível';
+    $('nationalAverageDate').textContent='Fonte DGEG sem resposta';
+    $('nationalTrendLabel').textContent='Sem estimativa';
+    $('nationalMarketInsight').textContent='Quando a DGEG voltar a disponibilizar os valores, a Bomba Certa atualiza automaticamente esta área. Não apresentamos valores inventados.';
+  }finally{
+    if(seq===nationalMarketRequestSeq)card.classList.remove('loading');
+  }
+}
+
 
 const $=id=>document.getElementById(id);
 
@@ -7477,7 +7791,8 @@ $('locateBtn').onclick=()=>{
   useFastLocation()
 };
 $('refreshBtn').onclick=searchStations;
-$('fuelType').onchange=()=>currentLat!=null&&searchStations();
+$('fuelType').onchange=()=>{loadNationalMarket();if(currentLat!=null)searchStations()};
+loadNationalMarket();
 $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
 
 

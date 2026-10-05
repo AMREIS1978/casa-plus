@@ -1,17 +1,25 @@
-# Bomba Certa v10.9 — Como Chegar
+# Bomba Certa v11.0 — Média Nacional + Tendência
 
-## Alteração de nome
-`Ver rota` foi substituído por **Como chegar**.
+## Novo painel nacional
+Foi acrescentado ao ecrã Mapa um painel que acompanha o combustível selecionado e mostra:
 
-É mais intuitivo porque descreve diretamente o que o utilizador pretende fazer.
+- preço médio diário oficial DGEG para Portugal Continental;
+- data do último valor oficial publicado;
+- probabilidade estimada de **subir**;
+- probabilidade estimada de **manter**;
+- probabilidade estimada de **descer**;
+- interpretação automática da evolução mais recente.
 
-## Correção funcional
-O botão agora:
-1. tenta usar a localização já conhecida;
-2. se ainda não existir, pede a geolocalização;
-3. calcula o percurso dentro da Bomba Certa com OSRM;
-4. apresenta distância e tempo;
-5. disponibiliza **Iniciar navegação** no Google Maps;
-6. se o cálculo interno falhar, mantém sempre o fallback para Google Maps.
+## Fonte
+DGEG — Preço Médio Diário (Continente).
 
-As chaves dos postos também passam a ser codificadas nos botões inline para evitar falhas com caracteres especiais.
+O preço médio é o valor oficial publicado pela DGEG.  
+As probabilidades NÃO são previsões da DGEG: são uma estimativa Bomba Certa baseada exclusivamente na série recente de preços médios oficiais.
+
+## Backend
+Nova Edge Function:
+`dgeg-national-average`
+
+A função é pública apenas para leitura de informação pública da DGEG e não acede a dados pessoais ou credenciais do utilizador.
+
+Se a fonte DGEG estiver indisponível, a app não inventa valores e apresenta “Indisponível”.
