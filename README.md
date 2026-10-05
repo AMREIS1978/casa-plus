@@ -1,19 +1,17 @@
-# Bomba Certa v11.2 — Média Nacional Sempre Visível
+# Bomba Certa v10.9 — Como Chegar
 
-Corrige o problema do bloco aparecer sem informação.
+## Alteração de nome
+`Ver rota` foi substituído por **Como chegar**.
 
-## Nova lógica de dados
-A app nunca fica dependente de uma única chamada:
+É mais intuitivo porque descreve diretamente o que o utilizador pretende fazer.
 
-1. tenta o preço médio diário oficial;
-2. se essa chamada falhar, calcula em tempo real uma **média nacional observada** com os preços dos postos publicados pela API DGEG;
-3. se a API nacional também falhar, mostra o último valor oficial DGEG guardado.
+## Correção funcional
+O botão agora:
+1. tenta usar a localização já conhecida;
+2. se ainda não existir, pede a geolocalização;
+3. calcula o percurso dentro da Bomba Certa com OSRM;
+4. apresenta distância e tempo;
+5. disponibiliza **Iniciar navegação** no Google Maps;
+6. se o cálculo interno falhar, mantém sempre o fallback para Google Maps.
 
-Nunca apresenta 0% ou “Indisponível” quando existe informação oficial anterior.
-
-## Transparência
-- “DGEG” = média diária oficial quando disponível;
-- “DGEG · média observada” = média aritmética calculada dos preços nacionais dos postos DGEG;
-- “DGEG · último oficial” = último valor oficial conhecido.
-
-A tendência/probabilidade continua identificada como estimativa Bomba Certa, não previsão oficial.
+As chaves dos postos também passam a ser codificadas nos botões inline para evitar falhas com caracteres especiais.
