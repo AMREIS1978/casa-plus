@@ -1,48 +1,25 @@
-# Bomba Certa v10.2 — Localização + Criar Posto + Publicidade
+# Bomba Certa v10.3 — Comentários + Publicidade
 
-## A sua localização
-O marcador do utilizador deixa de ser igual aos postos.
+## Número dos comentários
+O contador deixou de aparecer como um pequeno balão sobreposto ao ícone.
 
-Novo marcador:
-- azul;
-- pulsante;
-- com orientação visual própria;
-- prioridade visual superior aos postos;
-- popup próprio “A sua localização”.
+Agora aparece de forma discreta e alinhada:
+**💬 2**
 
-Assim o utilizador distingue imediatamente:
-**eu** vs. **posto de combustível**.
+A mesma lógica foi aplicada às partilhas:
+**↗ 3**
 
-## Criar posto
-Foi corrigida a lógica de abertura do modal.
+Fica mais próxima da linguagem visual das redes sociais e não compete com os emojis.
 
-Existe agora uma única função:
-`window.openAddStation()`
+## Botão da publicidade
+O botão **Saber mais** passa a funcionar em todos os espaços.
 
-É usada tanto por:
-- `+ Posto`;
-- `Adicionar posto` na coluna lateral.
+Comportamento:
+1. regista o clique;
+2. se existir `data-ad-url`, abre o destino da campanha;
+3. se a posição ainda não tiver URL configurado, abre um painel elegante que explica que o espaço está ativo e pronto para campanha.
 
-A janela:
-- abre acima do mapa e navegação;
-- limpa dados antigos;
-- pré-preenche latitude/longitude quando já existe localização;
-- envia visitantes para criação de conta;
-- apresenta feedback caso a geolocalização falhe.
+Isto evita botões que parecem não fazer nada.
 
-## Publicidade
-Todas as páginas continuam a ter publicidade e as páginas longas passam a ter um segundo espaço no rodapé:
-- Postos/Mapa;
-- Abastecimentos;
-- Viagem;
-- Análise;
-- Perfil;
-- Administração.
-
-Todos os novos espaços usam o mesmo tracking de:
-- impressão real;
-- clique;
-- CTR;
-- página/posição.
-
-Esses dados aparecem no painel de Administração > Publicidade.
+## Tracking
+O clique continua a ser contabilizado no painel Admin independentemente de o anúncio ainda estar em modo placeholder ou já ter destino configurado.

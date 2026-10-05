@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.2 — Localização e Publicidade</title>
+<title>Bomba Certa v10.3 — Interações e Publicidade</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2052,6 +2052,132 @@ header{
   }
 }
 
+
+/* ===== v10.3 · Comentários discretos + publicidade funcional ===== */
+
+/* O número do comentário deixa de ser um balão sobreposto. */
+.social-button-count{display:none!important}
+.facebook-icon-btn{
+  width:auto!important;
+  min-width:36px!important;
+  padding:0 7px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important
+}
+.social-inline-count{
+  position:static!important;
+  min-width:0!important;
+  height:auto!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#69778b!important;
+  font-size:9px!important;
+  font-weight:750!important;
+  line-height:1!important
+}
+.facebook-icon-btn:hover .social-inline-count{color:#46556a!important}
+.facebook-icon-btn.reacted .social-inline-count{color:#1769d2!important}
+
+/* Modal de publicidade */
+.ad-info-modal-card{
+  width:min(520px,100%);
+  border-radius:22px!important
+}
+.ad-info-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:11px;
+  border-bottom:1px solid #edf0f4
+}
+.ad-info-head h2{
+  margin:2px 0 0;
+  font-size:20px;
+  letter-spacing:-.025em
+}
+.ad-info-hero{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:14px;
+  padding:13px;
+  border-radius:15px;
+  background:linear-gradient(135deg,#f8fbff,#f5f7fb);
+  border:1px solid #e5eaf2
+}
+.ad-info-icon{
+  width:42px;height:42px;flex:0 0 42px;
+  border-radius:13px;
+  display:grid;place-items:center;
+  background:#eaf2ff;
+  color:#1769d2;
+  font-size:20px;
+  font-weight:900
+}
+.ad-info-hero strong{font-size:12px;color:#1d2939}
+.ad-info-hero p{
+  margin:3px 0 0;
+  font-size:9px;
+  line-height:1.45;
+  color:#748198
+}
+.ad-info-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+  margin-top:10px
+}
+.ad-info-grid>div{
+  padding:9px;
+  border-radius:12px;
+  background:#fafbfd;
+  border:1px solid #eaedf2
+}
+.ad-info-grid span{
+  display:block;
+  font-size:7.5px;
+  color:#8b96a8;
+  text-transform:uppercase;
+  letter-spacing:.04em
+}
+.ad-info-grid strong{
+  display:block;
+  margin-top:3px;
+  font-size:9px;
+  color:#344054
+}
+.ad-info-note{
+  margin-top:10px;
+  padding:10px 11px;
+  border-radius:12px;
+  background:#fffaf0;
+  border:1px solid #f1e4c4;
+  color:#78633a;
+  font-size:9px;
+  line-height:1.5
+}
+.ad-info-ok{
+  width:100%;
+  margin-top:12px
+}
+
+@media(max-width:560px){
+  .facebook-icon-btn{
+    min-width:34px!important;
+    padding:0 5px!important;
+    gap:3px!important
+  }
+  .social-inline-count{font-size:8.5px!important}
+  .ad-info-grid{grid-template-columns:1fr}
+  .ad-info-modal-card{
+    border-radius:20px 20px 0 0!important
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2883,6 +3009,41 @@ header{
 
 
 
+
+<!-- Modal: detalhes do espaço publicitário -->
+<div id="adInfoModal" class="modal">
+  <div class="modal-card ad-info-modal-card">
+    <div class="ad-info-head">
+      <div>
+        <div class="eyebrow">PUBLICIDADE</div>
+        <h2 id="adInfoTitle">Espaço publicitário</h2>
+      </div>
+      <button class="btn secondary compact-btn" data-close="adInfoModal">Fechar</button>
+    </div>
+
+    <div class="ad-info-hero">
+      <div class="ad-info-icon">◎</div>
+      <div>
+        <strong id="adInfoPlacement">Posição disponível</strong>
+        <p id="adInfoText">Este espaço está preparado para receber uma campanha.</p>
+      </div>
+    </div>
+
+    <div class="ad-info-grid">
+      <div><span>Formato</span><strong>Imagem + texto + link</strong></div>
+      <div><span>Medição</span><strong>Vistas, cliques e CTR</strong></div>
+      <div><span>Dispositivos</span><strong>PC + telemóvel</strong></div>
+    </div>
+
+    <div class="ad-info-note">
+      Quando esta posição tiver um anunciante configurado, o botão abre diretamente o destino da campanha.
+      Até lá, este painel confirma que o espaço está ativo e mensurável.
+    </div>
+
+    <button id="adInfoOkBtn" class="btn ad-info-ok" type="button">Percebi</button>
+  </div>
+</div>
+
 <!-- Modal: quem reagiu ao posto -->
 <div id="stationReactorsModal" class="modal">
   <div class="modal-card social-reactors-modal-card">
@@ -3121,6 +3282,24 @@ async function recordAdEvent(el,eventType){
   }
 }
 
+
+function adPlacementTitle(ad){
+  const key=ad?.dataset?.adKey||'';
+  const section=ad?.dataset?.adSection||'';
+  const label=typeof adPlacementLabel==='function'?adPlacementLabel(key):key;
+  return label||section||'Espaço publicitário'
+}
+
+function openAdInfo(ad){
+  if(!ad)return;
+  const title=adPlacementTitle(ad);
+  $('adInfoTitle').textContent='Espaço publicitário';
+  $('adInfoPlacement').textContent=title;
+  const section=ad.dataset.adSection||'esta página';
+  $('adInfoText').textContent=`Posição ativa em ${section}. Este espaço está preparado para receber uma campanha com destino configurável.`;
+  $('adInfoModal').classList.add('open')
+}
+
 function initAdTracking(){
   const ads=[...document.querySelectorAll('.managed-ad[data-ad-key]')];
   if(!ads.length)return;
@@ -3154,8 +3333,19 @@ function initAdTracking(){
     btn.addEventListener('click',async()=>{
       const ad=btn.closest('.managed-ad');
       await recordAdEvent(ad,'click');
-      const url=ad?.dataset?.adUrl;
-      if(url)window.open(url,'_blank','noopener')
+
+      const url=(ad?.dataset?.adUrl||'').trim();
+      if(url){
+        try{
+          const target=new URL(url,location.href);
+          window.open(target.href,'_blank','noopener')
+        }catch{
+          console.warn('URL de publicidade inválido:',url);
+          openAdInfo(ad)
+        }
+      }else{
+        openAdInfo(ad)
+      }
     })
   })
 }
@@ -4055,6 +4245,8 @@ $('profileTopBtn').onclick=()=>showSection('perfil');
 $('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
 $('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
+$('adInfoOkBtn')?.addEventListener('click',()=>$('adInfoModal')?.classList.remove('open'));
+
 
 
 let isAdminUser=false;
@@ -5832,13 +6024,14 @@ function stationSocialHTML(stationKey){
         title="Comentar" aria-label="Comentar"
         onclick="toggleStationComments('${token}')">
         <span class="social-main-icon">💬</span>
-        <span id="${id}-comment-button-count" class="social-button-count"></span>
+        <span id="${id}-comment-button-count" class="social-inline-count"></span>
       </button>
 
       <button class="social-action-btn facebook-icon-btn" type="button"
         title="Partilhar" aria-label="Partilhar"
         onclick="shareStation('${token}')">
         <span class="social-main-icon">↗</span>
+        <span id="${id}-share-button-count" class="social-inline-count"></span>
       </button>
     </div>
 
@@ -5901,6 +6094,8 @@ function renderSocialSummary(stationKey,row){
       ? `${shareCount} ${shareCount===1?'partilha':'partilhas'}`
       : '';
   }
+  const shareButtonCount=$(id+'-share-button-count');
+  if(shareButtonCount)shareButtonCount.textContent=shareCount?String(shareCount):'';
 
   const my=row?.my_reaction;
   const btn=$(id+'-my-reaction');
