@@ -1,24 +1,24 @@
-# MyGGas — Dashboard Refinado
+# MyGGas — Premium Stations
 
-Atualização visual da zona inferior inspirada no mockup aprovado, mantendo a funcionalidade existente.
+Versão ajustada para reproduzir mais de perto o mockup aprovado.
 
 ## Desktop
-- lista de postos compacta em cartões horizontais;
-- identificação visual de cada posto;
-- preços secundários compactos;
-- botão “Como chegar” destacado;
-- mapa em cartão lateral;
-- publicidade integrada no painel lateral;
-- layout mais próximo de uma dashboard de mobilidade.
+- lista de postos equilibrada com a coluna do mapa;
+- aproximadamente três cartões visíveis antes do scroll interno;
+- scroll suave e discreto apenas na lista de postos;
+- logótipos de marcas conhecidas com fallback seguro;
+- mapa lateral;
+- bloco “Preço médio nacional”;
+- banner “Viaje mais. Gaste menos.”;
+- aspeto mais compacto e premium.
 
 ## Mobile
-- mantém layout de uma coluna;
-- mapa e lista totalmente ajustados ao viewport;
-- cartões compactos e legíveis;
-- preços com scroll horizontal local;
-- ações em grelha;
-- nenhuma alteração aos IDs, dados ou fluxos principais.
+- sem scroll interno forçado na lista;
+- a página faz scroll naturalmente;
+- logótipos reduzidos;
+- mapa, média nacional e banner ajustados ao viewport;
+- navegação inferior permanece fixa.
 
-## Preservado
-Login, registo, mapa, pesquisa, preços reais, social, perfil, abastecimentos,
-viagem inteligente, análise, administração e restantes funções da versão-base.
+## Funcionalidade preservada
+Login, pesquisa, mapa, preços, comunidade, Como chegar, abastecimentos,
+Viagem Inteligente, Análise, Perfil e Admin.

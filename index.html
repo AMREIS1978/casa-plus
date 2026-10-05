@@ -4851,6 +4851,175 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   }
 }
 
+
+/* ==========================================================================
+   MyGGas — Premium stations final pass
+   ========================================================================== */
+@media (min-width:901px){
+  .premium-layout.social-layout{
+    grid-template-columns:minmax(0,1.55fr) minmax(355px,.90fr)!important;
+    gap:12px!important;
+  }
+  .premium-stations-panel.social-feed-panel,
+  .premium-map-card.social-map-rail{
+    border-radius:16px!important;
+    border-color:#e4ebf3!important;
+    box-shadow:0 8px 24px rgba(16,38,74,.045)!important;
+  }
+
+  /* Três cartões visíveis; restantes por scroll, equilibrado com a coluna do mapa. */
+  #stationList.social-feed{
+    max-height:520px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding-right:4px!important;
+    scroll-behavior:smooth!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#c9d7e8 transparent!important;
+    overscroll-behavior:contain!important;
+  }
+  #stationList.social-feed::-webkit-scrollbar{width:5px!important}
+  #stationList.social-feed::-webkit-scrollbar-track{background:transparent!important}
+  #stationList.social-feed::-webkit-scrollbar-thumb{
+    background:#c9d7e8!important;border-radius:999px!important
+  }
+
+  .social-feed .station{
+    min-height:148px!important;
+  }
+  .social-feed .station-main{
+    grid-template-columns:minmax(0,1fr) 108px!important;
+    padding:9px 10px 4px!important;
+  }
+  .station-identity{
+    grid-template-columns:46px minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  .station-brand-badge{
+    width:46px!important;height:46px!important;
+    background:#fff!important;
+    overflow:hidden!important;
+  }
+  .station-brand-badge img{
+    width:34px!important;height:34px!important;object-fit:contain!important;
+    display:block!important;
+  }
+  .station-brand-fallback{
+    display:none;
+    width:100%;height:100%;place-items:center;
+    color:#185fae;font-size:15px;font-weight:950
+  }
+  .station h3{font-size:11.5px!important}
+  .station-meta{font-size:7px!important}
+  .price{font-size:18px!important}
+  .social-feed .fuel-price-grid{
+    margin-left:66px!important;
+  }
+  .fuel-price-chip{
+    flex-basis:84px!important;min-width:84px!important;max-width:84px!important;
+  }
+
+  .market-reference-card{
+    margin-top:9px;
+    padding:10px;
+    border:1px solid #e6edf5;
+    border-radius:12px;
+    background:#fff;
+  }
+  .market-reference-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:8px
+  }
+  .market-reference-head strong{
+    font-size:9px;color:#102755
+  }
+  .market-reference-head span{
+    font-size:6px;color:#1470df;font-weight:900
+  }
+  .market-reference-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:7px
+  }
+  .market-reference-grid>div{
+    padding:8px;
+    border:1px solid #edf1f5;
+    border-radius:9px;
+    background:#fafcff
+  }
+  .market-reference-grid small{
+    display:block;font-size:6px;color:#718097
+  }
+  .market-reference-grid b{
+    display:block;margin-top:3px;font-size:15px;color:#102755
+  }
+  .market-reference-grid em{
+    display:inline-block;margin-top:4px;padding:2px 5px;border-radius:999px;
+    font-size:5.8px;font-style:normal;font-weight:900
+  }
+  .market-down{background:#eaf9f0;color:#198754}
+  .market-up{background:#fff0ef;color:#c53b31}
+  .market-stable{background:#f1f4f8;color:#6b7280}
+
+  .premium-ad-secondary{
+    min-height:108px!important;
+  }
+}
+
+/* Mobile premium: sem scroll interno da lista; página faz scroll naturalmente. */
+@media (max-width:900px){
+  #stationList.social-feed{
+    max-height:none!important;
+    overflow:visible!important;
+    padding-right:0!important;
+  }
+  .station-brand-badge{
+    overflow:hidden!important;
+    background:#fff!important;
+  }
+  .station-brand-badge img{
+    width:26px!important;height:26px!important;object-fit:contain!important;
+    display:block!important
+  }
+  .station-brand-fallback{
+    display:none;width:100%;height:100%;place-items:center;
+    color:#185fae;font-weight:950
+  }
+
+  .market-reference-card{
+    margin-top:7px;
+    padding:8px;
+    border:1px solid #e6edf5;
+    border-radius:11px;
+    background:#fff
+  }
+  .market-reference-head{
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+    margin-bottom:6px
+  }
+  .market-reference-head strong{font-size:7.8px;color:#102755}
+  .market-reference-head span{font-size:5.7px;color:#1470df;font-weight:900}
+  .market-reference-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:5px
+  }
+  .market-reference-grid>div{
+    padding:6px;border:1px solid #edf1f5;border-radius:8px;background:#fafcff
+  }
+  .market-reference-grid small{display:block;font-size:5.4px;color:#718097}
+  .market-reference-grid b{display:block;margin-top:2px;font-size:12px;color:#102755}
+  .market-reference-grid em{
+    display:inline-block;margin-top:3px;padding:2px 4px;border-radius:999px;
+    font-size:5.2px;font-style:normal;font-weight:900
+  }
+  .market-down{background:#eaf9f0;color:#198754}
+  .market-up{background:#fff0ef;color:#c53b31}
+  .market-stable{background:#f1f4f8;color:#6b7280}
+}
+
+/* Em telemóveis estreitos, manter tudo legível. */
+@media(max-width:430px){
+  .market-reference-grid b{font-size:11px}
+  .station-brand-badge img{width:23px!important;height:23px!important}
+}
+
 </style>
 </head>
 <body>
@@ -5150,6 +5319,24 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
         <div class="social-map-note">
           <span>●</span> Os preços aparecem nos marcadores e nos cartões dos postos.
         </div>
+        <section class="market-reference-card" aria-live="polite">
+          <div class="market-reference-head">
+            <strong>▥ Preço médio nacional</strong>
+            <span id="marketRefStatus">DGEG</span>
+          </div>
+          <div class="market-reference-grid">
+            <div>
+              <small id="marketRefFuel1">Gasóleo simples</small>
+              <b id="marketRefPrice1">—</b>
+              <em id="marketRefTrend1">a atualizar</em>
+            </div>
+            <div>
+              <small id="marketRefFuel2">Gasolina 95</small>
+              <b id="marketRefPrice2">—</b>
+              <em id="marketRefTrend2">a atualizar</em>
+            </div>
+          </div>
+        </section>
     <div class="ad premium-ad premium-ad-secondary" aria-label="Publicidade">
       <div class="premium-ad-secondary-copy">
         <div class="ad-badge">Publicidade</div>
@@ -9201,6 +9388,30 @@ document.addEventListener('click',e=>{
   }
 });
 
+
+function stationBrandAsset(station){
+  const txt=`${station?.brand||''} ${station?.name||''}`.toLowerCase();
+  if(txt.includes('repsol')) return {name:'Repsol',url:'https://logo.clearbit.com/repsol.com'};
+  if(txt.includes('galp')) return {name:'Galp',url:'https://logo.clearbit.com/galp.com'};
+  if(/\bbp\b/.test(txt) || txt.includes('bp ')) return {name:'BP',url:'https://logo.clearbit.com/bp.com'};
+  if(txt.includes('prio')) return {name:'Prio',url:'https://logo.clearbit.com/prio.pt'};
+  if(txt.includes('intermarch')) return {name:'Intermarché',url:'https://logo.clearbit.com/intermarche.pt'};
+  if(txt.includes('cepsa') || txt.includes('moeve')) return {name:'Moeve',url:'https://logo.clearbit.com/moeveglobal.com'};
+  if(txt.includes('shell')) return {name:'Shell',url:'https://logo.clearbit.com/shell.com'};
+  if(txt.includes('auchan')) return {name:'Auchan',url:'https://logo.clearbit.com/auchan-retail.com'};
+  return {name:String(station?.brand||station?.name||'?'),url:''}
+}
+function stationBrandBadgeHTML(station){
+  const a=stationBrandAsset(station);
+  const fallback=esc((a.name||'?').trim().charAt(0).toUpperCase());
+  if(!a.url)return `<div class="station-brand-badge"><span>${fallback}</span></div>`;
+  return `<div class="station-brand-badge">
+    <img src="${a.url}" alt="${esc(a.name)}" loading="lazy"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+    <span class="station-brand-fallback">${fallback}</span>
+  </div>`
+}
+
 function renderBasicStations(){
   const rows=[...nearbyStations].sort((a,b)=>{
     const ap=a.displayPrice??a.officialPrice, bp=b.displayPrice??b.officialPrice;
@@ -9220,10 +9431,11 @@ function renderBasicStations(){
     return `<div class="station">
       <div class="station-main">
         <div class="station-identity">
-          <div class="station-brand-badge">${esc((s.brand||s.name||'?').trim().charAt(0).toUpperCase())}</div>
+          ${stationBrandBadgeHTML(s)}
           <div class="station-copy">
-          <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
-          <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
+            <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
+            <div class="station-meta">${kmFmt(s.distance)} km${s.address?' · '+esc(s.address):''}</div>
+          </div>
         </div>
         <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'a atualizar'}</small></div>
       </div>
@@ -9301,10 +9513,12 @@ async function renderStations(){
     const canValidate=c&&c.authorUserId!==currentAuthUserId;
     return `<div class="station">
       <div class="station-main">
-        <div>
-          <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
-          <div class="station-meta">${kmFmt(s.distance)} km${s.brand?' · '+esc(s.brand):''}${s.address?' · '+esc(s.address):''}</div>
-          ${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}
+        <div class="station-identity">
+          ${stationBrandBadgeHTML(s)}
+          <div class="station-copy">
+            <div class="station-top"><h3>${esc(s.name)}</h3>${source}</div>
+            <div class="station-meta">${kmFmt(s.distance)} km${s.address?' · '+esc(s.address):''}</div>
+            ${updateLine}${authorLine}${validationLine}${s.closed?`<div class="warn">${esc(s.closed)}</div>`:''}
           </div>
         </div>
         <div class="price">${price?price+' €':'—'}<small>${price?esc($('fuelType').value)+' · por litro':'sem preço'}</small></div>
@@ -9340,14 +9554,55 @@ async function renderStations(){
   saveFastStationCache()
 }
 
+
+async function loadPremiumMarketReference(){
+  const p1=$('marketRefPrice1'),p2=$('marketRefPrice2');
+  if(!p1||!p2)return;
+  const selected=$('fuelType')?.value||'Gasóleo simples';
+  const second=selected==='Gasolina simples 95'?'Gasóleo simples':'Gasolina simples 95';
+  $('marketRefFuel1').textContent=selected;
+  $('marketRefFuel2').textContent=second==='Gasolina simples 95'?'Gasolina 95':second;
+
+  const loadOne=async(fuel,priceId,trendId)=>{
+    try{
+      const r=await fetch(`${SUPABASE_URL}/functions/v1/dgeg-national-average?fuel=${encodeURIComponent(fuel)}`,{cache:'no-store'});
+      if(!r.ok)throw new Error();
+      const d=await r.json();
+      const val=Number(d?.latest?.price);
+      if(!Number.isFinite(val))throw new Error();
+      $(priceId).textContent=val.toFixed(3).replace('.',',')+' €';
+      const f=d?.forecast||{};
+      const best=[
+        ['↑',Number(f.rise)||0,'subir'],
+        ['→',Number(f.stable)||0,'manter'],
+        ['↓',Number(f.fall)||0,'descer']
+      ].sort((a,b)=>b[1]-a[1])[0];
+      $(trendId).textContent=`${best[0]} ${Math.round(best[1])}% ${best[2]}`;
+      $(trendId).className=best[2]==='descer'?'market-down':best[2]==='subir'?'market-up':'market-stable';
+      return true
+    }catch{
+      $(priceId).textContent='—';
+      $(trendId).textContent='sem leitura';
+      $(trendId).className='market-stable';
+      return false
+    }
+  };
+  const result=await Promise.all([
+    loadOne(selected,'marketRefPrice1','marketRefTrend1'),
+    loadOne(second,'marketRefPrice2','marketRefTrend2')
+  ]);
+  $('marketRefStatus').textContent=result.some(Boolean)?'DGEG':'A atualizar';
+}
+
 $('locateBtn').onclick=()=>{
   $('fuelStatus').textContent='A localizar…';
   $('fastLocationInfo').classList.remove('hidden');
   useFastLocation()
 };
 $('refreshBtn').onclick=searchStations;
-$('fuelType').onchange=()=>currentLat!=null&&searchStations();
+$('fuelType').onchange=()=>{loadPremiumMarketReference().catch(()=>{});if(currentLat!=null)searchStations()};
 $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
+loadPremiumMarketReference().catch(()=>{});
 
 
 let recentPriceActivity=[];
