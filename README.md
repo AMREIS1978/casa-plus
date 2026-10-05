@@ -1,20 +1,12 @@
-# Bomba Certa v10.4 — Marcadores por preço
+# Bomba Certa v10.5 — Navegação fixa mobile
 
-## Novo comportamento
-Os balões dos postos no mapa passam a ter **três cores** de leitura imediata:
+## Melhorias
+- navegação principal sempre fixa e visível no telemóvel;
+- barra inferior mais simples, elegante e intuitiva;
+- comportamento mais próximo de apps sociais/mobile;
+- mais espaço inferior na página para evitar sobreposição de conteúdo;
+- ticker da comunidade reposicionado acima da navegação.
 
-- **Verde** → postos mais baratos
-- **Amarelo** → postos intermédios
-- **Vermelho** → postos mais caros
-
-Se um posto não tiver preço disponível, o marcador aparece em **cinzento**.
-
-## Critério
-A cor é calculada com base no **preço final apresentado para o combustível selecionado**.
-Os postos com preço disponível são ordenados e divididos em três grupos:
-1. terço mais barato;
-2. terço intermédio;
-3. terço mais caro.
-
-## Extra
-Cada marcador mostra também uma pequena etiqueta com o preço, para leitura mais rápida diretamente no mapa.
+## Compatibilidade
+- mantém desktop com navegação atual;
+- em mobile a navegação fica sempre acessível no fundo do ecrã.
