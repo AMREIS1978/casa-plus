@@ -1,25 +1,20 @@
-# Bomba Certa v10.3 — Comentários + Publicidade
+# Bomba Certa v10.4 — Marcadores por preço
 
-## Número dos comentários
-O contador deixou de aparecer como um pequeno balão sobreposto ao ícone.
+## Novo comportamento
+Os balões dos postos no mapa passam a ter **três cores** de leitura imediata:
 
-Agora aparece de forma discreta e alinhada:
-**💬 2**
+- **Verde** → postos mais baratos
+- **Amarelo** → postos intermédios
+- **Vermelho** → postos mais caros
 
-A mesma lógica foi aplicada às partilhas:
-**↗ 3**
+Se um posto não tiver preço disponível, o marcador aparece em **cinzento**.
 
-Fica mais próxima da linguagem visual das redes sociais e não compete com os emojis.
+## Critério
+A cor é calculada com base no **preço final apresentado para o combustível selecionado**.
+Os postos com preço disponível são ordenados e divididos em três grupos:
+1. terço mais barato;
+2. terço intermédio;
+3. terço mais caro.
 
-## Botão da publicidade
-O botão **Saber mais** passa a funcionar em todos os espaços.
-
-Comportamento:
-1. regista o clique;
-2. se existir `data-ad-url`, abre o destino da campanha;
-3. se a posição ainda não tiver URL configurado, abre um painel elegante que explica que o espaço está ativo e pronto para campanha.
-
-Isto evita botões que parecem não fazer nada.
-
-## Tracking
-O clique continua a ser contabilizado no painel Admin independentemente de o anúncio ainda estar em modo placeholder ou já ter destino configurado.
+## Extra
+Cada marcador mostra também uma pequena etiqueta com o preço, para leitura mais rápida diretamente no mapa.

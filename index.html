@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.3 — Interações e Publicidade</title>
+<title>Bomba Certa v10.4 — Marcadores por preço</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2178,6 +2178,119 @@ header{
   }
 }
 
+
+/* ===== v10.4 · Marcadores do mapa por faixa de preço ===== */
+.fuel-marker-shell{
+  position:relative;
+  width:30px;
+  height:42px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  pointer-events:auto
+}
+.fuel-marker-price{
+  position:absolute;
+  top:-12px;
+  left:50%;
+  transform:translateX(-50%);
+  min-width:40px;
+  max-width:58px;
+  padding:2px 6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(18,33,59,.12);
+  box-shadow:0 8px 18px rgba(18,33,59,.14);
+  color:#243247;
+  font-size:8px;
+  font-weight:900;
+  line-height:1.1;
+  text-align:center;
+  white-space:nowrap
+}
+.fuel-marker-pin{
+  position:absolute;
+  left:50%;
+  top:7px;
+  transform:translateX(-50%);
+  width:26px;
+  height:26px;
+  border-radius:50% 50% 50% 0;
+  transform-origin:center;
+  rotate:-45deg;
+  border:2px solid rgba(255,255,255,.96);
+  box-shadow:0 10px 18px rgba(14,25,43,.22)
+}
+.fuel-marker-pin::after{
+  content:'';
+  position:absolute;
+  inset:6px;
+  border-radius:50%;
+  background:rgba(255,255,255,.98)
+}
+.fuel-marker-pin.tier-cheap{background:linear-gradient(135deg,#20bf55,#119c43)}
+.fuel-marker-pin.tier-mid{background:linear-gradient(135deg,#ffd84d,#f2b100)}
+.fuel-marker-pin.tier-expensive{background:linear-gradient(135deg,#ff7b72,#dd2c2c)}
+.fuel-marker-pin.tier-none{background:linear-gradient(135deg,#a6b0c0,#7e899b)}
+
+.map-price-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-top:8px
+}
+.map-price-legend .legend-title{
+  font-size:10px;
+  font-weight:900;
+  color:#6d7890;
+  text-transform:uppercase;
+  letter-spacing:.08em
+}
+.map-price-legend .legend-item{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#f8fafc;
+  border:1px solid #e7edf5;
+  color:#4a5568;
+  font-size:10px;
+  font-weight:800
+}
+.map-price-legend .legend-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%
+}
+.map-price-legend .legend-dot.green{background:#18a64a}
+.map-price-legend .legend-dot.yellow{background:#f0b400}
+.map-price-legend .legend-dot.red{background:#e14646}
+.map-price-legend .legend-dot.gray{background:#94a3b8}
+
+@media(max-width:720px){
+  .fuel-marker-price{
+    min-width:36px;
+    padding:2px 5px;
+    font-size:7px
+  }
+  .fuel-marker-shell{
+    width:27px;
+    height:38px
+  }
+  .fuel-marker-pin{
+    width:23px;
+    height:23px;
+    top:8px
+  }
+  .map-price-legend{gap:6px}
+  .map-price-legend .legend-item{
+    font-size:9px;
+    padding:4px 7px
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2466,6 +2579,13 @@ header{
           <button id="refreshBtn" class="btn secondary compact-btn">↻ Atualizar</button>
         </div>
         <div id="fuelMap"></div>
+              <div class="map-price-legend" aria-label="Legenda de preços no mapa">
+                <span class="legend-title">Mapa</span>
+                <span class="legend-item"><span class="legend-dot green"></span>Mais barato</span>
+                <span class="legend-item"><span class="legend-dot yellow"></span>Intermédio</span>
+                <span class="legend-item"><span class="legend-dot red"></span>Mais caro</span>
+                <span class="legend-item"><span class="legend-dot gray"></span>Sem preço</span>
+              </div>
         <div id="routeBox" class="route hidden"></div>
         <div class="social-map-note">
           <span>●</span> Os preços aparecem nos marcadores e nos cartões dos postos.
@@ -5244,8 +5364,61 @@ function ensureMap(){
   bindFuelMapResize();
 }
 
-function makeFuelMarker(lat,lon,popupHtml){
-  const m=L.marker([lat,lon]).addTo(map).bindPopup(popupHtml,{maxWidth:340,minWidth:250});
+function formatMarkerPrice(price){
+  if(price==null || !Number.isFinite(Number(price)))return '';
+  return Number(price).toFixed(3).replace('.',',')
+}
+function stationResolvedPrice(station){
+  const n=Number(station?.displayPrice ?? station?.officialPrice);
+  return Number.isFinite(n) && n>0 ? n : null
+}
+function computeFuelMarkerTiers(stations){
+  const tiers={};
+  const priced=stations
+    .map(s=>({key:s.key,price:stationResolvedPrice(s)}))
+    .filter(x=>x.key && x.price!=null)
+    .sort((a,b)=>a.price-b.price);
+
+  if(!priced.length)return tiers;
+  if(priced.length===1){
+    tiers[priced[0].key]='cheap';
+    return tiers
+  }
+  if(priced.length===2){
+    tiers[priced[0].key]='cheap';
+    tiers[priced[1].key]='expensive';
+    return tiers
+  }
+
+  const cheapCut=Math.ceil(priced.length/3);
+  const midCut=Math.ceil((priced.length*2)/3);
+
+  priced.forEach((item,index)=>{
+    if(index<cheapCut)tiers[item.key]='cheap';
+    else if(index<midCut)tiers[item.key]='mid';
+    else tiers[item.key]='expensive'
+  });
+
+  return tiers
+}
+function fuelMarkerIcon(tier='none',price=null){
+  const tone=tier||'none';
+  const badge=formatMarkerPrice(price);
+  return L.divIcon({
+    className:'fuel-marker-shell',
+    html:`${badge?`<div class="fuel-marker-price">${badge} €</div>`:''}
+          <div class="fuel-marker-pin tier-${tone}"></div>`,
+    iconSize:[30,42],
+    iconAnchor:[15,38],
+    popupAnchor:[0,-34]
+  })
+}
+function makeFuelMarker(lat,lon,popupHtml,opts={}){
+  const m=L.marker([lat,lon],{
+    icon:fuelMarkerIcon(opts.tier,opts.price),
+    keyboard:true,
+    riseOnHover:true
+  }).addTo(map).bindPopup(popupHtml,{maxWidth:340,minWidth:250});
 
   // Leaflet já abre no click. Estes eventos eliminam a sensação de "primeiro toque para ativar".
   m.on('click',()=>m.openPopup());
@@ -6470,8 +6643,12 @@ async function renderStations(){
   loadStationSocialSummaries(nearbyStations.map(s=>s.key)).catch(()=>{});
   ensureMap();stationMarkers.forEach(m=>map.removeLayer(m));stationMarkers=[];
   makeUserLocationMarker(currentLat,currentLon,'A sua localização')
+  const markerTiers=computeFuelMarkerTiers(nearbyStations);
   for(const s of nearbyStations){
-    const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s));
+    const m=makeFuelMarker(s.lat,s.lon,mapStationPopupHTML(s),{
+      tier:markerTiers[s.key]||'none',
+      price:stationResolvedPrice(s)
+    });
     stationMarkers.push(m)
   }
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
