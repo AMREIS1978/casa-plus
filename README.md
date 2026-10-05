@@ -1,27 +1,17 @@
-# Bomba Certa v10.8 — Rodapé + Perfil
+# Bomba Certa v10.9 — Como Chegar
 
-## Rodapé dinâmico
-A barra “Comunidade em direto” passa a ocupar **100% da largura do ecrã**, sem margens laterais.
+## Alteração de nome
+`Ver rota` foi substituído por **Como chegar**.
 
-- alinhamento vertical centrado;
-- etiqueta e ticker na mesma linha;
-- largura `100vw`;
-- sem cantos arredondados laterais;
-- adaptação específica para telemóvel;
-- mantém-se fixa acima da barra de navegação.
+É mais intuitivo porque descreve diretamente o que o utilizador pretende fazer.
 
-## Perfil
-Foram acrescentadas duas ações:
+## Correção funcional
+O botão agora:
+1. tenta usar a localização já conhecida;
+2. se ainda não existir, pede a geolocalização;
+3. calcula o percurso dentro da Bomba Certa com OSRM;
+4. apresenta distância e tempo;
+5. disponibiliza **Iniciar navegação** no Google Maps;
+6. se o cálculo interno falhar, mantém sempre o fallback para Google Maps.
 
-### Sair
-Termina a sessão diretamente a partir do Perfil.
-
-### Apagar perfil
-Abre uma confirmação explícita e exige escrever `APAGAR`.
-
-A eliminação real é feita no backend pela Edge Function:
-`delete-my-account`
-
-A conta proprietária/admin fica protegida contra autoeliminação.
-
-A eliminação remove a conta Auth e os dados associados por cascata, e tenta remover também a fotografia do bucket `avatars`.
+As chaves dos postos também passam a ser codificadas nos botões inline para evitar falhas com caracteres especiais.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.8 — Rodapé e Perfil</title>
+<title>Bomba Certa v10.9 — Como Chegar</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -2970,6 +2970,22 @@ input,select,textarea,button{max-width:100%}
   }
 }
 
+
+/* ===== v10.9 · Como chegar ===== */
+.route-google-btn{
+  background:linear-gradient(135deg,#2f7df6,#1769d2)!important;
+  border-color:#1769d2!important;
+  color:#fff!important;
+  font-weight:900!important
+}
+.route-primary-actions{
+  display:flex!important;
+  gap:7px!important
+}
+.map-popup-route{
+  font-weight:900!important
+}
+
 </style>
 </head>
 <body>
@@ -3189,7 +3205,7 @@ input,select,textarea,button{max-width:100%}
       </div>
 
       <div class="smart-choice-actions">
-        <button id="smartChoiceRouteBtn" class="btn smart-route-btn" type="button">↗ Ver rota</button>
+        <button id="smartChoiceRouteBtn" class="btn smart-route-btn" type="button">⌖ Como chegar</button>
         <button id="smartChoiceSettingsBtn" class="btn secondary compact-btn" type="button">Ajustar cálculo</button>
       </div>
 
@@ -6923,7 +6939,7 @@ function mapStationPopupHTML(s){
       <span>${Number.isFinite(Number(s.distance))?kmFmt(s.distance)+' km':''}</span>
     </div>
     <div class="map-popup-fuels">${chips}</div>
-    <button class="map-popup-route" onclick="startRoute('${String(s.key).replace(/'/g,"\\'")}')">↗ Ver rota</button>
+    <button class="map-popup-route" onclick="startRoute('${encodeURIComponent(String(s.key)).replace(/'/g,"%27")}')">⌖ Como chegar</button>
   </div>`
 }
 
@@ -7346,7 +7362,7 @@ function renderBasicStations(){
       ${stationFuelGridHTML(s,$('fuelType').value)}
       ${stationSocialHTML(s.key)}
       <div class="station-actions utility-actions">
-        <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
+        <button class="go" onclick="startRoute('${encodeURIComponent(String(s.key)).replace(/'/g,"%27")}')">⌖ Como chegar</button>
         ${isGuestMode
           ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
           : `<button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>`}
@@ -7427,7 +7443,7 @@ async function renderStations(){
       ${stationFuelGridHTML(s,$('fuelType').value)}
       ${stationSocialHTML(s.key)}
       <div class="station-actions utility-actions">
-        <button class="go" onclick="startRoute('${s.key}')">↗ Ver rota</button>
+        <button class="go" onclick="startRoute('${encodeURIComponent(String(s.key)).replace(/'/g,"%27")}')">⌖ Como chegar</button>
         ${isGuestMode
           ? `<button onclick="promptGuestSignup()">Criar conta para contribuir</button>`
           : `<button class="photo" onclick="openPrice('${s.key}')">✎ Atualizar preço</button><button onclick="openFill('${s.key}')">⛽ Abastecimento</button>${canValidate?`<button onclick="confirmPrice('${c.report.id}',true)">✓ Confirmar</button><button onclick="confirmPrice('${c.report.id}',false)">✕ Incorreto</button><button onclick="openUserReport('${c.report.id}','${c.authorUserId}','${esc(c.authorName).replace(/'/g,'&#39;')}')">🚩 Denunciar</button>`:''}<button onclick="reportClosed('${s.key}')">⚠ Encerrado</button>`}
@@ -7688,14 +7704,113 @@ function direction(step){
   const t=step.maneuver?.type||'',m=step.maneuver?.modifier||'',n=step.name||'',d={'left':'à esquerda','right':'à direita','straight':'em frente','slight left':'ligeiramente à esquerda','slight right':'ligeiramente à direita'}[m]||'';
   if(t==='arrive')return 'Chegou ao destino';if(t==='turn')return `Vire ${d}${n?' para '+n:''}`;if(t==='roundabout')return `Entre na rotunda${step.maneuver?.exit?' e use a '+step.maneuver.exit+'.ª saída':''}`;return `Siga${n?' por '+n:''}`
 }
-window.startRoute=async key=>{
-  const s=nearbyStations.find(x=>x.key===key);if(!s)return;ensureMap();$('routeBox').classList.remove('hidden');$('routeBox').innerHTML='<b>A calcular caminho…</b>';
+async function resolveRouteOrigin(){
+  if(Number.isFinite(Number(currentLat)) && Number.isFinite(Number(currentLon))){
+    return {lat:Number(currentLat),lon:Number(currentLon)}
+  }
+
+  if(!navigator.geolocation)throw new Error('location_unavailable');
+
+  const pos=await new Promise((resolve,reject)=>{
+    navigator.geolocation.getCurrentPosition(
+      resolve,
+      reject,
+      {enableHighAccuracy:true,timeout:12000,maximumAge:60000}
+    )
+  });
+
+  currentLat=Number(pos.coords.latitude);
+  currentLon=Number(pos.coords.longitude);
+  makeUserLocationMarker(currentLat,currentLon,'A sua localização');
+  return {lat:currentLat,lon:currentLon}
+}
+
+function googleDirectionsUrl(station,origin=null){
+  const params=new URLSearchParams({
+    api:'1',
+    destination:`${station.lat},${station.lon}`,
+    travelmode:'driving'
+  });
+  if(origin?.lat!=null && origin?.lon!=null){
+    params.set('origin',`${origin.lat},${origin.lon}`)
+  }
+  return `https://www.google.com/maps/dir/?${params.toString()}`
+}
+
+window.startRoute=async rawKey=>{
+  const decodedKey=(()=>{
+    try{return decodeURIComponent(String(rawKey||''))}catch{return String(rawKey||'')}
+  })();
+
+  const s=nearbyStations.find(x=>String(x.key)===decodedKey || String(x.key)===String(rawKey));
+  if(!s){
+    alert('Não foi possível identificar este posto.');
+    return
+  }
+
+  ensureMap();
+  const box=$('routeBox');
+  if(box){
+    box.classList.remove('hidden');
+    box.innerHTML='<b>A preparar o percurso…</b><div class="status">A obter a sua localização.</div>'
+  }
+
+  let origin=null;
   try{
-    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${currentLon},${currentLat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`),j=await r.json(),route=j.routes?.[0];if(!route)throw 0;
-    if(routeLayer)map.removeLayer(routeLayer);routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.78}).addTo(map);map.fitBounds(routeLayer.getBounds().pad(.12));
-    const google=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}&travelmode=driving`;
-    $('routeBox').innerHTML=`<b>${esc(s.name)}</b><div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div><div class="actions" style="margin-top:8px"><a class="btn secondary" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">Abrir no Google Maps</a></div><div class="route-steps">${(route.legs?.[0]?.steps||[]).filter(x=>x.distance>8).slice(0,12).map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`).join('')}</div>`
-  }catch{$('routeBox').innerHTML=`<b>Não foi possível desenhar a rota aqui.</b><div class="status">Tente novamente ou abra o percurso no Google Maps.</div>`}
+    origin=await resolveRouteOrigin()
+  }catch{
+    // Mesmo sem localização, o utilizador pode abrir o destino diretamente.
+    const fallback=googleDirectionsUrl(s);
+    if(box){
+      box.innerHTML=`<b>${esc(s.name)}</b>
+        <div class="status">Não foi possível obter a sua localização.</div>
+        <div class="actions" style="margin-top:8px">
+          <a class="btn secondary" style="text-decoration:none" href="${fallback}" target="_blank" rel="noopener">Abrir no Google Maps</a>
+        </div>`
+    }
+    try{window.open(fallback,'_blank','noopener')}catch{}
+    return
+  }
+
+  const google=googleDirectionsUrl(s,origin);
+
+  try{
+    if(box)box.innerHTML='<b>A calcular o percurso…</b>';
+
+    const url=`https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${s.lon},${s.lat}?overview=full&geometries=geojson&steps=true`;
+    const r=await fetch(url);
+    if(!r.ok)throw new Error('route_http');
+    const j=await r.json();
+    const route=j.routes?.[0];
+    if(!route)throw new Error('route_missing');
+
+    if(routeLayer)map.removeLayer(routeLayer);
+    routeLayer=L.geoJSON(route.geometry,{weight:6,opacity:.78}).addTo(map);
+    map.fitBounds(routeLayer.getBounds().pad(.12));
+
+    if(box){
+      box.innerHTML=`<b>${esc(s.name)}</b>
+        <div class="tiny muted">${kmFmt(route.distance/1000)} km · cerca de ${Math.round(route.duration/60)} min</div>
+        <div class="actions route-primary-actions" style="margin-top:8px">
+          <a class="btn route-google-btn" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">▶ Iniciar navegação</a>
+        </div>
+        <div class="route-steps">${(route.legs?.[0]?.steps||[])
+          .filter(x=>x.distance>8)
+          .slice(0,12)
+          .map(x=>`<div class="route-step">${esc(direction(x))} · ${x.distance<1000?Math.round(x.distance)+' m':kmFmt(x.distance/1000)+' km'}</div>`)
+          .join('')}</div>`
+    }
+
+    setTimeout(()=>box?.scrollIntoView({behavior:'smooth',block:'nearest'}),80)
+  }catch{
+    if(box){
+      box.innerHTML=`<b>${esc(s.name)}</b>
+        <div class="status">Não foi possível desenhar o percurso dentro da Bomba Certa.</div>
+        <div class="actions" style="margin-top:8px">
+          <a class="btn route-google-btn" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">▶ Iniciar navegação</a>
+        </div>`
+    }
+  }
 };
 
 window.openAddStation=()=>{
