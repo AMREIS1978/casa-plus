@@ -4,30 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>MyGGas v11.2 — Média Nacional Sempre Visível</title>
+<title>MyGGas v12.1 — Corporate Stable</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
-/* ===== MyGGas v12 · Corporate navigation proxy ===== */
-document.querySelectorAll('.corporate-top-link').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const sec=btn.dataset.proxySection;
-    document.querySelector(`.bottom-nav .nav[data-section="${sec}"]`)?.click();
-  });
-});
-document.addEventListener('click',e=>{
-  const nav=e.target.closest?.('.bottom-nav .nav[data-section]');
-  if(!nav)return;
-  const sec=nav.dataset.section;
-  document.querySelectorAll('.corporate-top-link').forEach(x=>{
-    x.classList.toggle('active',x.dataset.proxySection===sec && (
-      sec!=='postos' || x.textContent.includes('Início')
-    ));
-  });
-});
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -3006,638 +2987,72 @@ input,select,textarea,button{max-width:100%}
 }
 
 
-/* ===== v11.0 · Mercado nacional DGEG + tendência ===== */
-.national-market-card{
-  margin:12px 0 14px;
-  padding:14px;
-  border:1px solid #e1e8f1;
-  border-radius:18px;
-  background:
-    radial-gradient(circle at 90% 0%,rgba(47,125,246,.10),transparent 34%),
-    linear-gradient(180deg,#fff,#fbfdff);
-  box-shadow:0 10px 28px rgba(15,23,42,.055);
-}
-.national-market-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
-.national-market-kicker{
-  font-size:8px;
-  font-weight:950;
-  letter-spacing:.12em;
-  color:#2f7df6;
-}
-.national-market-head h2{
-  margin:3px 0 2px;
-  font-size:16px;
-  line-height:1.1;
-  color:#152238;
-}
-.national-market-fuel{
-  font-size:9px;
-  font-weight:800;
-  color:#667085;
-}
-.national-market-main{
-  flex:0 0 auto;
-  text-align:right;
-  display:grid;
-  grid-template-columns:auto auto;
-  align-items:baseline;
-  justify-content:end;
-  column-gap:3px;
-}
-.national-market-main strong{
-  font-size:26px;
-  line-height:1;
-  letter-spacing:-.045em;
-  color:#10213b;
-}
-.national-market-main>span{
-  font-size:9px;
-  font-weight:900;
-  color:#667085;
-}
-.national-market-main small{
-  grid-column:1/-1;
-  margin-top:4px;
-  font-size:8px;
-  color:#98a2b3;
-}
-.national-market-forecast{
-  margin-top:12px;
-  padding-top:11px;
-  border-top:1px solid #edf1f5;
-}
-.national-forecast-title{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:9px;
-}
-.national-forecast-title>div{
-  display:grid;
-  gap:2px;
-}
-.national-forecast-title span{
-  font-size:8px;
-  color:#667085;
-  font-weight:800;
-}
-.national-forecast-title strong{
-  font-size:11px;
-  color:#1d2939;
-}
-.national-forecast-title small{
-  font-size:7.5px;
-  color:#98a2b3;
-}
-.national-prob-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:7px;
-}
-.national-prob-card{
-  padding:8px 9px;
-  border:1px solid #e8edf3;
-  border-radius:12px;
-  background:#fff;
-}
-.national-prob-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:6px;
-  font-size:8px;
-  font-weight:850;
-  color:#667085;
-}
-.national-prob-top strong{
-  font-size:11px;
-  color:#344054;
-}
-.national-prob-track{
-  display:block;
-  width:100%;
-  height:4px;
-  margin-top:6px;
-  border-radius:999px;
-  overflow:hidden;
-  background:#edf1f5;
-}
-.national-prob-track i{
-  display:block;
-  width:0%;
-  height:100%;
-  border-radius:999px;
-  transition:width .35s ease;
-}
-.national-prob-card.up .national-prob-track i{background:#e04f5f}
-.national-prob-card.stable .national-prob-track i{background:#e8a527}
-.national-prob-card.down .national-prob-track i{background:#20a36a}
-.national-market-insight{
-  margin-top:9px;
-  padding:8px 9px;
-  border-radius:10px;
-  background:#f5f8fc;
-  font-size:8.5px;
-  line-height:1.45;
-  color:#475467;
-}
-.national-market-source{
-  margin-top:6px;
-  font-size:7px;
-  line-height:1.4;
-  color:#98a2b3;
-}
-.national-market-card.loading{
-  opacity:.72;
-}
-.national-market-card.unavailable .national-market-main strong{
-  font-size:15px;
-  letter-spacing:0;
-  color:#667085;
-}
-
-@media(max-width:560px){
-  .national-market-card{
-    margin:9px 0 11px;
-    padding:11px;
-    border-radius:15px;
-  }
-  .national-market-head{
-    gap:10px;
-  }
-  .national-market-head h2{
-    font-size:14px;
-  }
-  .national-market-main strong{
-    font-size:22px;
-  }
-  .national-prob-grid{
-    gap:5px;
-  }
-  .national-prob-card{
-    padding:7px 6px;
-    border-radius:10px;
-  }
-  .national-prob-top{
-    font-size:7px;
-  }
-  .national-prob-top strong{
-    font-size:9px;
-  }
-}
-
-
-/* ===== v11.1 · Média nacional discreta, robusta e expansível ===== */
-.market-mini{
-  margin:8px 0 10px!important;
-  border:1px solid #e5eaf0!important;
-  border-radius:12px!important;
-  background:#fff!important;
-  box-shadow:none!important;
-  overflow:hidden!important;
-  opacity:1!important;
-}
-.market-mini-summary{
-  width:100%;
-  min-height:38px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:7px 10px;
-  border:0;
-  background:#fff;
-  cursor:pointer;
-  color:#344054;
-}
-.market-mini-summary:hover{background:#fafcff}
-.market-mini-left,
-.market-mini-right{
-  display:flex;
-  align-items:center;
-  min-width:0;
-}
-.market-mini-left{gap:5px}
-.market-mini-right{
-  gap:6px;
-  justify-content:flex-end;
-  overflow:hidden;
-}
-.market-mini-dot{
-  width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#98a2b3;
-}
-.market-mini-dot.up{background:#d92d20}
-.market-mini-dot.stable{background:#e7a21a}
-.market-mini-dot.down{background:#169b62}
-.market-mini-label{
-  font-size:8px;
-  font-weight:900;
-  color:#667085;
-  white-space:nowrap;
-}
-.market-mini-left strong{
-  font-size:13px;
-  line-height:1;
-  color:#182230;
-  letter-spacing:-.02em;
-}
-.market-mini-unit{
-  font-size:7px;
-  color:#98a2b3;
-}
-.market-mini-trend{
-  font-size:8px;
-  font-weight:900;
-  color:#475467;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.market-mini-confidence{
-  font-size:7px;
-  color:#98a2b3;
-  white-space:nowrap;
-}
-.market-mini-chevron{
-  font-size:11px;
-  color:#98a2b3;
-  transition:transform .2s ease;
-}
-.market-mini.open .market-mini-chevron{transform:rotate(180deg)}
-.market-mini-details{
-  padding:9px 10px 10px;
-  border-top:1px solid #eef1f4;
-  background:#fbfcfe;
-}
-.market-mini-details.hidden{display:none!important}
-.market-mini-meta{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:8px;
-  font-size:7.5px;
-  color:#7b8794;
-}
-.market-mini-meta span:first-child{font-weight:850;color:#475467}
-.market-mini-probs{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:6px;
-}
-.market-mini-probs>div{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:4px 6px;
-  padding:6px 7px;
-  border:1px solid #e8edf2;
-  border-radius:9px;
-  background:#fff;
-}
-.market-mini-probs span{font-size:7px;color:#667085;font-weight:800}
-.market-mini-probs strong{font-size:8px;color:#344054}
-.market-mini-probs i{
-  grid-column:1/-1;
-  height:3px;
-  overflow:hidden;
-  border-radius:999px;
-  background:#edf1f5;
-}
-.market-mini-probs i b{
-  display:block;
-  height:100%;
-  width:0%;
-  border-radius:999px;
-  transition:width .35s ease;
-}
-#probRiseBar{background:#d92d20}
-#probStableBar{background:#e7a21a}
-#probFallBar{background:#169b62}
-.market-mini-insight{
-  margin-top:7px;
-  padding:0;
-  background:transparent;
-  font-size:7.5px;
-  line-height:1.45;
-  color:#667085;
-}
-.market-mini-source{
-  margin-top:4px;
-  font-size:6.5px;
-  line-height:1.35;
-  color:#a0a8b3;
-}
-.market-mini.loading .market-mini-dot{
-  animation:marketPulse 1s ease-in-out infinite alternate
-}
-@keyframes marketPulse{from{opacity:.35}to{opacity:1}}
-@media(max-width:560px){
-  .market-mini{margin:6px 0 8px!important;border-radius:10px!important}
-  .market-mini-summary{min-height:36px;padding:6px 8px}
-  .market-mini-left{gap:4px}
-  .market-mini-left strong{font-size:12px}
-  .market-mini-label,.market-mini-trend{font-size:7.3px}
-  .market-mini-confidence{display:none}
-  .market-mini-probs{gap:4px}
-  .market-mini-probs>div{padding:5px}
-}
-
-
-/* v11.2 — ainda mais discreto */
-.market-mini-summary{min-height:34px!important;padding:5px 9px!important}
-.market-mini-left strong{font-size:12px!important}
-.market-mini-label{font-size:7.5px!important}
-.market-mini-trend{font-size:7.6px!important}
-.market-mini-confidence{font-size:6.7px!important}
-@media(max-width:560px){
-  .market-mini-summary{min-height:32px!important}
-  .market-mini-details{padding:7px 8px 8px!important}
-}
-
-
-/* ========================================================================
-   MyGGas v12 — Corporate redesign
-   ======================================================================== */
+/* ======================================================================
+   MyGGas v12.1 — Corporate Stable
+   ====================================================================== */
 :root{
-  --mg-navy:#0b2d6b;
-  --mg-navy-2:#143f82;
-  --mg-blue:#1473e6;
-  --mg-blue-2:#2f7df6;
-  --mg-ink:#10213b;
-  --mg-muted:#667085;
-  --mg-bg:#f4f7fb;
-  --mg-card:#ffffff;
-  --mg-line:#e5ebf3;
-  --mg-green:#1d9d62;
+  --mg-navy:#0b2d6b;--mg-blue:#1473e6;--mg-ink:#10213b;--mg-muted:#667085;
+  --mg-bg:#f4f7fb;--mg-card:#fff;--mg-line:#e5ebf3;--mg-green:#1d9d62;
 }
 html,body{background:var(--mg-bg)!important;color:var(--mg-ink)!important}
 body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important}
 #appShell{background:var(--mg-bg)!important}
-
-.myggas-header{
-  position:sticky!important;top:0!important;z-index:1500!important;
-  background:rgba(244,247,251,.88)!important;
-  backdrop-filter:blur(18px)!important;
-  border:0!important;padding:12px 14px 8px!important;
-}
-.corporate-header{
-  max-width:1420px!important;margin:0 auto!important;
-  min-height:70px!important;padding:8px 16px!important;
-  background:#fff!important;border:1px solid rgba(226,233,242,.9)!important;
-  border-radius:22px!important;
-  box-shadow:0 10px 30px rgba(18,41,73,.06)!important;
-  display:grid!important;grid-template-columns:250px 1fr auto!important;
-  align-items:center!important;gap:18px!important
-}
+.myggas-header{position:sticky!important;top:0!important;z-index:1500!important;background:rgba(244,247,251,.88)!important;backdrop-filter:blur(18px)!important;border:0!important;padding:12px 14px 8px!important}
+.corporate-header{max-width:1420px!important;margin:0 auto!important;min-height:70px!important;padding:8px 16px!important;background:#fff!important;border:1px solid rgba(226,233,242,.9)!important;border-radius:22px!important;box-shadow:0 10px 30px rgba(18,41,73,.06)!important;display:grid!important;grid-template-columns:250px 1fr auto!important;align-items:center!important;gap:18px!important}
 .myggas-brand-button{border:0;background:transparent;padding:0;cursor:pointer;justify-self:start}
 .myggas-brand-logo{display:block;width:210px;height:48px;object-fit:contain;object-position:left center}
 .corporate-top-nav{display:flex;align-items:center;justify-content:center;gap:4px}
-.corporate-top-link{
-  border:0;background:transparent;color:#536985;
-  min-height:42px;padding:0 14px;border-radius:999px;
-  display:flex;align-items:center;gap:8px;font-size:12px;font-weight:780;cursor:pointer
-}
+.corporate-top-link{border:0;background:transparent;color:#536985;min-height:42px;padding:0 14px;border-radius:999px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:780;cursor:pointer}
 .corporate-top-link span{font-size:17px;color:#365a8a}
 .corporate-top-link:hover,.corporate-top-link.active{background:#edf4ff;color:var(--mg-navy)}
-.corporate-top-link.active span{color:var(--mg-blue)}
-.corporate-profile{
-  border:0!important;background:transparent!important;padding:4px 7px!important;
-  box-shadow:none!important;gap:9px!important
-}
-.corporate-profile:hover{background:#f6f9fd!important}
-.corporate-profile .top-profile-copy strong{font-size:11px;color:var(--mg-navy)}
-.corporate-profile .top-profile-copy small{font-size:8px}
-.profile-chevron{font-size:13px;color:#667085}
-.header-logout{display:none!important}
-
+.corporate-profile{border:0!important;background:transparent!important;padding:4px 7px!important;box-shadow:none!important;gap:9px!important}
+.profile-chevron{font-size:13px;color:#667085}.header-logout{display:none!important}
 .app{max-width:1420px!important;margin:0 auto!important;padding:6px 14px 150px!important}
-.premium-home{display:block!important}
-.myggas-hero{
-  position:relative!important;
-  min-height:300px!important;
-  margin:0 0 12px!important;
-  padding:30px 38px!important;
-  border-radius:24px!important;
-  overflow:hidden!important;
-  background-image:
-    linear-gradient(90deg,rgba(238,247,255,.98) 0%,rgba(238,247,255,.95) 36%,rgba(238,247,255,.35) 57%,rgba(238,247,255,0) 76%),
-    url('assets/myggas-hero.jpg')!important;
-  background-size:cover!important;background-position:center!important;
-  border:1px solid #e1eaf5!important;box-shadow:0 12px 30px rgba(18,41,73,.05)!important
-}
+.myggas-hero{position:relative!important;min-height:300px!important;margin:0 0 12px!important;padding:30px 38px!important;border-radius:24px!important;overflow:hidden!important;background-image:linear-gradient(90deg,rgba(238,247,255,.98) 0%,rgba(238,247,255,.95) 36%,rgba(238,247,255,.35) 57%,rgba(238,247,255,0) 76%),url('assets/myggas-hero.jpg')!important;background-size:cover!important;background-position:center!important;border:1px solid #e1eaf5!important;box-shadow:0 12px 30px rgba(18,41,73,.05)!important}
 .myggas-hero-overlay{position:relative;z-index:2;max-width:650px}
 .myggas-hero .eyebrow{font-size:10px!important;letter-spacing:.24em!important;color:#45648d!important;font-weight:900!important}
-.myggas-hero h1{
-  margin:11px 0 7px!important;font-size:44px!important;line-height:1.03!important;
-  letter-spacing:-.045em!important;color:#081d52!important;font-weight:900!important
-}
-.myggas-hero h1 span{color:#0f64d8!important}
-.myggas-hero p{max-width:620px!important;font-size:15px!important;line-height:1.5!important;color:#405775!important;margin:0!important}
-
-.premium-search-shell{
-  position:relative!important;z-index:20!important;
-  width:min(920px,calc(100% - 76px))!important;
-  margin:-112px 0 28px 38px!important;padding:11px!important;
-  border:1px solid rgba(224,232,242,.96)!important;
-  border-radius:20px!important;background:rgba(255,255,255,.96)!important;
-  box-shadow:0 14px 36px rgba(11,45,107,.10)!important
-}
-.premium-search-row{
-  grid-template-columns:1.15fr 1fr .9fr!important;gap:10px!important
-}
+.myggas-hero h1{margin:11px 0 7px!important;font-size:44px!important;line-height:1.03!important;letter-spacing:-.045em!important;color:#081d52!important;font-weight:900!important}
+.myggas-hero h1 span{color:#0f64d8!important}.myggas-hero p{max-width:620px!important;font-size:15px!important;line-height:1.5!important;color:#405775!important;margin:0!important}
+.premium-search-shell{position:relative!important;z-index:20!important;width:min(920px,calc(100% - 76px))!important;margin:-112px 0 28px 38px!important;padding:11px!important;border:1px solid rgba(224,232,242,.96)!important;border-radius:20px!important;background:rgba(255,255,255,.96)!important;box-shadow:0 14px 36px rgba(11,45,107,.10)!important}
+.premium-search-row{grid-template-columns:1.15fr 1fr .9fr!important;gap:10px!important}
 .premium-field{border:1px solid #e2e9f2!important;background:#f9fbfe!important;border-radius:15px!important;padding:7px 12px!important}
 .premium-field>span{text-transform:none!important;letter-spacing:0!important;font-size:9px!important;color:#526982!important}
 .premium-field .input{border:0!important;background:transparent!important;padding:0!important;min-height:32px!important;font-size:12px!important;font-weight:800!important;color:#152b4a!important}
-.premium-primary{
-  min-height:56px!important;border-radius:15px!important;
-  background:linear-gradient(135deg,#1473e6,#075cca)!important;
-  box-shadow:0 10px 22px rgba(20,115,230,.22)!important;
-  font-size:13px!important
-}
-.premium-search-meta{padding:7px 5px 0!important}
-.price-source-legend{font-size:8px!important}
-
+.premium-primary{min-height:56px!important;border-radius:15px!important;background:linear-gradient(135deg,#1473e6,#075cca)!important;box-shadow:0 10px 22px rgba(20,115,230,.22)!important;font-size:13px!important}
 .managed-ad-horizontal{display:none!important}
-.smart-choice-card{margin:0 0 12px!important;border-radius:18px!important}
-
-.premium-layout.social-layout{
-  display:grid!important;
-  grid-template-columns:minmax(0,1.72fr) minmax(360px,.98fr)!important;
-  gap:14px!important;align-items:start!important
-}
+.premium-layout.social-layout{display:grid!important;grid-template-columns:minmax(0,1.72fr) minmax(360px,.98fr)!important;gap:14px!important;align-items:start!important}
 .social-left-rail{display:none!important}
-.premium-stations-panel,.premium-map-card{
-  background:#fff!important;border:1px solid var(--mg-line)!important;border-radius:20px!important;
-  box-shadow:0 10px 28px rgba(18,41,73,.045)!important;padding:14px!important
-}
-.social-feed-head{margin-bottom:8px!important}
+.premium-stations-panel,.premium-map-card{background:#fff!important;border:1px solid var(--mg-line)!important;border-radius:20px!important;box-shadow:0 10px 28px rgba(18,41,73,.045)!important;padding:14px!important}
 .social-feed-head .eyebrow,.premium-map-card .eyebrow{display:none!important}
-.social-feed-head h2,.premium-map-card h2{
-  color:#10214a!important;font-size:18px!important;letter-spacing:-.02em!important;margin:0!important
-}
-.social-feed-head p{font-size:10px!important;color:#7a8798!important}
-#addStationBtn,.premium-map-card #refreshBtn{
-  border-color:#dce5f0!important;color:#22538f!important;background:#fff!important;border-radius:12px!important
-}
-
+.social-feed-head h2,.premium-map-card h2{color:#10214a!important;font-size:18px!important;letter-spacing:-.02em!important;margin:0!important}
 .station-list{display:grid!important;gap:10px!important}
-.station{
-  border:1px solid #edf1f6!important;border-radius:16px!important;background:#fff!important;
-  box-shadow:0 7px 20px rgba(18,41,73,.035)!important;padding:13px 14px!important
-}
+.station{border:1px solid #edf1f6!important;border-radius:16px!important;background:#fff!important;box-shadow:0 7px 20px rgba(18,41,73,.035)!important;padding:13px 14px!important}
 .station:hover{border-color:#d8e5f5!important;box-shadow:0 10px 24px rgba(18,41,73,.07)!important}
-.station-main{gap:14px!important;align-items:flex-start!important}
-.station-top h3{font-size:13px!important;color:#0d2552!important}
-.station-meta{font-size:8.5px!important;color:#708096!important;line-height:1.45!important}
 .price{font-size:21px!important;color:#0a214e!important;letter-spacing:-.04em!important}
-.price small{font-size:7.5px!important;color:#77879a!important}
-.source{font-size:7px!important;border-radius:999px!important}
-.source.official{background:#ecfbf3!important;color:#27805b!important}
-.fuel-price-grid{gap:6px!important}
-.fuel-price-item{
-  background:#f8fafd!important;border:1px solid #e8edf4!important;border-radius:12px!important;
-  padding:8px!important
-}
-.fuel-price-item strong{font-size:12px!important;color:#142b50!important}
-.station-actions.utility-actions{
-  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-top:9px!important
-}
-.station-actions.utility-actions button{
-  min-height:34px!important;border-radius:10px!important;border:1px solid #e0e7f0!important;
-  background:#fff!important;color:#315779!important;font-size:8px!important
-}
-.station-actions.utility-actions .go{
-  background:linear-gradient(135deg,#1473e6,#0c62d1)!important;
-  color:#fff!important;border-color:transparent!important
-}
-.station-social{margin-top:8px!important}
-.facebook-action-row{border-top:1px solid #edf1f5!important;border-bottom:1px solid #edf1f5!important}
-
+.fuel-price-item{background:#f8fafd!important;border:1px solid #e8edf4!important;border-radius:12px!important;padding:8px!important}
+.station-actions.utility-actions button{min-height:34px!important;border-radius:10px!important;border:1px solid #e0e7f0!important;background:#fff!important;color:#315779!important;font-size:8px!important}
+.station-actions.utility-actions .go{background:linear-gradient(135deg,#1473e6,#0c62d1)!important;color:#fff!important;border-color:transparent!important}
 .social-map-rail{position:sticky!important;top:100px!important}
-#fuelMap{
-  height:330px!important;border-radius:15px!important;border:0!important;
-  box-shadow:inset 0 0 0 1px #e8edf4!important
-}
-.map-price-legend{padding:7px 3px!important;font-size:7px!important}
+#fuelMap{height:330px!important;border-radius:15px!important;border:0!important;box-shadow:inset 0 0 0 1px #e8edf4!important}
 .social-map-note{display:none!important}
-.route{border-radius:12px!important;background:#f8fafd!important}
-
-.market-mini{
-  margin:12px 0!important;border-radius:15px!important;border:1px solid #e5ebf3!important;
-  background:#fff!important
-}
-.market-mini-summary{padding:8px 10px!important}
-.market-mini-label:before{content:"▥ ";color:#0f64d8}
-.market-mini-left strong{font-size:15px!important;color:#0c2550!important}
-.market-mini-details{background:#fbfcfe!important}
-
-.myggas-promo-card{
-  margin-top:10px;min-height:126px;border-radius:16px;overflow:hidden;
-  padding:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
-  background:
-    linear-gradient(90deg,rgba(8,42,91,.92),rgba(8,42,91,.28)),
-    url('assets/myggas-hero.jpg') center/cover;
-  color:#fff
-}
-.myggas-promo-copy{display:grid;gap:5px}
-.myggas-promo-copy strong{font-size:18px;line-height:1.05}
-.myggas-promo-copy span{font-size:8px;opacity:.9}
-.myggas-promo-card button{
-  border:0;background:#fff;color:#173c70;padding:8px 10px;border-radius:999px;font-size:8px;font-weight:900
-}
-.premium-ad-secondary{display:none!important}
-.premium-community-strip,.premium-unlock{margin-top:12px!important;border-radius:16px!important}
-.community-activity-footer{
-  background:#0b2447!important;color:#fff!important;border-color:#0b2447!important
-}
-
-/* bottom navigation */
-.bottom-nav{
-  width:min(1380px,calc(100% - 28px))!important;
-  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
-  bottom:10px!important;padding:7px 18px!important;gap:14px!important;
-  border:1px solid #e2e8f0!important;border-radius:24px!important;background:rgba(255,255,255,.97)!important;
-  box-shadow:0 14px 38px rgba(18,41,73,.13)!important;backdrop-filter:blur(18px)!important
-}
-.nav{min-height:54px!important;background:transparent!important;color:#526985!important;border-radius:14px!important}
-.nav-icon{background:transparent!important;border:0!important;box-shadow:none!important;color:#45648d!important}
-.nav.active{background:transparent!important;color:#0870e6!important;box-shadow:none!important}
-.nav.active .nav-icon{
-  background:#edf4ff!important;color:#0870e6!important;border:1px solid #d8e7fb!important;
-  box-shadow:0 4px 12px rgba(20,115,230,.10)!important
-}
-.nav.active::after{display:none!important}
-.nav-label{font-size:9px!important}
-
-@media(max-width:1000px){
-  .corporate-header{grid-template-columns:180px 1fr auto!important}
-  .myggas-brand-logo{width:170px;height:42px}
-  .corporate-top-nav{gap:0}
-  .corporate-top-link{padding:0 8px;font-size:10px}
-  .premium-layout.social-layout{grid-template-columns:1fr!important}
-  .social-map-rail{position:relative!important;top:auto!important}
-}
-@media(max-width:760px){
-  .myggas-header{padding:6px 7px 4px!important}
-  .corporate-header{
-    min-height:56px!important;padding:5px 9px!important;border-radius:16px!important;
-    grid-template-columns:minmax(110px,1fr) auto!important
-  }
-  .corporate-top-nav{display:none!important}
-  .myggas-brand-logo{width:126px;height:38px}
-  .top-profile-copy{display:none!important}
-  .profile-chevron{display:none!important}
-  .top-profile-avatar{width:34px!important;height:34px!important}
-  .app{padding:4px 7px 132px!important}
-  .myggas-hero{
-    min-height:225px!important;padding:20px 14px!important;border-radius:17px!important;
-    background-position:62% center!important;
-  }
-  .myggas-hero:after{
-    content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,248,255,.98) 0%,rgba(240,248,255,.94) 54%,rgba(240,248,255,.10) 100%);
-    pointer-events:none
-  }
-  .myggas-hero-overlay{z-index:2;max-width:88%}
-  .myggas-hero .eyebrow{font-size:7px!important;letter-spacing:.14em!important}
-  .myggas-hero h1{font-size:25px!important;margin-top:8px!important}
-  .myggas-hero p{font-size:9.5px!important;max-width:82%!important}
-  .premium-search-shell{
-    width:calc(100% - 20px)!important;margin:-62px 10px 12px!important;
-    padding:8px!important;border-radius:15px!important
-  }
-  .premium-search-row{grid-template-columns:1fr 1fr!important;gap:7px!important}
-  .premium-primary{grid-column:1/-1!important;min-height:44px!important}
-  .premium-field{padding:5px 9px!important}
-  .premium-field .input{font-size:10px!important}
-  .premium-search-meta{padding-top:4px!important}
-  .premium-stations-panel,.premium-map-card{padding:9px!important;border-radius:16px!important}
-  .social-feed-head h2,.premium-map-card h2{font-size:15px!important}
-  #fuelMap{height:300px!important}
-  .bottom-nav{
-    left:0!important;right:0!important;bottom:0!important;transform:none!important;
-    width:100%!important;max-width:none!important;border-radius:16px 16px 0 0!important;
-    padding:5px 6px calc(8px + env(safe-area-inset-bottom))!important;gap:2px!important;
-    border-left:0!important;border-right:0!important;border-bottom:0!important
-  }
-  .nav{min-height:49px!important;padding:4px 2px!important}
-  .nav-icon{width:27px!important;height:27px!important;font-size:15px!important}
-  .nav-label{font-size:7.5px!important}
-  .community-activity-footer{bottom:67px!important}
-}
-@media(max-width:430px){
-  .myggas-hero{min-height:205px!important;background-position:67% center!important}
-  .myggas-hero h1{font-size:22px!important}
-  .myggas-hero p{font-size:8.7px!important}
-  .premium-search-shell{margin-top:-50px!important}
-  .station{padding:10px!important}
-  .station-main{grid-template-columns:minmax(0,1fr) auto!important}
-  .price{font-size:18px!important}
-}
+.market-mini{margin:12px 0 0!important;border:1px solid #e5ebf3!important;border-radius:15px!important;background:#fff!important;overflow:hidden}
+.market-mini-summary{width:100%;min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 10px;border:0;background:#fff;cursor:pointer}
+.market-mini-left,.market-mini-right{display:flex;align-items:center;gap:6px;min-width:0}.market-mini-right{justify-content:flex-end}
+.market-mini-dot{width:7px;height:7px;border-radius:50%;background:#98a2b3}.market-mini-dot.up{background:#d92d20}.market-mini-dot.stable{background:#e7a21a}.market-mini-dot.down{background:#169b62}
+.market-mini-label{font-size:8px;font-weight:900;color:#667085}.market-mini-left strong{font-size:15px;color:#0c2550}.market-mini-unit,.market-mini-confidence{font-size:7px;color:#98a2b3}.market-mini-trend{font-size:8px;font-weight:900;color:#475467}
+.market-mini-details{padding:9px 10px 10px;border-top:1px solid #eef1f4;background:#fbfcfe}.market-mini-details.hidden{display:none!important}
+.market-mini-meta{display:flex;justify-content:space-between;font-size:7.5px;color:#7b8794;margin-bottom:8px}
+.market-mini-probs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.market-mini-probs>div{display:grid;grid-template-columns:1fr auto;gap:4px 6px;padding:6px 7px;border:1px solid #e8edf2;border-radius:9px;background:#fff}
+.market-mini-probs span{font-size:7px;color:#667085}.market-mini-probs strong{font-size:8px}.market-mini-probs i{grid-column:1/-1;height:3px;background:#edf1f5;border-radius:999px;overflow:hidden}.market-mini-probs i b{display:block;height:100%;width:0}.market-mini-insight{margin-top:7px;font-size:7.5px;line-height:1.45;color:#667085}.market-mini-source{margin-top:4px;font-size:6.5px;color:#a0a8b3}
+#probRiseBar{background:#d92d20}#probStableBar{background:#e7a21a}#probFallBar{background:#169b62}
+.myggas-promo-card{margin-top:10px;min-height:126px;border-radius:16px;overflow:hidden;padding:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;background:linear-gradient(90deg,rgba(8,42,91,.92),rgba(8,42,91,.28)),url('assets/myggas-hero.jpg') center/cover;color:#fff}
+.myggas-promo-copy{display:grid;gap:5px}.myggas-promo-copy strong{font-size:18px;line-height:1.05}.myggas-promo-copy span{font-size:8px;opacity:.9}.myggas-promo-card button{border:0;background:#fff;color:#173c70;padding:8px 10px;border-radius:999px;font-size:8px;font-weight:900}
+.bottom-nav{width:min(1380px,calc(100% - 28px))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:10px!important;padding:7px 18px!important;gap:14px!important;border:1px solid #e2e8f0!important;border-radius:24px!important;background:rgba(255,255,255,.97)!important;box-shadow:0 14px 38px rgba(18,41,73,.13)!important;backdrop-filter:blur(18px)!important}
+.nav{min-height:54px!important;background:transparent!important;color:#526985!important;border-radius:14px!important}.nav-icon{background:transparent!important;border:0!important;box-shadow:none!important;color:#45648d!important}.nav.active{background:transparent!important;color:#0870e6!important;box-shadow:none!important}.nav.active .nav-icon{background:#edf4ff!important;color:#0870e6!important;border:1px solid #d8e7fb!important;box-shadow:0 4px 12px rgba(20,115,230,.10)!important}.nav.active::after{display:none!important}.nav-label{font-size:9px!important}
+.auth-logo{font-size:0!important}.auth-logo:before{content:"";display:block;width:190px;height:54px;background:url('assets/myggas-logo.png') left center/contain no-repeat}
+@media(max-width:1000px){.corporate-header{grid-template-columns:180px 1fr auto!important}.myggas-brand-logo{width:170px;height:42px}.corporate-top-link{padding:0 8px;font-size:10px}.premium-layout.social-layout{grid-template-columns:1fr!important}.social-map-rail{position:relative!important;top:auto!important}}
+@media(max-width:760px){.myggas-header{padding:6px 7px 4px!important}.corporate-header{min-height:56px!important;padding:5px 9px!important;border-radius:16px!important;grid-template-columns:minmax(110px,1fr) auto!important}.corporate-top-nav{display:none!important}.myggas-brand-logo{width:126px;height:38px}.top-profile-copy,.profile-chevron{display:none!important}.top-profile-avatar{width:34px!important;height:34px!important}.app{padding:4px 7px 132px!important}.myggas-hero{min-height:225px!important;padding:20px 14px!important;border-radius:17px!important;background-position:62% center!important}.myggas-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(240,248,255,.98) 0%,rgba(240,248,255,.94) 54%,rgba(240,248,255,.10) 100%)}.myggas-hero-overlay{z-index:2;max-width:88%}.myggas-hero .eyebrow{font-size:7px!important;letter-spacing:.14em!important}.myggas-hero h1{font-size:25px!important}.myggas-hero p{font-size:9.5px!important;max-width:82%!important}.premium-search-shell{width:calc(100% - 20px)!important;margin:-62px 10px 12px!important;padding:8px!important;border-radius:15px!important}.premium-search-row{grid-template-columns:1fr 1fr!important;gap:7px!important}.premium-primary{grid-column:1/-1!important;min-height:44px!important}.premium-stations-panel,.premium-map-card{padding:9px!important;border-radius:16px!important}#fuelMap{height:300px!important}.bottom-nav{left:0!important;right:0!important;bottom:0!important;transform:none!important;width:100%!important;max-width:none!important;border-radius:16px 16px 0 0!important;padding:5px 6px calc(8px + env(safe-area-inset-bottom))!important;gap:2px!important;border-left:0!important;border-right:0!important;border-bottom:0!important}.nav{min-height:49px!important;padding:4px 2px!important}.nav-icon{width:27px!important;height:27px!important;font-size:15px!important}.nav-label{font-size:7.5px!important}.community-activity-footer{bottom:67px!important}}
 
 </style>
 </head>
@@ -3714,7 +3129,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 <div id="appShell" class="hidden">
 <header class="myggas-header">
   <div class="header-in corporate-header">
-    <button class="myggas-brand-button" type="button" onclick="document.querySelector('.bottom-nav .nav[data-section=&quot;postos&quot;]')?.click()" aria-label="Ir para início">
+    <button id="brandHomeBtn" class="myggas-brand-button" type="button" aria-label="Ir para início">
       <img class="myggas-brand-logo" src="assets/myggas-logo.png" alt="MyGGas">
     </button>
 
@@ -3821,6 +3236,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
         </div>
       </div>
     </div>
+
 
     <div class="managed-ad managed-ad-horizontal" data-ad-key="postos_top" data-ad-section="postos">
       <div class="managed-ad-copy">
@@ -3954,45 +3370,41 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
         <div class="social-map-note">
           <span>●</span> Os preços aparecem nos marcadores e nos cartões dos postos.
         </div>
-<section id="nationalMarketCard" class="market-mini loading" aria-live="polite">
-      <button id="marketMiniToggle" class="market-mini-summary" type="button" aria-expanded="false">
-        <div class="market-mini-left">
-          <span class="market-mini-dot" id="marketTrendDot"></span>
-          <span class="market-mini-label">Média PT</span>
-          <strong id="nationalAveragePrice">—</strong>
-          <span class="market-mini-unit">€/L</span>
-        </div>
-        <div class="market-mini-right">
-          <span id="nationalTrendLabel" class="market-mini-trend">A atualizar…</span>
-          <span id="marketConfidence" class="market-mini-confidence"></span>
-          <span class="market-mini-chevron">⌄</span>
-        </div>
-      </button>
+        <section id="nationalMarketCard" class="market-mini loading" aria-live="polite">
+          <button id="marketMiniToggle" class="market-mini-summary" type="button" aria-expanded="false">
+            <div class="market-mini-left">
+              <span class="market-mini-dot" id="marketTrendDot"></span>
+              <span class="market-mini-label">Média PT</span>
+              <strong id="nationalAveragePrice">—</strong>
+              <span class="market-mini-unit">€/L</span>
+            </div>
+            <div class="market-mini-right">
+              <span id="nationalTrendLabel" class="market-mini-trend">A atualizar…</span>
+              <span id="marketConfidence" class="market-mini-confidence"></span>
+              <span class="market-mini-chevron">⌄</span>
+            </div>
+          </button>
+          <div id="marketMiniDetails" class="market-mini-details hidden">
+            <div class="market-mini-meta">
+              <span id="nationalMarketFuel">Gasóleo simples</span>
+              <span id="nationalAverageDate">DGEG</span>
+            </div>
+            <div class="market-mini-probs">
+              <div><span>↑ Subir</span><strong id="probRise">—</strong><i><b id="probRiseBar"></b></i></div>
+              <div><span>→ Manter</span><strong id="probStable">—</strong><i><b id="probStableBar"></b></i></div>
+              <div><span>↓ Descer</span><strong id="probFall">—</strong><i><b id="probFallBar"></b></i></div>
+            </div>
+            <div id="nationalMarketInsight" class="market-mini-insight">A analisar a evolução recente.</div>
+            <div class="market-mini-source">Fonte: DGEG. Tendência: estimativa MyGGas.</div>
+          </div>
+        </section>
 
-      <div id="marketMiniDetails" class="market-mini-details hidden">
-        <div class="market-mini-meta">
-          <span id="nationalMarketFuel">Gasóleo simples</span>
-          <span id="nationalAverageDate">DGEG</span>
-        </div>
-
-        <div class="market-mini-probs">
-          <div><span>↑ Subir</span><strong id="probRise">—</strong><i><b id="probRiseBar"></b></i></div>
-          <div><span>→ Manter</span><strong id="probStable">—</strong><i><b id="probStableBar"></b></i></div>
-          <div><span>↓ Descer</span><strong id="probFall">—</strong><i><b id="probFallBar"></b></i></div>
-        </div>
-
-        <div id="nationalMarketInsight" class="market-mini-insight">A analisar a evolução recente.</div>
-        <div class="market-mini-source">Preço: DGEG · Probabilidade: estimativa MyGGas, não previsão oficial.</div>
-      </div>
-    </section>
-
-    
         <div class="myggas-promo-card">
           <div class="myggas-promo-copy">
             <strong>Viaje mais.<br>Gaste menos.</strong>
             <span>Os melhores preços em todo o país.</span>
           </div>
-          <button type="button" onclick="document.querySelector('.bottom-nav .nav[data-section=&quot;viagem&quot;]')?.click()">Saiba mais</button>
+          <button id="promoTripBtn" type="button">Saiba mais</button>
         </div>
       </aside>
     </div>
@@ -4923,149 +4335,56 @@ function initAdTracking(){
 const DGEG_BASE='https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb';
 
 const NATIONAL_AVERAGE_FUNCTION='dgeg-national-average';
-const NATIONAL_MARKET_CACHE_KEY='bombaCerta:nationalMarket:v2';
-const NATIONAL_MARKET_FALLBACK={"GPL Auto":[["2026-09-18",0.895],["2026-09-19",0.895],["2026-09-20",0.895],["2026-09-21",0.896],["2026-09-22",0.896],["2026-09-23",0.896],["2026-09-24",0.896]],"Gasóleo simples":[["2026-09-18",2.156],["2026-09-19",2.153],["2026-09-20",2.154],["2026-09-21",2.21],["2026-09-22",2.216],["2026-09-23",2.221],["2026-09-24",2.221]],"Gasóleo especial":[["2026-09-18",2.174],["2026-09-19",2.171],["2026-09-20",2.172],["2026-09-21",2.215],["2026-09-22",2.23],["2026-09-23",2.243],["2026-09-24",2.243]],"Gasolina simples 95":[["2026-09-18",2.068],["2026-09-19",2.065],["2026-09-20",2.066],["2026-09-21",2.107],["2026-09-22",2.115],["2026-09-23",2.115],["2026-09-24",2.115]],"Gasolina especial 95":[["2026-09-18",2.09],["2026-09-19",2.085],["2026-09-20",2.085],["2026-09-21",2.121],["2026-09-22",2.13],["2026-09-23",2.135],["2026-09-24",2.135]],"Gasolina 98":[["2026-09-18",2.256],["2026-09-19",2.256],["2026-09-20",2.256],["2026-09-21",2.293],["2026-09-22",2.301],["2026-09-23",2.303],["2026-09-24",2.303]],"Gasolina especial 98":[["2026-09-18",2.291],["2026-09-19",2.287],["2026-09-20",2.289],["2026-09-21",2.334],["2026-09-22",2.337],["2026-09-23",2.339],["2026-09-24",2.34]]};
+const NATIONAL_MARKET_CACHE_KEY='myggas:nationalMarket:v1';
 let nationalMarketRequestSeq=0;
 
-function nationalPriceFmt(v){
+function marketPriceFmt(v){
   const n=Number(v);
   return Number.isFinite(n)?n.toFixed(3).replace('.',','):'—'
 }
-function nationalDateFmt(iso,prefix='DGEG'){
-  if(!iso)return prefix;
+function marketDateFmt(iso){
+  if(!iso)return 'DGEG';
   const d=new Date(`${iso}T12:00:00`);
-  if(Number.isNaN(d.getTime()))return `${prefix} · ${iso}`;
-  return `${prefix} · ${d.toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'})}`
+  return Number.isNaN(d.getTime())?'DGEG':`DGEG · ${d.toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'})}`
 }
-function setProbability(id,value){
+function setMarketProb(id,value){
   const n=Math.max(0,Math.min(100,Number(value)||0));
-  const txt=$(id),bar=$(`${id}Bar`);
-  if(txt)txt.textContent=`${Math.round(n)}%`;
-  if(bar)bar.style.width=`${n}%`
+  $(id).textContent=`${Math.round(n)}%`;
+  $(`${id}Bar`).style.width=`${n}%`
 }
-function localForecastFromSeries(series){
-  const s=(series||[]).map(x=>({date:x.date,price:Number(x.price)})).filter(x=>Number.isFinite(x.price)).sort((a,b)=>a.date.localeCompare(b.date)).slice(-14);
-  if(s.length<4)return {rise:33,stable:34,fall:33,label:'Estável',confidence:20};
-  const deltas=s.slice(1).map((x,i)=>x.price-s[i].price);
-  const weights=deltas.map((_,i)=>i+1);
-  const trend=deltas.reduce((a,d,i)=>a+d*weights[i],0)/(weights.reduce((a,b)=>a+b,0)||1);
-  const mean=deltas.reduce((a,b)=>a+b,0)/(deltas.length||1);
-  const vol=Math.sqrt(deltas.reduce((a,d)=>a+(d-mean)**2,0)/Math.max(1,deltas.length-1));
-  const pos=deltas.filter(d=>d>0).length,neg=deltas.filter(d=>d<0).length;
-  const consistency=Math.abs(pos-neg)/Math.max(1,deltas.length);
-  const signal=trend/Math.max(.0035,vol);
-  const strength=Math.max(0,Math.min(1,Math.abs(signal)/1.8));
-  const confidence=Math.round(Math.max(20,Math.min(92,35+40*strength+20*consistency-10*Math.min(1,vol/.03))));
-  const stable=Math.max(.22,Math.min(.62,.58-.34*strength));
-  const directional=1-stable;
-  const favored=.54+.38*strength;
-  let rise=signal>=0?directional*favored:directional*(1-favored);
-  let fall=directional-rise;
-  let R=Math.round(rise*100),S=Math.round(stable*100),F=100-R-S;
-  if(F<0){F=0;S=100-R}
-  const label=R>F&&R>S?'Subida provável':F>R&&F>S?'Descida provável':'Tendência estável';
-  return {rise:R,stable:S,fall:F,label,confidence,trendPerDay:trend}
-}
-
-function observedNationalAverageFromRows(rows){
-  const vals=(rows||[])
-    .map(r=>parsePrice(r?.Preco))
-    .filter(v=>Number.isFinite(v)&&v>.5&&v<5);
-  if(!vals.length)return null;
-  vals.sort((a,b)=>a-b);
-  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
-  const median=vals[Math.floor(vals.length/2)];
-  const dates=(rows||[]).map(r=>String(r?.DataAtualizacao||'')).filter(Boolean).sort();
-  const latestRaw=dates.at(-1)||'';
-  let date='';
-  const m=latestRaw.match(/(\d{4})[-/](\d{2})[-/](\d{2})/);
-  if(m)date=`${m[1]}-${m[2]}-${m[3]}`;
-  else{
-    const p=latestRaw.match(/(\d{2})[-/](\d{2})[-/](\d{4})/);
-    if(p)date=`${p[3]}-${p[2]}-${p[1]}`
-  }
-  return {avg,median,count:vals.length,date}
-}
-
-async function liveObservedNationalMarket(fuel){
+function marketCacheRead(fuel){
   try{
-    const rows=await dgegFuelNationalRows(fuel);
-    const stat=observedNationalAverageFromRows(rows);
-    if(!stat)return null;
-
-    const fb=fallbackMarketData(fuel);
-    return {
-      fuel,
-      latest:{date:stat.date||fb?.latest?.date||'',price:Number(stat.avg.toFixed(3))},
-      series:fb?.series||[],
-      forecast:fb?.forecast||localForecastFromSeries([]),
-      source:`DGEG · média observada em ${stat.count} postos`,
-      sourceMode:'observed_station_mean',
-      observedCount:stat.count,
-      median:Number(stat.median.toFixed(3))
-    }
-  }catch{
-    return null
-  }
-}
-
-function fallbackMarketData(fuel){
-  const raw=NATIONAL_MARKET_FALLBACK[fuel];
-  if(!raw?.length)return null;
-  const series=raw.map(([date,price])=>({date,price}));
-  return {
-    fuel,
-    latest:series.at(-1),
-    series,
-    forecast:localForecastFromSeries(series),
-    source:'DGEG · último valor oficial guardado',
-    fallback:true
-  }
-}
-function marketInsight(data){
-  const s=data?.series||[], latest=s.at(-1), prev=s.at(-2), f=data?.forecast||{};
-  let first='';
-  if(latest&&prev){
-    const d=Number(latest.price)-Number(prev.price);
-    const cents=Math.abs(d*100);
-    first=Math.abs(d)<.0005?'Último valor sem alteração relevante.':`Último valor ${d>0?'subiu':'desceu'} ${cents.toFixed(1).replace('.',',')} cênt./L.`;
-  }
-  const best=[['subida',f.rise||0],['manutenção',f.stable||0],['descida',f.fall||0]].sort((a,b)=>b[1]-a[1])[0];
-  return `${first} Cenário dominante: ${best[0]} (${Math.round(best[1])}%).`;
-}
-function applyMarketData(data,sourceLabel='DGEG'){
-  const f=data?.forecast||localForecastFromSeries(data?.series||[]);
-  $('nationalAveragePrice').textContent=nationalPriceFmt(data.latest?.price);
-  const sourceText=data?.sourceMode==='observed_station_mean'
-    ? `${sourceLabel} · ${data.observedCount||0} postos`
-    : sourceLabel;
-  $('nationalAverageDate').textContent=nationalDateFmt(data.latest?.date,sourceText);
-  $('nationalTrendLabel').textContent=f.label||'Tendência estável';
-  $('marketConfidence').textContent=f.confidence?`conf. ${f.confidence}%`:'';
-  setProbability('probRise',f.rise);
-  setProbability('probStable',f.stable);
-  setProbability('probFall',f.fall);
-  $('nationalMarketInsight').textContent=marketInsight({...data,forecast:f});
-  const dot=$('marketTrendDot');
-  dot?.classList.remove('up','stable','down');
-  if(dot){
-    const dominant=(f.rise>f.stable&&f.rise>f.fall)?'up':(f.fall>f.stable&&f.fall>f.rise)?'down':'stable';
-    dot.classList.add(dominant)
-  }
-}
-function readNationalMarketCache(fuel){
-  try{
-    const all=JSON.parse(localStorage.getItem(NATIONAL_MARKET_CACHE_KEY)||'{}');
-    const item=all?.[fuel];
-    return item?.latest?item:null
+    const x=JSON.parse(localStorage.getItem(NATIONAL_MARKET_CACHE_KEY)||'{}');
+    return x?.[fuel]?.latest?x[fuel]:null
   }catch{return null}
 }
-function writeNationalMarketCache(fuel,data){
+function marketCacheWrite(fuel,data){
   try{
-    const all=JSON.parse(localStorage.getItem(NATIONAL_MARKET_CACHE_KEY)||'{}');
-    all[fuel]={...data,cachedAt:Date.now()};
-    localStorage.setItem(NATIONAL_MARKET_CACHE_KEY,JSON.stringify(all))
+    const x=JSON.parse(localStorage.getItem(NATIONAL_MARKET_CACHE_KEY)||'{}');
+    x[fuel]={...data,cachedAt:Date.now()};
+    localStorage.setItem(NATIONAL_MARKET_CACHE_KEY,JSON.stringify(x))
   }catch{}
+}
+function applyNationalMarket(data,source='DGEG'){
+  if(!data?.latest)return;
+  const f=data.forecast||{};
+  $('nationalAveragePrice').textContent=marketPriceFmt(data.latest.price);
+  $('nationalAverageDate').textContent=marketDateFmt(data.latest.date);
+  $('nationalMarketFuel').textContent=data.fuel||$('fuelType')?.value||'Combustível';
+  $('nationalTrendLabel').textContent=f.label||'Tendência em análise';
+  $('marketConfidence').textContent=f.confidence?`conf. ${Math.round(f.confidence)}%`:'';
+  setMarketProb('probRise',f.rise);
+  setMarketProb('probStable',f.stable);
+  setMarketProb('probFall',f.fall);
+  const dot=$('marketTrendDot');
+  dot.classList.remove('up','stable','down');
+  const dominant=(Number(f.rise)>Number(f.stable)&&Number(f.rise)>Number(f.fall))?'up':
+    (Number(f.fall)>Number(f.stable)&&Number(f.fall)>Number(f.rise))?'down':'stable';
+  dot.classList.add(dominant);
+  const count=Number(data.station_count||0);
+  $('nationalMarketInsight').textContent=count
+    ? `Média calculada a partir de ${count} preços nacionais publicados pela DGEG.`
+    : `Última leitura nacional disponível.`;
 }
 async function loadNationalMarket(){
   const card=$('nationalMarketCard');
@@ -5075,64 +4394,2116 @@ async function loadNationalMarket(){
   $('nationalMarketFuel').textContent=fuel;
   card.classList.add('loading');
 
-  const cached=readNationalMarketCache(fuel);
-  const fallback=fallbackMarketData(fuel);
+  const cached=marketCacheRead(fuel);
+  if(cached)applyNationalMarket(cached,'cache');
 
-  // Nunca deixar o bloco vazio: primeiro mostra o último valor oficial conhecido.
-  if(cached)applyMarketData(cached,'DGEG · cache');
-  else if(fallback)applyMarketData(fallback,'DGEG · último oficial');
-
-  // 1) Tenta média oficial diária via backend.
   try{
-    const endpoint=`${SUPABASE_URL}/functions/v1/${NATIONAL_AVERAGE_FUNCTION}?fuel=${encodeURIComponent(fuel)}`;
-    const r=await fetch(endpoint,{cache:'no-store'});
+    const url=`${SUPABASE_URL}/functions/v1/${NATIONAL_AVERAGE_FUNCTION}?fuel=${encodeURIComponent(fuel)}`;
+    const r=await fetch(url,{cache:'no-store'});
     if(seq!==nationalMarketRequestSeq)return;
-    if(r.ok){
-      const data=await r.json();
-      if(data?.latest && Number.isFinite(Number(data.latest.price))){
-        const forecast=data.forecast||localForecastFromSeries(data.series||[]);
-        const normalized={...data,forecast};
-        applyMarketData(normalized,'DGEG');
-        writeNationalMarketCache(fuel,normalized);
-        card.classList.remove('loading');
-        return
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const data=await r.json();
+    if(!data?.latest || !Number.isFinite(Number(data.latest.price)))throw new Error('Sem dados válidos');
+    applyNationalMarket(data);
+    marketCacheWrite(fuel,data);
+  }catch(e){
+    if(seq!==nationalMarketRequestSeq)return;
+    if(!cached){
+      $('nationalAveragePrice').textContent='—';
+      $('nationalTrendLabel').textContent='A aguardar DGEG';
+      $('marketConfidence').textContent='';
+      $('nationalAverageDate').textContent='DGEG';
+      $('nationalMarketInsight').textContent='A informação nacional volta a atualizar automaticamente quando a DGEG responder.'
+    }
+  }finally{
+    if(seq===nationalMarketRequestSeq)card.classList.remove('loading')
+  }
+}
+
+
+const $=id=>document.getElementById(id);
+
+function syncViewportWidth(){
+  const w=Math.max(280,Math.round(window.visualViewport?.width||window.innerWidth||document.documentElement.clientWidth||320));
+  document.documentElement.style.setProperty('--actual-vw',w+'px');
+}
+syncViewportWidth();
+window.addEventListener('resize',syncViewportWidth,{passive:true});
+window.visualViewport?.addEventListener('resize',syncViewportWidth,{passive:true});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const money=v=>Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
+const kmFmt=v=>Number(v||0).toLocaleString('pt-PT',{maximumFractionDigits:1});
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+
+const FUEL_ALIASES={
+  'Gasóleo simples':['gasoleo simples','gasóleo simples','diesel simples','diesel'],
+  'Gasóleo especial':['gasoleo especial','gasóleo especial','gasoleo aditivado','gasóleo aditivado','diesel ultimate','ultimate diesel','diesel premium','gasoleo premium','gasóleo premium'],
+  'Gasolina simples 95':['gasolina simples 95','gasolina 95 simples','gasolina 95','eurosuper 95'],
+  'Gasolina especial 95':['gasolina especial 95','gasolina 95 especial','gasolina 95 aditivada','gasolina 95 premium'],
+  'Gasolina 98':['gasolina 98','gasolina simples 98','super 98'],
+  'Gasolina especial 98':['gasolina especial 98','gasolina 98 especial','gasolina 98 aditivada','gasolina 98 premium','gasolina ultimate','ultimate gasolina','ultimate'],
+  'GPL Auto':['gpl auto','gpl','autogas','auto gas']
+};
+function fuelAliases(name){return FUEL_ALIASES[name]||[String(name||'')]}
+function fuelMatchesLabel(apiLabel,selected){
+  const n=norm(apiLabel);
+  return fuelAliases(selected).some(a=>n===norm(a)||n.includes(norm(a))||norm(a).includes(n))
+}
+
+
+let map=null,userMarker=null,stationMarkers=[],routeLayer=null,currentLat=null,currentLon=null,nearbyStations=[],currentAuthUserId=null;
+let isGuestMode=false;
+let currentStation=null,currentPriceStation=null,fillups=[],monthlyChart=null,priceChart=null,fuelChannel=null,dgegFuelTypes=[];
+
+
+function playRewardTone(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),now=ctx.currentTime;
+    [523.25,659.25,783.99].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.0001,now+i*.07);g.gain.exponentialRampToValueAtTime(.08,now+i*.07+.02);g.gain.exponentialRampToValueAtTime(.0001,now+i*.07+.18);o.connect(g).connect(ctx.destination);o.start(now+i*.07);o.stop(now+i*.07+.2)});
+    setTimeout(()=>ctx.close(),700)
+  }catch{}
+}
+function confettiBurst(){
+  const pieces=18;
+  for(let i=0;i<pieces;i++){
+    const el=document.createElement('div');el.className='confetti';
+    el.style.background=['#12b76a','#f79009','#2e90fa','#7f56d9','#f04438'][i%5];
+    const angle=(Math.PI*2*i/pieces),dist=90+Math.random()*90;
+    el.style.setProperty('--x',`${Math.cos(angle)*dist}px`);
+    el.style.setProperty('--y',`${Math.sin(angle)*dist-40}px`);
+    el.style.setProperty('--r',`${Math.round(Math.random()*540)}deg`);
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1100)
+  }
+}
+
+async function loadCommunityGame(){
+  const [mine,community]=await Promise.allSettled([
+    supabase.rpc('my_game_progress'),
+    supabase.rpc('community_today_activity')
+  ]);
+
+  const m=mine.status==='fulfilled'?mine.value.data?.[0]:null;
+  const c=community.status==='fulfilled'?community.value.data?.[0]:null;
+
+  if(m){
+    $('myStreak').textContent=`${Number(m.streak_days||0)} dia${Number(m.streak_days||0)===1?'':'s'}`;
+    $('todayActionText').textContent=Number(m.today_actions||0)>0
+      ?`${m.today_actions} contribuição${Number(m.today_actions)===1?'':'ões'} hoje. Continue a ajudar!`
+      :'Faça a primeira contribuição de hoje.';
+    $('communityMyLevel').textContent=m.level_name||'Novato'
+  }
+  if(c){
+    $('communityPricesToday').textContent=Number(c.prices_today||0);
+    $('communityValidationsToday').textContent=Number(c.validations_today||0);
+    $('communityActiveToday').textContent=Number(c.active_contributors_today||0)
+  }
+}
+function showWelcomeMission(){
+  if(localStorage.getItem('bombaCerta:newUser')!=='1')return;
+  localStorage.removeItem('bombaCerta:newUser');
+
+  $('rewardTitle').textContent='Parabéns!';
+  $('rewardPoints').textContent='Conta criada com sucesso';
+  $('rewardSub').textContent='Bem-vindo à MyGGas.';
+  const o=$('rewardOverlay');
+  o.classList.add('show');
+  confettiBurst();
+  playRewardTone();
+  navigator.vibrate?.([45,35,70]);
+}
+$('shareAppBtn').onclick=async()=>{
+  const data={
+    title:'MyGGas',
+    text:'Ajuda-me a manter os preços de combustível atualizados na MyGGas.',
+    url:window.location.origin
+  };
+  try{
+    if(navigator.share)await navigator.share(data);
+    else{
+      await navigator.clipboard.writeText(data.url);
+      alert('Link copiado. Partilhe com quem quiser ajudar a comunidade.')
+    }
+  }catch{}
+}
+
+function showReward(points,title='Boa!'){
+  $('rewardTitle').textContent=title;
+  $('rewardPoints').textContent=points>0?`+${points} pts`:'';
+  $('rewardSub').textContent=points>0?'Ajudou a comunidade e subiu na reputação.':'';
+  const o=$('rewardOverlay');o.classList.add('show');
+  confettiBurst();playRewardTone();
+  navigator.vibrate?.([45,35,70]);
+  setTimeout(()=>o.classList.remove('show'),1450)
+}
+async function myPoints(){
+  const {data:{user}}=await supabase.auth.getUser();if(!user)return 0;
+  const {data}=await supabase.from('fuel_contributor_stats').select('points').eq('user_id',user.id).maybeSingle();
+  return Number(data?.points||0)
+}
+
+function errPT(e){
+  const m=String(e?.message||e||'').toLowerCase();
+  if(m.includes('invalid login credentials'))return 'Email ou palavra-passe incorretos.';
+  if(m.includes('email not confirmed'))return 'Confirme primeiro o email recebido.';
+  if(m.includes('rate limit')||m.includes('demasiados registos'))return 'Foram feitos vários registos nesta ligação. Tente novamente mais tarde.';
+  if(m.includes('anonymous sign-ins'))return 'Preencha nome, email e palavra-passe para criar a conta.';
+  if(m.includes('already')||m.includes('já existe'))return 'Já existe uma conta com este email.';
+  if(m.includes('network')||m.includes('fetch'))return 'Não foi possível ligar ao serviço.';
+  return e?.message||String(e||'Ocorreu um erro.')
+}
+
+let tripAccessAllowed=false;
+let tripMap=null,tripRouteLayer=null,tripStopMarkers=[];
+let tripOriginCoords=null,tripDestinationCoords=null;
+let lastTripPlan=null;
+
+function tripMoney(v){
+  return Number(v||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2})
+}
+function tripNum(v,d=1){
+  return Number(v||0).toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d})
+}
+function tripMedian(values){
+  const a=values.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length)return 0;
+  const m=Math.floor(a.length/2);
+  return a.length%2?a[m]:(a[m-1]+a[m])/2
+}
+
+async function checkTripAccess(){
+  if(isGuestMode){
+    tripAccessAllowed=false;
+    $('tripPlanner')?.classList.add('hidden');
+    $('tripLocked')?.classList.remove('hidden');
+    $('tripAccessBadge').textContent='Conta necessária';
+    $('tripLockedText').textContent='Crie uma conta e alcance o nível Explorador para desbloquear esta funcionalidade.';
+    $('tripUnlockProgress').style.width='0%';
+    return false
+  }
+  try{
+    const {data:allowed,error}=await supabase.rpc('can_use_trip_planner');
+    if(error)throw error;
+    tripAccessAllowed=allowed===true;
+
+    let points=0,level='Novato';
+    const {data:progress}=await supabase.rpc('my_game_progress');
+    const row=Array.isArray(progress)?progress[0]:progress;
+    if(row){points=Number(row.points||0);level=row.level_name||'Novato'}
+
+    $('tripAccessBadge').textContent=tripAccessAllowed?`${level} · desbloqueado`:`${level} · bloqueado`;
+    $('tripAccessBadge').classList.toggle('unlocked',tripAccessAllowed);
+    $('tripPlanner').classList.toggle('hidden',!tripAccessAllowed);
+    $('tripLocked').classList.toggle('hidden',tripAccessAllowed);
+
+    if(!tripAccessAllowed){
+      const need=Math.max(0,50-points);
+      $('tripLockedText').textContent=`Tem ${points} pontos. Faltam ${need} para chegar a Explorador e desbloquear a Viagem Inteligente.`;
+      $('tripUnlockProgress').style.width=Math.min(100,points/50*100)+'%'
+    }
+    return tripAccessAllowed
+  }catch(e){
+    tripAccessAllowed=false;
+    $('tripPlanner')?.classList.add('hidden');
+    $('tripLocked')?.classList.remove('hidden');
+    $('tripAccessBadge').textContent='Acesso indisponível';
+    $('tripLockedText').textContent='Não foi possível confirmar o nível neste momento. Tente novamente dentro de instantes.';
+    return false
+  }
+}
+
+async function tripGeocode(query){
+  const q=String(query||'').trim();
+  if(!q)throw new Error('Indique a origem e o destino.');
+  const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q='+encodeURIComponent(q);
+  const r=await fetch(url,{headers:{Accept:'application/json'}});
+  if(!r.ok)throw new Error('Não foi possível localizar "'+q+'".');
+  const data=await r.json();
+  if(!data?.length)throw new Error('Não encontrei "'+q+'". Tente escrever uma localidade ou morada mais completa.');
+  return {lat:Number(data[0].lat),lon:Number(data[0].lon),label:data[0].display_name||q}
+}
+
+
+function tripSampleCoords(coords,max=90){
+  if(coords.length<=max)return coords;
+  const step=Math.ceil(coords.length/max);
+  const out=[];
+  for(let i=0;i<coords.length;i+=step)out.push(coords[i]);
+  if(out[out.length-1]!==coords[coords.length-1])out.push(coords[coords.length-1]);
+  return out
+}
+
+async function tripElevationGain(coords){
+  const sample=tripSampleCoords(coords,90);
+  if(sample.length<2)return {gain:null,loss:null};
+  try{
+    const lat=sample.map(p=>p.lat.toFixed(5)).join(',');
+    const lon=sample.map(p=>p.lon.toFixed(5)).join(',');
+    const r=await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`);
+    if(!r.ok)throw new Error('elevation');
+    const j=await r.json();
+    const e=Array.isArray(j?.elevation)?j.elevation.map(Number):[];
+    if(e.length!==sample.length)return {gain:null,loss:null};
+    let gain=0,loss=0;
+    for(let i=1;i<e.length;i++){
+      const d=e[i]-e[i-1];
+      if(d>0)gain+=d; else loss+=Math.abs(d)
+    }
+    return {gain,loss}
+  }catch{
+    return {gain:null,loss:null}
+  }
+}
+
+function tripRouteFuelEstimate(route,baseConsumption){
+  const km=Number(route.distanceKm||0);
+  const hours=Math.max(.1,Number(route.durationSec||0)/3600);
+  const avgSpeed=km/hours;
+  let speedFactor=1;
+  if(avgSpeed>105)speedFactor+=Math.min(.22,(avgSpeed-105)*.004);
+  else if(avgSpeed<35)speedFactor+=Math.min(.18,(35-avgSpeed)*.006);
+
+  const base=km*(baseConsumption/100)*speedFactor;
+  // Aproximação física conservadora sem conhecer massa/cx do veículo:
+  // penalização pequena por subida acumulada, usada apenas para comparar rotas.
+  const climbPenalty=Number.isFinite(route.elevationGain)?(route.elevationGain/100)*0.11:0;
+  return base+climbPenalty
+}
+
+async function tripRouteOptions(a,b,preference='fastest',baseConsumption=6.5){
+  const alt=preference==='eco'?'true':'false';
+  const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson&steps=false&alternatives=${alt}`;
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('Não foi possível calcular a rota rodoviária.');
+  const j=await r.json();
+  const raw=Array.isArray(j?.routes)?j.routes:[];
+  if(!raw.length)throw new Error('Não existe uma rota rodoviária disponível entre os locais indicados.');
+
+  const routes=raw.slice(0,3).map(route=>({
+    distanceKm:Number(route.distance)/1000,
+    durationSec:Number(route.duration),
+    coords:route.geometry.coordinates.map(([lon,lat])=>({lat,lon})),
+    elevationGain:null,
+    elevationLoss:null
+  }));
+
+  if(preference==='eco' && routes.length>1){
+    await Promise.all(routes.map(async route=>{
+      const elev=await tripElevationGain(route.coords);
+      route.elevationGain=elev.gain;
+      route.elevationLoss=elev.loss;
+      route.estimatedLiters=tripRouteFuelEstimate(route,baseConsumption)
+    }));
+  }else{
+    routes[0].estimatedLiters=tripRouteFuelEstimate(routes[0],baseConsumption)
+  }
+
+  const fastest=[...routes].sort((x,y)=>x.durationSec-y.durationSec)[0];
+  let chosen=fastest;
+  if(preference==='eco' && routes.length>1){
+    chosen=[...routes].sort((x,y)=>
+      (x.estimatedLiters??Infinity)-(y.estimatedLiters??Infinity)
+    )[0]
+  }
+  chosen.fastestDurationSec=fastest.durationSec;
+  chosen.fastestDistanceKm=fastest.distanceKm;
+  chosen.routePreference=preference;
+  chosen.alternativesEvaluated=routes.length;
+  return chosen
+}
+
+function tripBuildPath(outbound,returnRoute){
+  const coords=[...outbound.coords];
+  if(returnRoute)coords.push(...returnRoute.coords.slice(1));
+  let km=0;
+  const points=[];
+  for(let i=0;i<coords.length;i++){
+    if(i)km+=haversine(coords[i-1].lat,coords[i-1].lon,coords[i].lat,coords[i].lon);
+    points.push({...coords[i],km})
+  }
+  return {points,totalKm:km}
+}
+
+function tripRouteSamples(path,max=420){
+  const pts=path.points||[];
+  if(pts.length<=max)return pts;
+  const step=Math.ceil(pts.length/max);
+  const out=[];
+  for(let i=0;i<pts.length;i+=step)out.push(pts[i]);
+  if(out[out.length-1]!==pts[pts.length-1])out.push(pts[pts.length-1]);
+  return out
+}
+
+function tripStationNearPath(row,samples){
+  const lat=Number(String(row.Latitude??'').replace(',','.'));
+  const lon=Number(String(row.Longitude??'').replace(',','.'));
+  const price=parsePrice(row.Preco);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)||!price)return null;
+  let best=null,bestD=Infinity;
+  for(const p of samples){
+    const d=haversine(lat,lon,p.lat,p.lon);
+    if(d<bestD){bestD=d;best=p}
+  }
+  if(!best||bestD>8)return null;
+  return {
+    key:`dgeg:${row.Id}`,dgegId:Number(row.Id),name:row.Nome||'Posto',
+    brand:row.Marca||'',address:[row.Morada,row.Localidade,row.CodPostal].filter(Boolean).join(', '),
+    lat,lon,price:Number(price),updatedAt:row.DataAtualizacao||'',source:'DGEG',
+    routeKm:best.km,crossKm:bestD,routePoint:{lat:best.lat,lon:best.lon}
+  }
+}
+
+async function tripCommunityOverlay(candidates,fuel){
+  if(!candidates.length||isGuestMode)return candidates;
+  const minLat=Math.min(...candidates.map(s=>s.lat))-.05,maxLat=Math.max(...candidates.map(s=>s.lat))+.05;
+  const minLon=Math.min(...candidates.map(s=>s.lon))-.05,maxLon=Math.max(...candidates.map(s=>s.lon))+.05;
+  const since=new Date(Date.now()-7*86400000).toISOString();
+  try{
+    const {data}=await supabase.from('fuel_price_reports')
+      .select('station_key,station_name,latitude,longitude,price,observed_at')
+      .eq('fuel_type',fuel).gte('observed_at',since)
+      .gte('latitude',minLat).lte('latitude',maxLat).gte('longitude',minLon).lte('longitude',maxLon)
+      .order('observed_at',{ascending:false}).limit(1500);
+
+    for(const r of (data||[])){
+      let s=candidates.find(x=>x.key===r.station_key);
+      if(!s){
+        let best=null,bestD=.35;
+        for(const x of candidates){
+          const d=haversine(x.lat,x.lon,Number(r.latitude),Number(r.longitude));
+          if(d<bestD){best=x;bestD=d}
+        }
+        s=best
+      }
+      if(s && !s._communityApplied){
+        s.price=Number(r.price);s.updatedAt=r.observed_at;s.source='Comunidade';s._communityApplied=true
       }
     }
   }catch{}
+  return candidates
+}
 
-  // 2) Se a página da média oficial falhar, calcula em tempo real a média
-  // aritmética dos preços nacionais publicados pela própria API DGEG.
-  const observed=await liveObservedNationalMarket(fuel);
-  if(seq!==nationalMarketRequestSeq)return;
-  if(observed){
-    applyMarketData(observed,'DGEG · média observada');
-    writeNationalMarketCache(fuel,observed);
-    $('nationalMarketInsight').textContent=
-      `${marketInsight(observed)} Média calculada agora a partir de ${observed.observedCount} preços nacionais publicados pela DGEG.`;
-    card.classList.remove('loading');
+async function tripRefineDetours(stations){
+  const limited=stations.slice(0,30);
+  for(let i=0;i<limited.length;i+=5){
+    await Promise.all(limited.slice(i,i+5).map(async s=>{
+      try{
+        const a=s.routePoint,b={lat:s.lat,lon:s.lon};
+        const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+        const r=await fetch(url);if(!r.ok)return;
+        const j=await r.json();const km=Number(j?.routes?.[0]?.distance)/1000;
+        if(Number.isFinite(km))s.detourKm=km*2
+      }catch{}
+      if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2
+    }))
+  }
+  for(const s of stations)if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2;
+  return stations
+}
+
+
+
+function tripChooseReserveStop(options,strategy,reservePoint,currentPos,emptyPoint){
+  if(!options.length)return null;
+
+  // Zona normal de paragem: desde a entrada na reserva até perto do limite físico.
+  // Tolerância de 5 km antes da reserva apenas para evitar falhar um posto praticamente coincidente.
+  const zoneStart=Math.max(currentPos+3,reservePoint-5);
+  const zoneEnd=Math.max(zoneStart,emptyPoint-8);
+
+  let pool=options.filter(s=>s.routeKm>=zoneStart && s.routeKm<=zoneEnd);
+
+  // Se não houver nenhum posto nessa zona, aceitar o último posto imediatamente antes da reserva.
+  // Isto é um fallback de segurança, não uma otimização económica.
+  let fallbackBeforeReserve=false;
+  if(!pool.length){
+    const before=options
+      .filter(s=>s.routeKm>currentPos+3 && s.routeKm<zoneStart)
+      .sort((a,b)=>b.routeKm-a.routeKm);
+    if(before.length){
+      pool=[before[0]];
+      fallbackBeforeReserve=true
+    }
+  }
+  if(!pool.length)return null;
+
+  const minPrice=Math.min(...pool.map(s=>s.price));
+  const maxPrice=Math.max(...pool.map(s=>s.price));
+  const priceSpan=Math.max(.001,maxPrice-minPrice);
+
+  const scored=pool.map(s=>{
+    const afterReserve=Math.max(0,s.routeKm-reservePoint);
+    const beforeReserve=Math.max(0,reservePoint-s.routeKm);
+    const pricePenalty=(s.price-minPrice)/priceSpan;
+    const detourPenalty=Math.min(1,(s.detourKm||0)/12);
+
+    // Regra principal: parar perto do momento em que entra na reserva.
+    // O preço decide entre postos equivalentes nessa zona, nunca força uma paragem antecipada.
+    const timingPenalty=(afterReserve/Math.max(1,emptyPoint-reservePoint))*.55
+      +(beforeReserve/Math.max(1,reservePoint-currentPos))*.85;
+
+    let score;
+    if(strategy==='cheapest') score=timingPenalty*.52+pricePenalty*.34+detourPenalty*.14;
+    else if(strategy==='fewer') score=timingPenalty*.66+detourPenalty*.27+pricePenalty*.07;
+    else score=timingPenalty*.60+pricePenalty*.24+detourPenalty*.16;
+
+    return {s,score}
+  }).sort((a,b)=>a.score-b.score);
+
+  const chosen=scored[0]?.s||null;
+  if(chosen)chosen._reserveFallback=fallbackBeforeReserve;
+  return chosen
+}
+
+function tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy){
+  const fullRange=tank/consumption*100;
+  if(!Number.isFinite(fullRange)||fullRange<=reserve+20){
+    throw new Error('A capacidade do depósito e o consumo indicados não permitem uma autonomia útil acima da reserva.')
+  }
+
+  const sorted=[...candidates].sort((a,b)=>a.routeKm-b.routeKm);
+  const stops=[];
+  let pos=0;
+  let range=Math.max(0,autonomy);
+  let guard=0;
+
+  // REGRA 1: se o destino é alcançável com a autonomia existente, não há paragem.
+  // A reserva serve para decidir QUANDO procurar um posto, não para obrigar a chegar com reserva intacta.
+  if(range>=totalKm)return {stops,fullRange};
+
+  while(pos+range<totalKm && guard++<20){
+    const remainingFromHere=totalKm-pos;
+
+    // Se já conseguimos terminar a viagem, acabou. Não criar "top-ups" residuais.
+    if(range>=remainingFromHere)break;
+
+    const reservePoint=Math.min(totalKm,pos+Math.max(0,range-reserve));
+    const emptyPoint=Math.min(totalKm,pos+range);
+
+    if(emptyPoint<=pos+5){
+      throw new Error('A autonomia atual é demasiado baixa para continuar a viagem.')
+    }
+
+    const reachable=sorted.filter(s=>s.routeKm>pos+3 && s.routeKm<=emptyPoint-8);
+    if(!reachable.length){
+      throw new Error(`Não encontrei um posto com preço real antes de esgotar a autonomia disponível (${Math.round(range)} km).`)
+    }
+
+    const stop=tripChooseReserveStop(reachable,strategy,reservePoint,pos,emptyPoint);
+    if(!stop)throw new Error('Não encontrei um posto adequado na zona de reserva.');
+
+    const routeTravel=stop.routeKm-pos;
+    const detourOut=(stop.detourKm||0)/2;
+    const detourBack=(stop.detourKm||0)/2;
+    const arrivalRange=Math.max(0,range-routeTravel-detourOut);
+    const currentLiters=arrivalRange*consumption/100;
+
+    const remainingAfterStop=Math.max(0,totalKm-stop.routeKm);
+
+    // Quanto precisamos para chegar ao destino a partir deste posto,
+    // incluindo apenas o regresso do posto à rota e uma pequena margem técnica de 5 km.
+    const finishRangeNeed=remainingAfterStop+detourBack+5;
+
+    let targetRange;
+    let finalStop=false;
+
+    if(finishRangeNeed<=fullRange){
+      // Dá para acabar a viagem a partir daqui: esta tem de ser a ÚLTIMA paragem.
+      targetRange=finishRangeNeed;
+      finalStop=true;
+    }else{
+      // Ainda será necessária outra paragem. Encher o depósito para maximizar a etapa seguinte.
+      targetRange=fullRange;
+    }
+
+    const targetLiters=Math.min(tank,targetRange*consumption/100);
+    let buyLiters=Math.max(0,targetLiters-currentLiters);
+
+    // Nunca criar uma paragem com compra residual se, na realidade, já conseguimos terminar.
+    const rangeWithoutBuying=Math.max(0,arrivalRange-detourBack);
+    if(remainingAfterStop<=rangeWithoutBuying){
+      break
+    }
+
+    // Se a última compra for muito pequena, tentar absorvê-la na paragem anterior.
+    // Isto elimina situações absurdas como "parar para meter 3 L" quando havia capacidade na paragem anterior.
+    if(finalStop && buyLiters<8 && stops.length){
+      const prev=stops[stops.length-1];
+      const prevFreeLiters=Math.max(0,tank-(prev.afterFillLiters||0));
+      if(prevFreeLiters>=buyLiters+0.5){
+        const extra=buyLiters;
+        prev.buyLiters+=extra;
+        prev.purchaseCost=prev.buyLiters*prev.price;
+        prev.afterFillLiters=Math.min(tank,(prev.afterFillLiters||0)+extra);
+        prev.afterFillRange=prev.afterFillLiters/consumption*100;
+        prev.reason='Paragem otimizada: abastecimento reforçado para evitar uma segunda paragem desnecessária';
+        break
+      }
+    }
+
+    // Se ainda for inevitável uma compra pequena, não a mascara:
+    // mantém a paragem porque é matematicamente necessária para concluir a viagem.
+    const purchaseCost=buyLiters*stop.price;
+    const detourCost=(stop.detourKm||0)*consumption/100*stop.price;
+    const afterFillLiters=Math.min(tank,currentLiters+buyLiters);
+    const afterFillRange=afterFillLiters/consumption*100;
+
+    let reason;
+    if(finalStop){
+      reason=buyLiters<8
+        ? 'Última paragem indispensável: falta pouca autonomia para concluir a viagem'
+        : 'Última paragem necessária para concluir a viagem';
+    }else if(stop._reserveFallback){
+      reason='Paragem de segurança imediatamente antes da reserva — não existe posto adequado já dentro da zona de reserva';
+    }else{
+      reason='Paragem necessária quando o carro entra na reserva';
+    }
+
+    stops.push({
+      ...stop,
+      reservePoint,
+      arrivalRange,
+      buyLiters,
+      purchaseCost,
+      detourCost,
+      afterFillLiters,
+      afterFillRange,
+      reason
+    });
+
+    // Depois de regressar à rota, esta é a autonomia efetiva disponível.
+    range=Math.max(0,afterFillRange-detourBack);
+    pos=stop.routeKm;
+
+    // REGRA 2: depois de abastecer, se já chega ao destino, terminar imediatamente.
+    if(range>=totalKm-pos)break
+  }
+
+  return {stops,fullRange}
+}
+
+function tripInitMap(){
+  if(tripMap)return;
+  tripMap=L.map('tripMap',{zoomControl:true}).setView([39.5,-8],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(tripMap)
+}
+
+function tripRenderMap(path,stops,origin,destination){
+  tripInitMap();
+  if(tripRouteLayer)tripMap.removeLayer(tripRouteLayer);
+  tripStopMarkers.forEach(m=>tripMap.removeLayer(m));tripStopMarkers=[];
+
+  const latlngs=path.points.map(p=>[p.lat,p.lon]);
+  tripRouteLayer=L.polyline(latlngs,{weight:5,opacity:.8}).addTo(tripMap);
+  tripStopMarkers.push(L.marker([origin.lat,origin.lon]).addTo(tripMap).bindPopup('<b>Origem</b>'));
+  tripStopMarkers.push(L.marker([destination.lat,destination.lon]).addTo(tripMap).bindPopup('<b>Destino</b>'));
+  stops.forEach((s,i)=>{
+    const m=L.marker([s.lat,s.lon]).addTo(tripMap).bindPopup(`<b>Paragem ${i+1}: ${esc(s.name)}</b><br>${Number(s.price).toFixed(3).replace('.',',')} €/L<br>Abastecer ${tripNum(s.buyLiters,1)} L`);
+    tripStopMarkers.push(m)
+  });
+  const bounds=L.latLngBounds(latlngs);
+  if(bounds.isValid())tripMap.fitBounds(bounds.pad(.08));
+  setTimeout(()=>tripMap.invalidateSize(),80)
+}
+
+function tripRenderPlan(plan){
+  lastTripPlan=plan;
+  const {path,stops,candidates,origin,destination,totalKm,consumption,fuel,mode,routePreference,outbound,returnRoute}=plan;
+  const boughtLiters=stops.reduce((a,s)=>a+s.buyLiters,0);
+  const purchaseCost=stops.reduce((a,s)=>a+s.purchaseCost,0);
+  const detourCost=stops.reduce((a,s)=>a+s.detourCost,0);
+  const medianPrice=tripMedian(candidates.map(s=>s.price));
+  const baselineCost=boughtLiters*medianPrice;
+  const netSaving=Math.max(0,baselineCost-purchaseCost-detourCost);
+  const tripFuel=totalKm*consumption/100;
+
+  const durationSec=Number(outbound?.durationSec||0)+Number(returnRoute?.durationSec||0);
+  const fastestSec=Number(outbound?.fastestDurationSec||outbound?.durationSec||0)+Number(returnRoute?.fastestDurationSec||returnRoute?.durationSec||0);
+  const totalGain=(Number.isFinite(outbound?.elevationGain)?outbound.elevationGain:0)+(Number.isFinite(returnRoute?.elevationGain)?returnRoute.elevationGain:0);
+  const extraMin=Math.max(0,Math.round((durationSec-fastestSec)/60));
+  $('tripChosenRouteType').textContent=routePreference==='eco'?'Mais económica':'Mais rápida';
+  $('tripDuration').textContent=durationSec?`${Math.floor(durationSec/3600)}h ${Math.round((durationSec%3600)/60)}min`:'—';
+  $('tripElevationGain').textContent=(outbound?.elevationGain!=null || returnRoute?.elevationGain!=null)?`${tripNum(totalGain,0)} m`:'não disponível';
+  $('tripRouteTradeoff').textContent=routePreference==='eco'?(extraMin?`+${extraMin} min`:'sem tempo adicional'):'referência';
+  $('tripRouteComparison').classList.remove('hidden');
+
+  $('tripDistance').textContent=tripNum(totalKm,0)+' km';
+  $('tripFuelNeeded').textContent=tripNum(tripFuel,1)+' L';
+  $('tripStopsCount').textContent=String(stops.length);
+  $('tripFuelCost').textContent=tripMoney(purchaseCost);
+  $('tripMedianPrice').textContent=medianPrice?medianPrice.toFixed(3).replace('.',',')+' €/L':'—';
+  $('tripBaselineCost').textContent=tripMoney(baselineCost);
+  $('tripDetourCost').textContent=tripMoney(detourCost);
+  $('tripNetSaving').textContent=tripMoney(netSaving);
+  $('tripSaving').textContent=tripMoney(netSaving);
+  $('tripSavingBasis').textContent='vs. preço mediano dos postos reais encontrados';
+
+  $('tripHeadline').textContent=stops.length
+    ?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}`
+    :'A autonomia atual é suficiente';
+  $('tripHeadlineDetail').textContent=stops.length
+    ?`${routePreference==='eco'?'Rota económica':'Rota mais rápida'} · só propomos parar quando a autonomia entra na reserva. Dentro dessa zona, escolhemos o posto mais vantajoso para ${fuel}.`
+    :`Com a autonomia indicada, não precisa de abastecer durante os ${tripNum(totalKm,0)} km da viagem.`;
+
+  $('tripRouteLabel').textContent=mode==='roundtrip'?'Ida e volta':'Só ida';
+  $('tripCandidateCount').textContent=`${candidates.length} postos`;
+
+  $('tripStops').innerHTML=stops.length?stops.map((s,i)=>`
+    <div class="trip-stop">
+      <div class="trip-stop-head">
+        <div style="display:flex;gap:8px;min-width:0">
+          <span class="trip-stop-index">${i+1}</span>
+          <div><h3>${esc(s.name)}</h3><div class="trip-stop-meta">${tripNum(s.routeKm,0)} km no percurso · desvio ${tripNum(s.detourKm||0,1)} km${s.address?' · '+esc(s.address):''}</div></div>
+        </div>
+        <div class="trip-stop-price">${s.price.toFixed(3).replace('.',',')} €</div>
+      </div>
+      <div class="trip-stop-plan">
+        <div><span>Autonomia à chegada</span><strong>${tripNum(s.arrivalRange,0)} km ${s.arrivalRange<=plan.reserve+8?'· RESERVA':''}</strong></div>
+        <div><span>Abastecer</span><strong>${tripNum(s.buyLiters,1)} L</strong></div>
+        <div><span>Custo combustível</span><strong>${tripMoney(s.purchaseCost)}</strong></div>
+        <div><span>Custo estimado do desvio</span><strong>${tripMoney(s.detourCost)}</strong></div>
+      </div>
+      <div class="trip-stop-reason ${s.buyLiters<8?'micro-stop':''}">✓ ${esc(s.reason||'Paragem necessária')}</div>
+      <div class="trip-stop-source">${esc(s.source)}${s.updatedAt?' · '+esc(sourceAgeLabel(s.updatedAt)):''}</div>
+      <button class="trip-stop-nav" type="button" onclick="window.startTripStop(${s.lat},${s.lon})">Abrir este posto na navegação</button>
+    </div>`).join(''):'<div class="empty">Não são necessárias paragens com a autonomia indicada.</div>';
+
+  $('tripAlternatives').innerHTML=candidates.slice(0,24).map(s=>`
+    <div class="trip-alt">
+      <b>${esc(s.name)}</b>
+      <strong>${s.price.toFixed(3).replace('.',',')} €/L</strong>
+      <small>${tripNum(s.routeKm,0)} km no percurso · desvio ${tripNum(s.detourKm||s.crossKm*2,1)} km · ${esc(s.source)}</small>
+    </div>`).join('');
+
+  $('tripResults').classList.remove('hidden');
+  tripRenderMap(path,stops,origin,destination)
+}
+
+async function calculateTrip(){
+  if(!tripAccessAllowed){
+    await checkTripAccess();
+    if(!tripAccessAllowed)return
+  }
+
+  const autonomy=Number($('tripAutonomy').value),consumption=Number($('tripConsumption').value),
+        tank=Number($('tripTank').value),reserve=Number($('tripReserve').value),
+        strategy=$('tripStrategy').value,fuel=$('tripFuel').value,mode=$('tripMode').value,
+        routePreference=(document.querySelector('input[name="tripRouteMode"]:checked')?.value||'fastest');
+
+  if(!Number.isFinite(autonomy)||autonomy<10)throw new Error('Indique uma autonomia atual válida.');
+  if(!Number.isFinite(consumption)||consumption<2)throw new Error('Indique o consumo médio do veículo.');
+  if(!Number.isFinite(tank)||tank<15)throw new Error('Indique a capacidade aproximada do depósito.');
+  if(!Number.isFinite(reserve)||reserve<10)throw new Error('Indique uma reserva de segurança válida.');
+
+  $('tripStatus').textContent='A localizar origem e destino…';
+  $('tripCalculateBtn').disabled=true;
+
+  try{
+    const origin=tripOriginCoords || await tripGeocode($('tripOrigin').value);
+    const destination=tripDestinationCoords || await tripGeocode($('tripDestination').value);
+    tripOriginCoords=origin;tripDestinationCoords=destination;
+
+    $('tripStatus').textContent='A calcular a rota rodoviária…';
+    const outbound=await tripRouteOptions(origin,destination,routePreference,consumption);
+    let returnRoute=null;
+    if(mode==='roundtrip')returnRoute=await tripRouteOptions(destination,origin,routePreference,consumption);
+    const path=tripBuildPath(outbound,returnRoute);
+    const totalKm=outbound.distanceKm+(returnRoute?.distanceKm||0);
+
+    $('tripStatus').textContent='A pesquisar preços reais junto ao percurso…';
+    const officialRows=await dgegFuelNationalRows(fuel);
+    const samples=tripRouteSamples(path);
+    const candidates=[];
+    const seen=new Set();
+    for(const row of officialRows){
+      const s=tripStationNearPath(row,samples);
+      if(!s||seen.has(s.key))continue;
+      seen.add(s.key);candidates.push(s)
+    }
+    if(!candidates.length)throw new Error('Não encontrei postos com preço real publicado suficientemente próximos desta rota.');
+
+    await tripCommunityOverlay(candidates,fuel);
+    candidates.sort((a,b)=>a.routeKm-b.routeKm);
+
+    $('tripStatus').textContent=`Encontrados ${candidates.length} postos com preço real. A calcular desvios…`;
+    // Refina os postos mais relevantes ao longo do percurso. Primeiro reduzimos a um conjunto representativo.
+    const relevant=[...candidates].sort((a,b)=>{
+      const pa=a.price+(a.crossKm*.01),pb=b.price+(b.crossKm*.01);
+      return pa-pb
+    }).slice(0,30);
+    await tripRefineDetours(relevant);
+
+    // Garantir detour em todos os candidatos, usando aproximação apenas onde ainda não foi refinado.
+    for(const s of candidates)if(!Number.isFinite(s.detourKm))s.detourKm=s.crossKm*2;
+
+    $('tripStatus').textContent='A otimizar as paragens de abastecimento…';
+    const {stops}=tripBuildPlan(candidates,totalKm,autonomy,consumption,tank,reserve,strategy);
+
+    const plan={origin,destination,outbound,returnRoute,path,totalKm,stops,candidates,autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference};
+    localStorage.setItem('bombaCerta:tripPrefs',JSON.stringify({autonomy,consumption,tank,reserve,strategy,fuel,mode,routePreference}));
+    tripRenderPlan(plan);
+    $('tripStatus').textContent=stops.length
+      ?`✓ ${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'} — apenas na zona de reserva.`
+      :'✓ A autonomia indicada chega ao fim da viagem sem necessidade de parar.'
+  }finally{
+    $('tripCalculateBtn').disabled=false
+  }
+}
+
+
+window.startTripStop=(lat,lon)=>{
+  const url=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${lat},${lon}`)}&travelmode=driving`;
+  window.open(url,'_blank','noopener')
+};
+
+function tripGoogleMapsUrl(plan){
+  if(!plan?.origin||!plan?.destination)return null;
+
+  const origin=`${plan.origin.lat},${plan.origin.lon}`;
+  const finalDestination=plan.mode==='roundtrip'
+    ? `${plan.origin.lat},${plan.origin.lon}`
+    : `${plan.destination.lat},${plan.destination.lon}`;
+
+  const waypoints=[];
+  const sortedStops=[...(plan.stops||[])].sort((a,b)=>a.routeKm-b.routeKm);
+
+  if(plan.mode==='roundtrip'){
+    const outboundKm=Number(plan.outbound?.distanceKm||0);
+    let destinationInserted=false;
+    for(const s of sortedStops){
+      if(!destinationInserted && s.routeKm>outboundKm){
+        waypoints.push(`${plan.destination.lat},${plan.destination.lon}`);
+        destinationInserted=true
+      }
+      waypoints.push(`${s.lat},${s.lon}`)
+    }
+    if(!destinationInserted)waypoints.push(`${plan.destination.lat},${plan.destination.lon}`)
+  }else{
+    sortedStops.forEach(s=>waypoints.push(`${s.lat},${s.lon}`))
+  }
+
+  const params=new URLSearchParams({
+    api:'1',
+    origin,
+    destination:finalDestination,
+    travelmode:'driving'
+  });
+  if(waypoints.length)params.set('waypoints',waypoints.slice(0,9).join('|'));
+  return `https://www.google.com/maps/dir/?${params.toString()}`
+}
+
+
+function tripShareText(plan){
+  if(!plan)return '';
+  const stops=[...(plan.stops||[])].sort((a,b)=>a.routeKm-b.routeKm);
+  const routeName=plan.routePreference==='eco'?'mais económica':'mais rápida';
+  const lines=[
+    '🧭 MyGGas — Viagem Inteligente',
+    `${plan.origin.label||'Origem'} → ${plan.destination.label||'Destino'}${plan.mode==='roundtrip'?' → regresso':''}`,
+    `Rota: ${routeName} · ${tripNum(plan.totalKm,0)} km`,
+    stops.length?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}:`:'Sem paragens de abastecimento necessárias.'
+  ];
+  stops.forEach((s,i)=>lines.push(`${i+1}. ${s.name} — ${s.price.toFixed(3).replace('.',',')} €/L — abastecer ${tripNum(s.buyLiters,1)} L`));
+  return lines.join('\n')
+}
+
+async function shareTripRoute(){
+  if(!lastTripPlan){
+    $('tripStatus').textContent='Calcule primeiro a viagem.';
+    return
+  }
+  const url=tripGoogleMapsUrl(lastTripPlan);
+  const text=tripShareText(lastTripPlan);
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title:'MyGGas — Viagem Inteligente',
+        text,
+        url
+      });
+      $('tripStatus').textContent='✓ Percurso partilhado.'
+      return
+    }
+  }catch(e){
+    if(e?.name==='AbortError')return
+  }
+  try{
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    $('tripStatus').textContent='✓ Percurso copiado. Pode agora enviar aos seus amigos.'
+  }catch{
+    window.prompt('Copie este percurso para partilhar:',`${text}\n${url}`)
+  }
+}
+
+function startTripRoute(){
+  if(!lastTripPlan){
+    $('tripStatus').textContent='Calcule primeiro a viagem.';
+    return
+  }
+  const url=tripGoogleMapsUrl(lastTripPlan);
+  if(!url){
+    $('tripStatus').textContent='Não foi possível preparar a navegação.';
+    return
+  }
+  window.open(url,'_blank','noopener')
+}
+
+$('tripStartRouteBtn')?.addEventListener('click',startTripRoute);
+$('tripShareBtn')?.addEventListener('click',shareTripRoute);
+$('tripRecalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
+  $('tripStatus').textContent=errPT(e)
+}));
+
+$('tripCalculateBtn')?.addEventListener('click',()=>calculateTrip().catch(e=>{
+  $('tripStatus').textContent=errPT(e)
+}));
+$('tripUseLocationBtn')?.addEventListener('click',async()=>{
+  try{
+    $('tripStatus').textContent='A obter a localização atual…';
+    let lat=currentLat,lon=currentLon;
+    if(lat==null||lon==null){
+      const pos=await new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:12000,maximumAge:60000}));
+      lat=pos.coords.latitude;lon=pos.coords.longitude
+    }
+    tripOriginCoords={lat:Number(lat),lon:Number(lon),label:'Localização atual'};
+    $('tripOrigin').value='Localização atual';
+    $('tripStatus').textContent='✓ Origem definida pela localização atual.'
+  }catch{
+    $('tripStatus').textContent='Não foi possível obter a localização. Escreva a origem manualmente.'
+  }
+});
+$('tripOrigin')?.addEventListener('input',()=>{tripOriginCoords=null});
+$('tripDestination')?.addEventListener('input',()=>{tripDestinationCoords=null});
+$('tripExplainBtn')?.addEventListener('click',()=>{
+  const box=$('tripExplainBox');const open=!box.classList.toggle('hidden');
+  $('tripExplainBtn').textContent=open?'Fechar explicação':'Como é calculada esta economia?'
+});
+$('tripGoProfileBtn')?.addEventListener('click',()=>showSection('perfil'));
+
+try{
+  const prefs=JSON.parse(localStorage.getItem('bombaCerta:tripPrefs')||'{}');
+  if(prefs.autonomy)$('tripAutonomy').value=prefs.autonomy;
+  if(prefs.consumption)$('tripConsumption').value=prefs.consumption;
+  if(prefs.tank)$('tripTank').value=prefs.tank;
+  if(prefs.reserve)$('tripReserve').value=prefs.reserve;
+  if(prefs.strategy)$('tripStrategy').value=prefs.strategy;
+  if(prefs.fuel)$('tripFuel').value=prefs.fuel;
+  if(prefs.mode)$('tripMode').value=prefs.mode;
+  if(prefs.routePreference){
+    const r=document.querySelector(`input[name="tripRouteMode"][value="${prefs.routePreference}"]`);
+    if(r)r.checked=true
+  }
+}catch{}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+  $(id)?.classList.add('active');
+  document.querySelectorAll(`.nav[data-section="${id}"]`).forEach(x=>x.classList.add('active'));
+  if(id==='abastecimentos'||id==='estatisticas')loadFillups();
+  if(id==='perfil')loadLeaderboard();
+  if(id==='viagem'){
+    checkTripAccess().then(ok=>{if(ok&&tripMap)setTimeout(()=>tripMap.invalidateSize(),80)});
+  }
+  if(id==='admin'&&isAdminUser){loadAdminSummary();loadAdminUsers();loadAdminReports();}
+  if(id==='postos'&&map)setTimeout(()=>map.invalidateSize(),80)
+}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
+$('railAddStationBtn')?.addEventListener('click',()=>window.openAddStation());
+$('railInviteBtn')?.addEventListener('click',()=>$('shareAppBtn')?.click());
+$('railLevelsBtn')?.addEventListener('click',()=>{
+  showSection('perfil');
+  setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)
+});
+
+$('profileTopBtn').onclick=()=>showSection('perfil');
+$('adminTopBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
+$('seeUnlocksBtn').onclick=()=>{showSection('perfil');setTimeout(()=>$('unlockGrid')?.scrollIntoView({behavior:'smooth',block:'center'}),120)};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove('open'));
+$('adInfoOkBtn')?.addEventListener('click',()=>$('adInfoModal')?.classList.remove('open'));
+
+
+
+let isAdminUser=false;
+
+function showAdminUI(){
+  isAdminUser=true;
+  $('adminNav')?.classList.remove('hidden');
+  $('adminTopBtn')?.classList.remove('hidden');
+  $('profileAdminBtn')?.classList.remove('hidden');
+  document.querySelector('.bottom-nav')?.classList.add('admin-enabled');
+  if($('myLevel'))$('myLevel').textContent='Administrador'
+}
+function hideAdminUI(){
+  isAdminUser=false;
+  $('adminNav')?.classList.add('hidden');
+  $('adminTopBtn')?.classList.add('hidden');
+  $('profileAdminBtn')?.classList.add('hidden');
+  document.querySelector('.bottom-nav')?.classList.remove('admin-enabled')
+}
+
+async function checkAdmin(){
+  try{
+    const {data:{user}}=await supabase.auth.getUser();
+    const email=(user?.email||'').trim().toLowerCase();
+
+    if(email==='a.miguel.reis@gmail.com') {
+      // A conta proprietária deve ver sempre o painel imediatamente.
+      showAdminUI();
+
+      // Confirmar o papel em background, mas uma falha transitória não esconde o painel.
+      supabase.rpc('is_app_admin').then(({data,error})=>{
+        if(error)console.warn('Verificação admin temporariamente indisponível:',error)
+        else if(data!==true)console.warn('Conta proprietária sem flag admin no backend.')
+      }).catch(()=>{});
+
+      return true
+    }
+
+    hideAdminUI();
+    return false
+  }catch(e){
+    console.error('Falha ao verificar administração:',e);
+    hideAdminUI();
+    return false
+  }
+}
+
+function reportReasonPT(r){
+  return ({preco_falso:'Preço falso ou enganador',spam:'Spam / alterações repetidas',abuso:'Comportamento abusivo',outro:'Outro motivo'})[r]||r
+}
+async function loadAdminReports(){
+  if(!isAdminUser)return;
+  $('adminReports').className='empty';$('adminReports').textContent='A carregar denúncias…';
+  const {data,error}=await supabase.rpc('admin_list_user_reports');
+  if(error){$('adminReports').textContent=errPT(error);return}
+  const rows=data||[],pending=rows.filter(x=>x.status==='pendente').length;
+  $('pendingReportsBadge').textContent=`${pending} pendente${pending===1?'':'s'}`;
+  if(!rows.length){$('adminReports').className='empty';$('adminReports').textContent='Ainda não existem denúncias.';return}
+  $('adminReports').className='';
+  $('adminReports').innerHTML=rows.map(r=>`<div class="report-card">
+    <div class="report-head">
+      <div><b>🚩 ${esc(r.reported_name||'Utilizador')}</b><div class="admin-email">${esc(r.reported_email||'')}</div></div>
+      <span class="report-status ${esc(r.status)}">${esc(r.status)}</span>
+    </div>
+    <div class="report-meta">
+      Denunciado por <b>${esc(r.reporter_name||'Utilizador')}</b> · ${new Date(r.created_at).toLocaleString('pt-PT')}<br>
+      Motivo: <b>${esc(reportReasonPT(r.reason))}</b>
+      ${r.station_name?`<br>Preço: ${esc(r.station_name)} · ${esc(r.fuel_type||'')} · ${Number(r.reported_price||0).toFixed(3).replace('.',',')} €/L`:''}
+      ${r.details?`<br>Detalhe: ${esc(r.details)}`:''}
+    </div>
+    <div class="actions" style="margin-top:9px">
+      ${r.status!=='revista'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','revista')">Marcar revista</button>`:''}
+      ${r.status!=='arquivada'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','arquivada')">Arquivar</button>`:''}
+      ${r.status!=='pendente'?`<button class="btn secondary" onclick="setAdminReportStatus('${r.report_id}','pendente')">Reabrir</button>`:''}
+    </div>
+  </div>`).join('')
+}
+window.setAdminReportStatus=async(id,status)=>{
+  const {error}=await supabase.rpc('admin_set_user_report_status',{p_report_id:id,p_status:status});
+  if(error){alert(errPT(error));return}
+  await loadAdminReports()
+}
+
+
+function setAdminCreateStatus(message,type='info'){
+  const el=$('adminCreateStatus');
+  el.className=type==='success'?'admin-create-success':type==='error'?'admin-create-error':'admin-create-info';
+  el.textContent=message
+}
+function adminLevelLabel(level){
+  return ({
+    novato:'Novato',explorador:'Explorador',guia:'Guia',especialista:'Especialista',
+    embaixador:'Embaixador',editor:'Editor de confiança',administrador:'Administrador'
+  })[level]||level
+}
+async function ensureFreshAdminSession(){
+  let {data:{session}}=await supabase.auth.getSession();
+  if(!session)throw new Error('Sessão terminada. Entre novamente.');
+
+  const expiresAt=Number(session.expires_at||0)*1000;
+  if(expiresAt && expiresAt-Date.now()<90_000){
+    const refreshed=await supabase.auth.refreshSession();
+    if(refreshed.error||!refreshed.data.session)throw new Error('Não foi possível renovar a sessão.');
+    session=refreshed.data.session
+  }
+
+  const {data:isAdmin,error}=await supabase.rpc('is_app_admin');
+  if(error||isAdmin!==true)throw new Error('Esta conta não tem permissões de administrador.');
+  return session
+}
+
+
+function adPlacementLabel(key){
+  return ({
+    postos_top:'Mapa · topo',
+    postos_feed:'Mapa · lateral/feed',
+    abastecimentos_top:'Abastecimentos',
+    viagem_top:'Viagem',
+    estatisticas_top:'Análise',
+    perfil_top:'Perfil',
+    admin_top:'Administração · topo',
+    abastecimentos_bottom:'Abastecimentos · rodapé',
+    estatisticas_bottom:'Análise · rodapé',
+    viagem_bottom:'Viagem · rodapé',
+    perfil_bottom:'Perfil · rodapé',
+    admin_bottom:'Administração · rodapé'
+  })[key]||key
+}
+
+async function loadAdminAdAnalytics(){
+  if(!isAdminUser)return;
+  try{
+    const {data,error}=await supabase.rpc('admin_ad_analytics');
+    if(error)throw error;
+    const d=data||{};
+    const views=Number(d.impressions_total||0);
+    const clicks=Number(d.clicks_total||0);
+    const ctr=views?clicks/views*100:0;
+
+    $('adminAdViews').textContent=views.toLocaleString('pt-PT');
+    $('adminAdClicks').textContent=clicks.toLocaleString('pt-PT');
+    $('adminAdCtr').textContent=ctr.toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+    $('adminAdToday').textContent=`${Number(d.impressions_today||0).toLocaleString('pt-PT')} / ${Number(d.clicks_today||0).toLocaleString('pt-PT')}`;
+
+    const rows=Array.isArray(d.placements)?d.placements:[];
+    $('adminAdRows').innerHTML=rows.length?rows.map(r=>`
+      <tr>
+        <td><b>${esc(adPlacementLabel(r.ad_key))}</b></td>
+        <td>${esc(r.section_name||'—')}</td>
+        <td>${Number(r.impressions||0).toLocaleString('pt-PT')}</td>
+        <td>${Number(r.clicks||0).toLocaleString('pt-PT')}</td>
+        <td>${Number(r.ctr||0).toLocaleString('pt-PT',{minimumFractionDigits:2,maximumFractionDigits:2})}%</td>
+      </tr>`).join('')
+      :'<tr><td colspan="5">Ainda não existem impressões registadas.</td></tr>'
+  }catch(e){
+    console.warn('Analytics de publicidade indisponível:',e);
+    $('adminAdRows').innerHTML='<tr><td colspan="5">Não foi possível carregar as métricas.</td></tr>'
+  }
+}
+
+async function loadAdminSummary(){
+  if(!isAdminUser)return;
+  try{
+    const {data,error}=await supabase.rpc('admin_dashboard_summary');
+    if(error)throw error;
+
+    const s=data||{};
+    loadAdminAdAnalytics().catch(()=>{});
+    $('adminUserCount').textContent=Number(s.users_total||0).toLocaleString('pt-PT');
+    $('adminViewsToday').textContent=Number(s.views_today||0).toLocaleString('pt-PT');
+    $('adminViewsTotal').textContent=Number(s.views_total||0).toLocaleString('pt-PT');
+
+    const days=Array.isArray(s.views_last_7_days)?s.views_last_7_days:[];
+    const total7=days.reduce((sum,d)=>sum+Number(d.views||0),0);
+    $('adminViews7Days').textContent=total7.toLocaleString('pt-PT');
+
+    const fmt=new Intl.DateTimeFormat('pt-PT',{weekday:'short',day:'2-digit',month:'2-digit'});
+    $('adminDailyViews').innerHTML=days.length?days.map(d=>{
+      const dt=new Date(String(d.day)+'T12:00:00');
+      return `<div class="admin-day"><b>${Number(d.views||0).toLocaleString('pt-PT')}</b><span>${esc(fmt.format(dt))}</span></div>`
+    }).join(''):'<div class="empty">Ainda não existem visualizações registadas.</div>';
+  }catch(e){
+    console.warn('Resumo administrativo indisponível:',e);
+    $('adminDailyViews').innerHTML='<div class="empty">Não foi possível carregar as estatísticas.</div>'
+  }
+}
+
+async function loadAdminUsers(){
+  if(!isAdminUser)return;
+  $('adminUsers').className='empty';$('adminUsers').textContent='A carregar utilizadores…';
+  const {data,error}=await supabase.rpc('admin_list_users_v2');
+  if(error){$('adminUsers').textContent=errPT(error);return}
+  const rows=data||[];
+  const {data:{user}}=await supabase.auth.getUser();
+  $('adminUsers').className='';
+  $('adminUsers').innerHTML=rows.map(u=>{
+    const self=u.user_id===user?.id;
+    const name=esc(u.display_name||'Utilizador');
+    const currentLevel=u.trusted_publisher?'editor':
+      u.level_name==='Embaixador'?'embaixador':
+      u.level_name==='Especialista'?'especialista':
+      u.level_name==='Guia'?'guia':
+      u.level_name==='Explorador'?'explorador':'novato';
+    return `<div class="admin-user">
+      <div>
+        <b>${name}${self?'<span class="admin-badge">A sua conta</span>':''}</b>
+        <div class="admin-email">${esc(u.email||'')}</div>
+        <div class="tiny muted">Nível atual: ${esc(u.level_name||'Novato')} · Criada: ${u.created_at?new Date(u.created_at).toLocaleDateString('pt-PT'):'—'} · Último acesso: ${u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-PT'):'—'}</div>
+        <div class="actions" style="margin-top:8px">
+          <input id="name_${u.user_id}" class="input" maxlength="28" value="${esc(u.display_name||'')}" placeholder="Nome público" style="max-width:220px">
+          <button class="btn secondary" onclick="adminSetName('${u.user_id}')">Alterar nome</button>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <select id="level_${u.user_id}" class="input" style="max-width:220px">
+            <option value="novato" ${currentLevel==='novato'?'selected':''}>Novato</option>
+            <option value="explorador" ${currentLevel==='explorador'?'selected':''}>Explorador</option>
+            <option value="guia" ${currentLevel==='guia'?'selected':''}>Guia</option>
+            <option value="especialista" ${currentLevel==='especialista'?'selected':''}>Especialista</option>
+            <option value="embaixador" ${currentLevel==='embaixador'?'selected':''}>Embaixador</option>
+            <option value="editor" ${currentLevel==='editor'?'selected':''}>Editor de confiança</option>
+          </select>
+          <button class="btn secondary" onclick="adminSetLevel('${u.user_id}')">Alterar nível</button>
+        </div>
+      </div>
+      <div>${self?'<span class="pill">Proprietário</span>':`<button class="btn danger" onclick="adminDeleteUser('${u.user_id}','${esc((u.email||'').replace(/'/g,''))}')">Apagar conta</button>`}</div>
+    </div>`
+  }).join('')
+}
+
+window.adminSetName=async(userId)=>{
+  const input=document.getElementById(`name_${userId}`);
+  if(!input)return;
+
+  const name=input.value.trim();
+  if(name.length<2){
+    alert('O nome deve ter pelo menos 2 caracteres.');
+    input.focus();
     return
   }
 
-  // 3) Último fallback oficial conhecido. Nunca mostrar 0% / "Indisponível"
-  // quando existe um valor oficial anterior.
-  if(fallback){
-    applyMarketData(fallback,'DGEG · último oficial');
-    $('nationalMarketInsight').textContent=
-      `${marketInsight(fallback)} Último valor oficial disponível guardado pela MyGGas.`;
-  }else{
-    $('nationalAveragePrice').textContent='—';
-    $('nationalTrendLabel').textContent='Sem dados';
-    $('nationalAverageDate').textContent='DGEG';
+  const original=input.value;
+  input.disabled=true;
+
+  try{
+    const {data,error}=await supabase.rpc('admin_set_user_name',{
+      p_user_id:userId,
+      p_name:name
+    });
+    if(error)throw error;
+
+    const finalName=String(data||name);
+    input.value=finalName;
+
+    // Atualizar de imediato os textos visíveis na lista.
+    const card=input.closest('.admin-user');
+    const title=card?.querySelector('b');
+    if(title){
+      const selfBadge=title.querySelector('.admin-badge');
+      title.childNodes[0].nodeValue=finalName;
+      if(selfBadge && !title.contains(selfBadge))title.appendChild(selfBadge)
+    }
+
+    await loadAdminUsers();
+    loadLeaderboard().catch(()=>{});
+    hydrateTopProfile().catch(()=>{});
+
+    alert(`Nome alterado para ${finalName}.`)
+  }catch(e){
+    input.value=original;
+    alert('Não foi possível alterar o nome: '+errPT(e))
+  }finally{
+    input.disabled=false
   }
-  card.classList.remove('loading')
+};
+
+window.adminSetLevel=async(userId)=>{
+  const sel=document.getElementById(`level_${userId}`);if(!sel)return;
+  const level=sel.value;
+  const {data,error}=await supabase.rpc('admin_set_user_level',{p_user_id:userId,p_level:level});
+  if(error){alert('Não foi possível alterar o nível: '+errPT(error));return}
+  await loadAdminUsers();
+  alert('Nível atualizado.')
+}
+window.adminDeleteUser=async(userId,email)=>{
+  const phrase='APAGAR';
+  const confirmation=prompt(`Eliminar permanentemente a conta ${email}?\n\nEscreva ${phrase} para confirmar.`);
+  if(confirmation!==phrase)return;
+  if(!confirm(`Última confirmação: apagar definitivamente ${email}?`))return;
+  const {data,error}=await supabase.rpc('admin_delete_user',{p_user_id:userId});
+  if(error){alert('Não foi possível apagar a conta: '+errPT(error));return}
+  if(!data){alert('A conta não foi encontrada ou já tinha sido eliminada.')}
+  await Promise.all([loadAdminUsers(),loadAdminSummary()])
 }
 
-$('marketMiniToggle')?.addEventListener('click',()=>{
-  const card=$('nationalMarketCard'),details=$('marketMiniDetails'),btn=$('marketMiniToggle');
-  const open=details.classList.toggle('hidden')===false;
-  card.classList.toggle('open',open);
-  btn.setAttribute('aria-expanded',String(open))
+$('toggleAdminPassword').onclick=()=>{
+  const p=$('adminNewPassword');
+  p.type=p.type==='password'?'text':'password';
+  $('toggleAdminPassword').textContent=p.type==='password'?'👁':'🙈'
+};
+
+$('adminCreateUserBtn').onclick=async()=>{
+  const email=$('adminNewEmail').value.trim().toLowerCase();
+  const password=$('adminNewPassword').value;
+  const level=$('adminNewLevel').value;
+  const btn=$('adminCreateUserBtn');
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    setAdminCreateStatus('Introduza um email válido.','error');return
+  }
+  if(password.length<8){
+    setAdminCreateStatus('A palavra-passe deve ter pelo menos 8 caracteres.','error');return
+  }
+
+  btn.disabled=true;
+  const oldText=btn.textContent;
+  btn.textContent='A criar conta…';
+  setAdminCreateStatus('A validar permissões e criar a conta…','info');
+
+  try{
+    const session=await ensureFreshAdminSession();
+
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/admin-create-user`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${session.access_token}`,
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({email,password,level})
+    });
+
+    let payload={};
+    try{payload=await response.json()}catch{}
+
+    if(!response.ok || payload?.error){
+      const raw=String(payload?.error||`Erro ${response.status}`);
+      const low=raw.toLowerCase();
+      if(low.includes('already')||low.includes('registered')||low.includes('exists')){
+        throw new Error('Já existe uma conta com este email.')
+      }
+      if(response.status===401)throw new Error('A sessão expirou. Saia e volte a entrar.')
+      if(response.status===403)throw new Error('Esta conta não tem permissões para criar utilizadores.')
+      throw new Error(raw)
+    }
+
+    $('adminNewEmail').value='';
+    $('adminNewPassword').value='';
+    $('adminNewLevel').value='novato';
+
+    setAdminCreateStatus(`✓ Conta ${email} criada com sucesso · ${adminLevelLabel(level)}.`,'success');
+
+    // Dar tempo ao Auth/database para refletir a criação e atualizar a lista imediatamente.
+    await new Promise(r=>setTimeout(r,220));
+    await Promise.all([loadAdminUsers(),loadAdminSummary()]);
+
+    const list=$('adminUsers');
+    list?.scrollIntoView({behavior:'smooth',block:'nearest'})
+  }catch(e){
+    setAdminCreateStatus(errPT(e),'error')
+  }finally{
+    btn.disabled=false;
+    btn.textContent=oldText
+  }
+}
+
+$('refreshAdminBtn').onclick=async()=>{await Promise.all([loadAdminSummary(),loadAdminUsers()])};
+$('refreshAdAnalyticsBtn')?.addEventListener('click',loadAdminAdAnalytics);
+$('refreshReportsBtn').onclick=loadAdminReports;
+
+
+async function safeEnsureFuelProfile(){
+  try{
+    await supabase.rpc('ensure_my_fuel_profile')
+    return true
+  }catch(e){
+    console.warn('Não foi possível garantir o perfil neste momento:',e)
+    return false
+  }
+}
+
+async function enterApp(){
+  $('authScreen').classList.add('hidden');
+  $('appShell').classList.remove('hidden');
+
+  setTimeout(initAdTracking,50);
+  ensureMap();
+  if(!isGuestMode){
+    subscribeRealtime();
+    loadRecentPriceActivity().catch(()=>{});
+  }
+  setTimeout(()=>autoSearchOnOpen().catch(()=>{}),0);
+
+  if(isGuestMode){
+    currentAuthUserId=null;
+    hideAdminUI();
+    document.body.classList.add('guest-mode');
+    if($('topName'))$('topName').textContent='Visitante';
+    if($('topLevel'))$('topLevel').textContent='Consulta';
+    if($('logoutBtn'))$('logoutBtn').textContent='Sair';
+    return
+  }
+
+  document.body.classList.remove('guest-mode');
+  try{
+    const {data:{user}}=await supabase.auth.getUser();
+    currentAuthUserId=user?.id||null;
+    if((user?.email||'').trim().toLowerCase()==='a.miguel.reis@gmail.com') showAdminUI();
+    else hideAdminUI();
+  }catch{
+    currentAuthUserId=null
+  }
+
+  hydrateTopProfile().catch(()=>{});
+  await safeEnsureFuelProfile();
+  await checkAdmin();
+
+  loadLeaderboard().catch(()=>{});
+  checkTripAccess().catch(()=>{});
+  if(isAdminUser && document.getElementById('admin')?.classList.contains('active')){
+    loadAdminSummary().catch(()=>{});
+    loadAdminUsers().catch(()=>{});
+    loadAdminReports().catch(()=>{})
+  }
+
+  setTimeout(()=>loadFillups().catch(()=>{}),250);
+  setTimeout(()=>loadCommunityGame?.().catch(()=>{}),120)
+}
+async function authCheck(){
+  const {data:{session}}=await supabase.auth.getSession();
+  if(session){
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.remove('hidden');
+    await enterApp();
+    setTimeout(()=>showWelcomeMission(),350)
+  }else{
+    $('authScreen').classList.remove('hidden');
+    $('appShell').classList.add('hidden')
+  }
+}
+
+['username','password'].forEach(id=>{
+  $(id).addEventListener('input',()=>{$('authStatus').textContent=''})
 });
+
+
+
+$('toggleLoginPassword').onclick=()=>{
+  const p=$('password');
+  p.type=p.type==='password'?'text':'password';
+  $('toggleLoginPassword').textContent=p.type==='password'?'👁':'🙈'
+};
+
+$('forgotPasswordBtn').onclick=()=>{
+  $('recoveryEmail').value='';
+  $('recoveryStatus').textContent='';
+  $('forgotPasswordModal').classList.add('open')
+};
+
+$('sendRecoveryBtn').onclick=async()=>{
+  const email=$('recoveryEmail').value.trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    $('recoveryStatus').textContent='Introduza um email válido.';return
+  }
+  const btn=$('sendRecoveryBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A enviar…';
+  $('recoveryStatus').textContent='';
+  try{
+    const {error}=await supabase.auth.resetPasswordForEmail(email,{
+      redirectTo:location.origin
+    });
+    if(error)throw error;
+    $('recoveryStatus').textContent='✓ Link enviado. Abra o email e siga o link para definir uma nova palavra-passe.'
+  }catch(e){
+    $('recoveryStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+$('profileAdminBtn').onclick=()=>{if(isAdminUser)showSection('admin')};
+
+$('changePasswordBtn').onclick=()=>{
+  $('currentPassword').value='';
+  $('newPassword').value='';
+  $('confirmNewPassword').value='';
+  $('passwordStatus').textContent='';
+  $('changePasswordModal').classList.add('open')
+};
+
+$('savePasswordBtn').onclick=async()=>{
+  const current=$('currentPassword').value;
+  const next=$('newPassword').value;
+  const confirm=$('confirmNewPassword').value;
+  if(next.length<8){$('passwordStatus').textContent='A nova palavra-passe deve ter pelo menos 8 caracteres.';return}
+  if(next!==confirm){$('passwordStatus').textContent='As novas palavras-passe não coincidem.';return}
+  const btn=$('savePasswordBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A guardar…';
+  try{
+    const {data:{user}}=await supabase.auth.getUser();
+    if(!user?.email)throw new Error('Sessão inválida.');
+
+    const check=await supabase.auth.signInWithPassword({email:user.email,password:current});
+    if(check.error)throw new Error('A palavra-passe atual está incorreta.');
+
+    const {error}=await supabase.auth.updateUser({password:next});
+    if(error)throw error;
+
+    $('passwordStatus').textContent='✓ Palavra-passe alterada com sucesso.';
+    setTimeout(()=>$('changePasswordModal').classList.remove('open'),700)
+  }catch(e){
+    $('passwordStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+supabase.auth.onAuthStateChange(async(event)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.add('hidden');
+    $('recoveryNewPasswordModal').classList.add('open')
+  }
+});
+
+$('saveRecoveryPasswordBtn').onclick=async()=>{
+  const next=$('recoveryNewPassword').value;
+  const confirm=$('recoveryConfirmPassword').value;
+  if(next.length<8){$('recoveryNewPasswordStatus').textContent='A palavra-passe deve ter pelo menos 8 caracteres.';return}
+  if(next!==confirm){$('recoveryNewPasswordStatus').textContent='As palavras-passe não coincidem.';return}
+  const btn=$('saveRecoveryPasswordBtn'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='A guardar…';
+  try{
+    const {error}=await supabase.auth.updateUser({password:next});
+    if(error)throw error;
+    $('recoveryNewPasswordStatus').textContent='✓ Palavra-passe definida. A entrar…';
+    $('recoveryNewPasswordModal').classList.remove('open');
+    await enterApp()
+  }catch(e){
+    $('recoveryNewPasswordStatus').textContent=errPT(e)
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+$('loginBtn').onclick=async()=>{
+  const login=$('username').value.trim();
+  const password=$('password').value;
+
+  if(!login||!password){
+    $('authStatus').textContent='Introduza o username ou email e a palavra-passe.';
+    return
+  }
+
+  const btn=$('loginBtn'),old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='A entrar…';
+  $('authStatus').textContent='A validar acesso…';
+
+  try{
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({login,password})
+    });
+
+    let payload={};
+    try{payload=await response.json()}catch{}
+
+    if(!response.ok || payload?.error){
+      const code=String(payload?.error||'').toLowerCase();
+      if(code.includes('too_many_attempts')){
+        throw new Error('Demasiadas tentativas. Aguarde alguns minutos e tente novamente.')
+      }
+      if(code.includes('login_failed')){
+        throw new Error('Não foi possível validar o acesso neste momento. Tente novamente.')
+      }
+      throw new Error('Username/email ou palavra-passe incorretos.')
+    }
+
+    if(!payload?.access_token || !payload?.refresh_token){
+      throw new Error('Não foi possível iniciar a sessão.')
+    }
+
+    const {data,error}=await supabase.auth.setSession({
+      access_token:payload.access_token,
+      refresh_token:payload.refresh_token
+    });
+    if(error || !data?.session)throw error||new Error('Não foi possível iniciar a sessão.');
+
+    $('authStatus').textContent='✓ Sessão iniciada.';
+    $('authScreen').classList.add('hidden');
+    $('appShell').classList.remove('hidden');
+
+    try{
+      await enterApp()
+    }catch(e){
+      console.error('Bootstrap após login:',e)
+    }
+  }catch(e){
+    $('authStatus').textContent=errPT(e);
+    $('password').focus();
+    $('password').select()
+  }finally{
+    btn.disabled=false;
+    btn.textContent=old
+  }
+};
+
+const signupStartedAt=Date.now();
+let signupUsernameTouched=false;
+
+function setSignupFieldState(inputId,hintId,state,message){
+  const input=$(inputId),label=input?.closest('.signup-field');
+  if(label){label.classList.remove('valid','invalid');if(state)label.classList.add(state)}
+  if(message && $(hintId))$(hintId).textContent=message
+}
+function setSignupStatus(message,type=''){
+  const el=$('signupStatus');
+  el.className='status signup-status'+(type?' '+type:'');
+  el.innerHTML=message||''
+}
+function normalizeSignupUsername(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
+    .replace(/\s+/g,'.').replace(/[^a-z0-9_.-]/g,'').replace(/\.{2,}/g,'.')
+    .replace(/^[._-]+|[._-]+$/g,'').slice(0,20)
+}
+function suggestedUsernameFromName(){
+  const base=normalizeSignupUsername($('signupName').value);return base.length>=3?base:''
+}
+function validateSignupName(){
+  const v=$('signupName').value.trim(),ok=v.length>=2;
+  setSignupFieldState('signupName','signupNameHint',v?(ok?'valid':'invalid'):'',
+    v?(ok?'✓ Nome público válido.':'Escreva pelo menos 2 caracteres.'):'Este é o nome público que a comunidade verá.');
+  return ok
+}
+function validateSignupUsername(){
+  const el=$('signupUsername'),normalized=normalizeSignupUsername(el.value);
+  if(el.value!==normalized)el.value=normalized;
+  const ok=/^[a-z0-9_.-]{3,20}$/.test(normalized);
+  setSignupFieldState('signupUsername','signupUsernameHint',normalized?(ok?'valid':'invalid'):'',
+    normalized?(ok?'✓ Username com formato válido.':'Use 3–20 caracteres: letras, números, ponto, hífen ou _.'):'3–20 caracteres. Pode usar letras, números, ponto, hífen e _.');
+  return ok
+}
+function validateSignupEmail(){
+  const el=$('signupEmail');el.value=el.value.trim().toLowerCase();const v=el.value;
+  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  setSignupFieldState('signupEmail','signupEmailHint',v?(ok?'valid':'invalid'):'',
+    v?(ok?'✓ Email de recuperação válido.':'Verifique o email introduzido.'):'Só é usado para recuperação. Pode continuar a entrar com o username.');
+  return ok
+}
+function validateSignupPassword(){
+  const v=$('signupPassword').value,meter=$('signupPasswordMeter'),len=v.length;
+  const pct=len?Math.min(100,Math.max(18,len/12*100)):0;
+  if(meter){meter.style.width=pct+'%';meter.style.background=len>=10?'#12b76a':len>=8?'#f79009':'#d92d20'}
+  setSignupFieldState('signupPassword','signupPasswordHint',v?(len>=8?'valid':'invalid'):'',
+    len>=8?'✓ Palavra-passe válida.':'Use pelo menos 8 caracteres.');
+  return len>=8
+}
+function validateSignupForm(){
+  const a=validateSignupName(),b=validateSignupUsername(),c=validateSignupEmail(),d=validateSignupPassword();
+  return a&&b&&c&&d
+}
+function showLoginPane(){
+  $('signupPane').classList.add('hidden');$('loginPane').classList.remove('hidden');
+  $('authTitle').textContent='Combustível mais inteligente.';
+  $('authLead').textContent='Entre com o seu username e palavra-passe. Também pode usar o email associado à conta.'
+}
+function showSignupPane(){
+  $('loginPane').classList.add('hidden');$('signupPane').classList.remove('hidden');
+  $('authTitle').textContent='Criar conta é simples.';
+  $('authLead').textContent='Quatro dados, sem confirmação por email. No fim entra automaticamente.';
+  const fromLogin=normalizeSignupUsername($('username').value);
+  if(fromLogin && !fromLogin.includes('@')){$('signupUsername').value=fromLogin;signupUsernameTouched=true}
+  setSignupStatus('');setTimeout(()=>$('signupName').focus(),40)
+}
+$('openSignupBtn').onclick=showSignupPane;
+$('guestBtn').onclick=async()=>{
+  isGuestMode=true;
+  await enterApp()
+};
+
+$('backLoginBtn').onclick=showLoginPane;
+$('toggleSignupPassword').onclick=()=>{
+  const p=$('signupPassword');p.type=p.type==='password'?'text':'password';
+  $('toggleSignupPassword').textContent=p.type==='password'?'Mostrar':'Ocultar'
+};
+
+$('signupName').addEventListener('input',()=>{
+  validateSignupName();
+  if(!signupUsernameTouched){
+    const suggestion=suggestedUsernameFromName();
+    if(suggestion){$('signupUsername').value=suggestion;validateSignupUsername()}
+  }
+});
+$('signupUsername').addEventListener('input',()=>{
+  signupUsernameTouched=true;validateSignupUsername();$('signupSuggestionBtn').classList.add('hidden');setSignupStatus('')
+});
+$('signupEmail').addEventListener('input',()=>{validateSignupEmail();setSignupStatus('')});
+$('signupPassword').addEventListener('input',()=>{validateSignupPassword();setSignupStatus('')});
+
+$('signupSuggestionBtn').onclick=()=>{
+  const btn=$('signupSuggestionBtn'),suggestion=btn.dataset.username||'';
+  if(suggestion){
+    $('signupUsername').value=suggestion;signupUsernameTouched=true;validateSignupUsername();
+    btn.classList.add('hidden');setSignupStatus('Username alternativo aplicado. Pode continuar o registo.','info')
+  }
+};
+function offerUsernameSuggestion(base){
+  const clean=normalizeSignupUsername(base)||'condutor',suffix=String(Math.floor(10+Math.random()*90));
+  const candidate=(clean.slice(0,Math.max(3,20-suffix.length))+suffix).slice(0,20);
+  const btn=$('signupSuggestionBtn');btn.dataset.username=candidate;btn.textContent=`Usar ${candidate}`;btn.classList.remove('hidden')
+}
+async function loginWithNewAccount(username,password){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/functions/v1/public-login`,{
+      method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+      body:JSON.stringify({login:username,password})
+    });
+    let p={};try{p=await r.json()}catch{}
+    if(!r.ok||!p?.access_token||!p?.refresh_token)return false;
+    const {data,error}=await supabase.auth.setSession({access_token:p.access_token,refresh_token:p.refresh_token});
+    if(error||!data?.session)return false;
+    localStorage.setItem('bombaCerta:newUser','1');await safeEnsureFuelProfile();await enterApp();
+    showAccountCreatedToast();setTimeout(()=>showWelcomeMission(),350);return true
+  }catch{return false}
+}
+function showAccountCreatedToast(){
+  document.getElementById('accountCreatedToast')?.remove();
+  const el=document.createElement('div');el.id='accountCreatedToast';el.className='account-created-toast';
+  el.innerHTML='🎉 Conta criada com sucesso<small>Bem-vindo à MyGGas.</small>';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3800)
+}
+$('signupBtn').onclick=async()=>{
+  const name=$('signupName').value.trim(),username=normalizeSignupUsername($('signupUsername').value);
+  $('signupUsername').value=username;
+  const email=$('signupEmail').value.trim().toLowerCase(),password=$('signupPassword').value,website=$('signupWebsite').value;
+  if(website)return;
+  if(!validateSignupForm()){
+    setSignupStatus('Revise os campos assinalados acima.','error');
+    document.querySelector('#signupPane .signup-field.invalid .input')?.focus();return
+  }
+
+  const btn=$('signupBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='A criar conta…';
+  setSignupStatus('⏳ A criar a conta. Não feche esta janela…','info');
+
+  try{
+    let response;
+    try{
+      response=await fetch(`${SUPABASE_URL}/functions/v1/public-register`,{
+        method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+        body:JSON.stringify({name,username,email,password,website})
+      })
+    }catch{
+      if(await loginWithNewAccount(username,password))return;
+      throw new Error('A ligação foi interrompida. Verifique a internet e tente novamente.')
+    }
+
+    let payload={};try{payload=await response.json()}catch{}
+    if(!response.ok||payload?.error){
+      const code=String(payload?.error||'').toLowerCase();
+      if(code.includes('username_exists')){
+        if(await loginWithNewAccount(username,password))return;
+        offerUsernameSuggestion(username);
+        setSignupFieldState('signupUsername','signupUsernameHint','invalid','Este username já está ocupado. Escolha outro ou use a sugestão.');
+        $('signupUsername').focus();
+        throw new Error('Esse username já existe. Pode usar a sugestão apresentada abaixo.')
+      }
+      if(code.includes('email_exists')){
+        setSignupFieldState('signupEmail','signupEmailHint','invalid','Este email já está associado a outra conta.');
+        $('signupEmail').focus();
+        throw new Error('Este email já pertence a uma conta. Se for a sua, volte atrás e use “Recuperar acesso”.')
+      }
+      if(code.includes('invalid_username')){setSignupFieldState('signupUsername','signupUsernameHint','invalid','Username inválido.');throw new Error('Revise o username e tente novamente.')}
+      if(code.includes('too_many_attempts'))throw new Error('Foram feitas várias tentativas seguidas. Aguarde alguns minutos antes de tentar novamente.')
+      if(code.includes('weak_password')){setSignupFieldState('signupPassword','signupPasswordHint','invalid','Use pelo menos 8 caracteres.');throw new Error('Escolha uma palavra-passe com pelo menos 8 caracteres.')}
+      if(code.includes('invalid_email')){setSignupFieldState('signupEmail','signupEmailHint','invalid','Verifique o email.');throw new Error('Introduza um email de recuperação válido.')}
+      if(code.includes('invalid_name')){setSignupFieldState('signupName','signupNameHint','invalid','Escreva pelo menos 2 caracteres.');throw new Error('Escolha um nome público com pelo menos 2 caracteres.')}
+      throw new Error(payload?.error==='registration_failed'?'Não foi possível concluir o registo. Tente novamente.':(payload?.error||`Não foi possível criar a conta (${response.status}).`))
+    }
+
+    setSignupStatus('<b>✅ Conta criada.</b> A entrar automaticamente…','success');
+    if(await loginWithNewAccount(username,password))return;
+
+    $('username').value=username;$('password').value='';showLoginPane();
+    $('authStatus').innerHTML='<b>✓ Conta criada com sucesso.</b> Introduza a palavra-passe escolhida para entrar.'
+  }catch(e){
+    setSignupStatus(errPT(e),'error')
+  }finally{
+    btn.disabled=false;btn.textContent=old
+  }
+};
+
+$('logoutBtn').onclick=async()=>{
+  if(isGuestMode){isGuestMode=false;document.body.classList.remove('guest-mode');location.reload();return}
+  await supabase.auth.signOut();location.reload()
+};
+
+$('profileLogoutBtn')?.addEventListener('click',async()=>{
+  if(isGuestMode){
+    isGuestMode=false;
+    document.body.classList.remove('guest-mode');
+    location.reload();
+    return
+  }
+  $('profileStatus').textContent='A terminar sessão…';
+  await supabase.auth.signOut();
+  location.reload()
+});
+
+$('deleteProfileBtn')?.addEventListener('click',()=>{
+  if(isGuestMode){
+    promptGuestSignup();
+    return
+  }
+  if(isAdminUser){
+    alert('A conta de administração/proprietário está protegida contra autoeliminação.');
+    return
+  }
+  $('deleteProfileConfirmText').value='';
+  $('deleteProfileStatus').textContent='';
+  $('confirmDeleteProfileBtn').disabled=true;
+  $('deleteProfileModal').classList.add('open');
+  setTimeout(()=>$('deleteProfileConfirmText')?.focus(),100)
+});
+
+$('deleteProfileConfirmText')?.addEventListener('input',()=>{
+  $('confirmDeleteProfileBtn').disabled=$('deleteProfileConfirmText').value.trim()!=='APAGAR'
+});
+
+$('confirmDeleteProfileBtn')?.addEventListener('click',async()=>{
+  if($('deleteProfileConfirmText').value.trim()!=='APAGAR')return;
+  const btn=$('confirmDeleteProfileBtn');
+  btn.disabled=true;
+  const old=btn.textContent;
+  btn.textContent='A apagar…';
+  $('deleteProfileStatus').textContent='A eliminar a conta e os dados associados…';
+
+  try{
+    const {data,error}=await supabase.functions.invoke('delete-my-account',{body:{confirm:'APAGAR'}});
+    if(error){
+      const msg=String(error?.context?.body?.error||error?.message||'');
+      if(msg.includes('admin_account_protected')){
+        throw new Error('A conta de administração/proprietário está protegida.')
+      }
+      throw error
+    }
+    if(!data?.ok)throw new Error('Não foi possível concluir a eliminação da conta.');
+
+    try{await supabase.auth.signOut()}catch{}
+    localStorage.clear();
+    sessionStorage.clear();
+    alert('Perfil eliminado com sucesso.');
+    location.reload()
+  }catch(e){
+    $('deleteProfileStatus').textContent='Não foi possível apagar o perfil: '+errPT(e);
+    btn.disabled=false;
+    btn.textContent=old
+  }
+});
+
+
+
+
+function stationCacheKey(){
+  return `bombaCerta:fast:${$('fuelType')?.value||''}:${$('fuelRadius')?.value||''}`
+}
+function saveFastStationCache(){
+  try{
+    localStorage.setItem(stationCacheKey(),JSON.stringify({
+      lat:currentLat,lon:currentLon,ts:Date.now(),
+      stations:nearbyStations.slice(0,80).map(s=>({
+        key:s.key,dgegId:s.dgegId||null,name:s.name,brand:s.brand||'',address:s.address||'',
+        lat:s.lat,lon:s.lon,officialPrice:s.officialPrice??null,officialUpdated:s.officialUpdated||'',
+        source:s.source||'',displayPrice:s.displayPrice??null,priceSource:s.priceSource||null,lastUpdated:s.lastUpdated||null,
+        multiFuelPrices:s.multiFuelPrices||{}
+      }))
+    }))
+  }catch{}
+}
+function getFastStationCache(lat,lon){
+  try{
+    const c=JSON.parse(localStorage.getItem(stationCacheKey())||'null');
+    if(!c||!Array.isArray(c.stations)||!c.stations.length)return null;
+    if(Date.now()-Number(c.ts||0)>2*60*60*1000)return null;
+    if(haversine(lat,lon,Number(c.lat),Number(c.lon))>5)return null;
+    return c
+  }catch{return null}
+}
+
+function saveLastLocation(lat,lon){
+  try{localStorage.setItem('bombaCerta:lastLocation',JSON.stringify({lat,lon,ts:Date.now()}))}catch{}
+}
+function getLastLocation(){
+  try{
+    const v=JSON.parse(localStorage.getItem('bombaCerta:lastLocation')||'null');
+    if(v && Number.isFinite(v.lat) && Number.isFinite(v.lon) && Date.now()-v.ts<24*60*60*1000)return v
+  }catch{}
+  return null
+}
+
+let initialSearchStarted=false;
+async function autoSearchOnOpen(){
+  if(initialSearchStarted)return;
+  initialSearchStarted=true;
+
+  ensureMap();
+
+  const cached=getLastLocation();
+  if(cached){
+    currentLat=cached.lat;currentLon=cached.lon;
+    if(map){
+      map.setView([currentLat,currentLon],13,{animate:false});
+      makeUserLocationMarker(currentLat,currentLon,'Última localização conhecida')
+    }
+    renderFastCache(currentLat,currentLon);
+    $('fuelStatus').textContent='A atualizar automaticamente…';
+    searchStations().catch(()=>{})
+  }
+
+  if(!navigator.geolocation){
+    if(!cached)$('fuelStatus').textContent='Ative a localização para procurar postos próximos.';
+    return
+  }
+
+  navigator.geolocation.getCurrentPosition(async p=>{
+    currentLat=p.coords.latitude;currentLon=p.coords.longitude;
+    saveLastLocation(currentLat,currentLon);
+    await searchStations()
+  },()=>{
+    if(!cached){
+      $('fuelStatus').textContent='Toque em “Procurar perto de mim” e autorize a localização.';
+      $('stationList').innerHTML='<div class="empty">Preciso da sua localização para mostrar os postos mais próximos.</div>'
+    }
+  },{enableHighAccuracy:false,timeout:5000,maximumAge:600000})
+}
+
+async function useFastLocation(){
+  const cached=getLastLocation();
+  if(cached){
+    currentLat=cached.lat;currentLon=cached.lon;
+    $('fastLocationInfo')?.classList.remove('hidden');
+    $('fuelStatus').textContent='A mostrar já os postos da última localização conhecida…';
+    searchStations().catch(()=>{});
+  }
+  if(!navigator.geolocation){
+    $('fuelStatus').textContent='Este dispositivo não permite localização.';
+    return
+  }
+  navigator.geolocation.getCurrentPosition(async p=>{
+    currentLat=p.coords.latitude;currentLon=p.coords.longitude;saveLastLocation(currentLat,currentLon);
+    $('fastLocationInfo')?.classList.add('hidden');
+    await searchStations()
+  },()=>{
+    $('fastLocationInfo')?.classList.add('hidden');
+    if(!cached)$('fuelStatus').textContent='Não foi possível obter a localização. Autorize-a no navegador.'
+  },{enableHighAccuracy:false,timeout:4500,maximumAge:300000});
+
+  if(navigator.geolocation.watchPosition){
+    const watch=navigator.geolocation.watchPosition(async p=>{
+      currentLat=p.coords.latitude;currentLon=p.coords.longitude;saveLastLocation(currentLat,currentLon);
+      navigator.geolocation.clearWatch(watch)
+    },()=>{}, {enableHighAccuracy:true,timeout:12000,maximumAge:0})
+  }
+}
+
+
+let fuelMapResizeObserver=null;
+function bindFuelMapResize(){
+  const el=document.getElementById('fuelMap');
+  if(!el || typeof ResizeObserver==='undefined')return;
+  if(fuelMapResizeObserver)fuelMapResizeObserver.disconnect();
+  fuelMapResizeObserver=new ResizeObserver(()=>{
+    if(map)requestAnimationFrame(()=>map.invalidateSize({pan:false}))
+  });
+  fuelMapResizeObserver.observe(el)
+}
+
+
+function makeUserLocationMarker(lat,lon,label='A sua localização'){
+  ensureMap();
+
+  if(userMarker){
+    try{map.removeLayer(userMarker)}catch{}
+    userMarker=null
+  }
+
+  const icon=L.divIcon({
+    className:'user-location-marker-shell',
+    html:`<div class="user-location-pulse"></div>
+          <div class="user-location-dot">
+            <span class="user-location-arrow">▲</span>
+          </div>`,
+    iconSize:[38,38],
+    iconAnchor:[19,19],
+    popupAnchor:[0,-18]
+  });
+
+  const marker=L.marker([lat,lon],{
+    icon,
+    zIndexOffset:1200,
+    keyboard:true,
+    riseOnHover:true,
+    title:label
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="user-location-popup">
+      <b>📍 ${esc(label)}</b>
+      <span>Posição usada para calcular distâncias e postos próximos.</span>
+    </div>
+  `,{closeButton:true,autoPan:true});
+
+  marker.on('click',()=>marker.openPopup());
+  marker.on('touchstart',()=>requestAnimationFrame(()=>marker.openPopup()));
+
+  userMarker=marker;
+  return marker
+}
+
+function ensureMap(){
+  if(map)return;
+  const isTouch=window.matchMedia?.('(pointer:coarse)')?.matches || ('ontouchstart' in window);
+  map=L.map('fuelMap',{
+    zoomControl:true,
+    dragging:true,
+    touchZoom:true,
+    scrollWheelZoom:!isTouch,
+    doubleClickZoom:!isTouch,
+    boxZoom:!isTouch,
+    keyboard:!isTouch,
+    tapHold:false,
+    zoomSnap:1
+  }).setView([39.5,-8],6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19,
+    attribution:'© OpenStreetMap',
+    updateWhenIdle:true,
+    keepBuffer:2
+  }).addTo(map);
+
+  const el=map.getContainer();
+  el.setAttribute('role','application');
+  el.setAttribute('aria-label','Mapa interativo de postos de combustível');
+
+  // Em ecrãs tácteis o mapa recebe o gesto logo no primeiro toque.
+  if(isTouch){
+    el.style.touchAction='none';
+    el.addEventListener('pointerdown',()=>{
+      if(document.activeElement!==el){
+        try{el.focus({preventScroll:true})}catch{el.focus()}
+      }
+    },{passive:true});
+  }
+
+  bindFuelMapResize();
+}
+
+function formatMarkerPrice(price){
+  if(price==null || !Number.isFinite(Number(price)))return '';
+  return Number(price).toFixed(3).replace('.',',')
+}
+function stationResolvedPrice(station){
+  const n=Number(station?.displayPrice ?? station?.officialPrice);
+  return Number.isFinite(n) && n>0 ? n : null
+}
+function computeFuelMarkerTiers(stations){
+  const tiers={};
+  const priced=stations
+    .map(s=>({key:s.key,price:stationResolvedPrice(s)}))
+    .filter(x=>x.key && x.price!=null)
+    .sort((a,b)=>a.price-b.price);
+
+  if(!priced.length)return tiers;
+  if(priced.length===1){
+    tiers[priced[0].key]='cheap';
+    return tiers
+  }
+  if(priced.length===2){
+    tiers[priced[0].key]='cheap';
+    tiers[priced[1].key]='expensive';
+    return tiers
+  }
+
+  const cheapCut=Math.ceil(priced.length/3);
+  const midCut=Math.ceil((priced.length*2)/3);
+
+  priced.forEach((item,index)=>{
+    if(index<cheapCut)tiers[item.key]='cheap';
+    else if(index<midCut)tiers[item.key]='mid';
+    else tiers[item.key]='expensive'
+  });
+
+  return tiers
+}
+function fuelMarkerIcon(tier='none',price=null){
+  const tone=tier||'none';
+  const badge=formatMarkerPrice(price);
+  return L.divIcon({
+    className:'fuel-marker-shell',
+    html:`${badge?`<div class="fuel-marker-price">${badge} €</div>`:''}
+          <div class="fuel-marker-pin tier-${tone}"></div>`,
+    iconSize:[30,42],
+    iconAnchor:[15,38],
+    popupAnchor:[0,-34]
+  })
+}
+function makeFuelMarker(lat,lon,popupHtml,opts={}){
+  const m=L.marker([lat,lon],{
+    icon:fuelMarkerIcon(opts.tier,opts.price),
+    keyboard:true,
+    riseOnHover:true
+  }).addTo(map).bindPopup(popupHtml,{maxWidth:340,minWidth:250});
+
+  // Leaflet já abre no click. Estes eventos eliminam a sensação de "primeiro toque para ativar".
+  m.on('click',()=>m.openPopup());
+  m.on('touchstart',()=>{
+    requestAnimationFrame(()=>m.openPopup())
+  });
+
+  return m
+}
+function haversine(a,b,c,d){
+  const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
+  const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
+  return 2*R*Math.asin(Math.sqrt(q))
+}
+async function dgeg(path){
+  const r=await fetch(DGEG_BASE+path);
+  if(!r.ok)throw new Error('A DGEG não respondeu.');
+  const j=await r.json();
+  if(j?.status===false)throw new Error(j.mensagem||'Erro DGEG');
+  return j?.resultado??j
+}
+function parsePrice(v){
+  if(v==null)return null;
+  const m=String(v).replace(/\s/g,'').match(/(\d+),(\d+)/);
+  const n=m?Number(`${m[1]}.${m[2]}`):Number(String(v).replace(',','.').replace(/[^\d.]/g,''));
+  return Number.isFinite(n)&&n>.5&&n<5?n:null
+}
+async function reverseMunicipality(lat,lon){
+  const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1&accept-language=pt`);
+  const j=await r.json(),a=j.address||{};
+  return (a.municipality||a.city||a.town||a.village||a.county||'').trim()
+}
+
+async function officialPriceCache(lat,lon,radius){
+  const km=Number(radius)/1000;
+  const dy=km/111;
+  const dx=km/(111*Math.max(.2,Math.cos(lat*Math.PI/180)));
+  const fuelType=$('fuelType').value;
+
+  const {data,error}=await supabase
+    .from('fuel_official_prices')
+    .select('dgeg_id,station_key,station_name,brand,address,latitude,longitude,price,source_updated_text,fetched_at')
+    .eq('fuel_type',fuelType)
+    .gte('latitude',lat-dy).lte('latitude',lat+dy)
+    .gte('longitude',lon-dx).lte('longitude',lon+dx)
+    .order('fetched_at',{ascending:false})
+    .limit(250);
+
+  if(error)return [];
+
+  return (data||[]).map(p=>({
+    key:p.station_key||`dgeg:${p.dgeg_id}`,
+    dgegId:Number(p.dgeg_id),
+    name:p.station_name||'Posto',
+    brand:p.brand||'',
+    address:p.address||'',
+    lat:Number(p.latitude),
+    lon:Number(p.longitude),
+    officialPrice:Number(p.price),
+    officialUpdated:p.source_updated_text||p.fetched_at||'',
+    source:'DGEG',
+    distance:haversine(lat,lon,Number(p.latitude),Number(p.longitude)),
+    fromOfficialCache:true
+  })).filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)&&s.distance<=km)
+}
+
 
 const DGEG_ALL_FUEL_IDS={
   'Gasóleo simples':2101,
@@ -6318,8 +7689,7 @@ $('locateBtn').onclick=()=>{
   useFastLocation()
 };
 $('refreshBtn').onclick=searchStations;
-$('fuelType').onchange=()=>{loadNationalMarket();if(currentLat!=null)searchStations()};
-loadNationalMarket();
+$('fuelType').onchange=()=>currentLat!=null&&searchStations();
 $('fuelRadius').onchange=()=>currentLat!=null&&searchStations();
 
 
@@ -7021,6 +8391,28 @@ function subscribeRealtime(){
 }
 
 authCheck();
+
+/* ===== MyGGas v12.1 · Corporate navigation ===== */
+$('brandHomeBtn')?.addEventListener('click',()=>{
+  document.querySelector('.bottom-nav .nav[data-section="postos"]')?.click()
+});
+document.querySelectorAll('.corporate-top-link').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelector(`.bottom-nav .nav[data-section="${btn.dataset.proxySection}"]`)?.click()
+  })
+});
+$('promoTripBtn')?.addEventListener('click',()=>{
+  document.querySelector('.bottom-nav .nav[data-section="viagem"]')?.click()
+});
+$('marketMiniToggle')?.addEventListener('click',()=>{
+  const details=$('marketMiniDetails');
+  const open=!details.classList.toggle('hidden');
+  $('nationalMarketCard').classList.toggle('open',open);
+  $('marketMiniToggle').setAttribute('aria-expanded',String(open))
+});
+$('fuelType')?.addEventListener('change',()=>loadNationalMarket().catch(()=>{}));
+loadNationalMarket().catch(()=>{});
+
 </script>
 </body>
 </html>

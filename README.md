@@ -1,18 +1,26 @@
-# MyGGas
+# MyGGas v12.1 — Corporate Stable
 
-Versão corporate da aplicação MyGGas.
+Versão reconstruída sobre a última base com autenticação funcional.
+
+## Correção principal
+A versão anterior tinha perdido o bloco JavaScript responsável por:
+- `authCheck()`
+- botão **Entrar**
+- login por username/email através de `public-login`
+- criação de conta
+- modo visitante
+- recuperação de acesso
+
+Esta versão volta a incluir integralmente esse fluxo.
 
 ## Estrutura
+- `index.html`
+- `assets/myggas-logo.png`
+- `assets/myggas-hero.jpg`
 
-- `index.html` — aplicação principal
-- `assets/myggas-logo.png` — logótipo
-- `assets/myggas-hero.jpg` — imagem do hero
+## Mantido
+Mapa, postos, preços, social, perfil, apagar perfil, abastecimentos, viagem inteligente,
+análise, navegação fixa, “Como chegar” e restantes funcionalidades da base estável.
 
-## Publicação
-
-Este pacote está preparado para ser colocado diretamente na raiz de um repositório GitHub
-e publicado num alojamento estático ou através do fluxo de deploy já configurado.
-
-## Versão
-
-MyGGas v12 Corporate
+## MyGGas Market
+O painel nacional é compacto e consulta a função `dgeg-national-average`.
