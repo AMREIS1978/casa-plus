@@ -3369,6 +3369,918 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .premium-field{padding:8px 10px!important}
 }
 
+
+/* ==========================================================================
+   MyGGas — MOBILE FIRST FINAL PATCH
+   Este bloco vem por último para neutralizar conflitos entre versões antigas.
+   ========================================================================== */
+
+@media (max-width: 900px){
+
+  /* --- viewport / estrutura geral --- */
+  html, body{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    overflow-x:hidden!important;
+    -webkit-text-size-adjust:100%!important;
+    text-size-adjust:100%!important;
+  }
+  body{
+    padding-bottom:108px!important;
+    background:#f5f8fc!important;
+  }
+  #appShell, main, .app, .section, .section.active,
+  .premium-home, .premium-layout, .social-layout,
+  .premium-stations-panel, .premium-map-card,
+  .social-feed-panel, .social-map-rail,
+  .card, .station, .trip-section,
+  .trip-form-card, .trip-summary-card,
+  .trip-map-card, .trip-stops-card,
+  .trip-alternatives-card, .rank-grid, .grid2{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+  .app{
+    margin:0!important;
+    padding:6px 8px 162px!important;
+  }
+  .section,.section.active{
+    margin:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  /* --- cabeçalho compacto e estável --- */
+  header{
+    position:sticky!important;
+    top:0!important;
+    z-index:1600!important;
+    width:100%!important;
+    padding:5px 6px 0!important;
+    border:0!important;
+    background:rgba(245,248,252,.96)!important;
+    backdrop-filter:blur(14px)!important;
+  }
+  .header-in{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:54px!important;
+    padding:5px 8px!important;
+    margin:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    border:1px solid #e0e8f2!important;
+    border-radius:16px!important;
+    background:rgba(255,255,255,.985)!important;
+    box-shadow:0 6px 20px rgba(20,41,74,.055)!important;
+  }
+  .header-in>.brand{
+    display:flex!important;
+    flex:1 1 auto!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:150px!important;
+    height:40px!important;
+    overflow:hidden!important;
+  }
+  .header-in>.brand img{
+    display:block!important;
+    width:auto!important;
+    height:36px!important;
+    max-width:145px!important;
+    object-fit:contain!important;
+    object-position:left center!important;
+  }
+  .header-actions{
+    display:flex!important;
+    flex:0 0 auto!important;
+    align-items:center!important;
+    gap:4px!important;
+    min-width:0!important;
+    max-width:150px!important;
+    margin:0!important;
+  }
+  #adminTopBtn,#logoutBtn{
+    display:none!important;
+  }
+  .top-profile-btn{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:6px!important;
+    width:auto!important;
+    min-width:38px!important;
+    max-width:138px!important;
+    height:40px!important;
+    padding:3px 6px 3px 3px!important;
+    border:1px solid #e0e7f0!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  .top-profile-avatar{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    border-radius:50%!important;
+    object-fit:cover!important;
+  }
+  .top-profile-copy{
+    display:grid!important;
+    min-width:0!important;
+    max-width:82px!important;
+    gap:1px!important;
+    text-align:left!important;
+  }
+  .top-profile-copy strong{
+    font-size:8px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .top-profile-copy .top-profile-level{
+    display:block!important;
+    max-width:82px!important;
+    font-size:6.7px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  /* --- hero mobile --- */
+  .premium-home{
+    padding-top:7px!important;
+  }
+  .premium-hero{
+    position:relative!important;
+    min-height:205px!important;
+    height:auto!important;
+    margin:0!important;
+    padding:19px 14px 78px!important;
+    overflow:hidden!important;
+    border-radius:17px!important;
+    border:1px solid #dfe8f3!important;
+    background-position:72% center!important;
+    background-size:cover!important;
+    box-shadow:0 7px 22px rgba(20,41,74,.05)!important;
+  }
+  .premium-hero::before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    inset:0!important;
+    z-index:1!important;
+    pointer-events:none!important;
+    background:linear-gradient(90deg,
+      rgba(239,247,255,.985) 0%,
+      rgba(239,247,255,.96) 55%,
+      rgba(239,247,255,.68) 68%,
+      rgba(239,247,255,.10) 100%)!important;
+  }
+  .premium-hero::after{
+    display:none!important;
+  }
+  .premium-hero>*{
+    position:relative!important;
+    z-index:2!important;
+  }
+  .premium-hero .eyebrow{
+    max-width:77%!important;
+    margin:0!important;
+    font-size:6.6px!important;
+    line-height:1.25!important;
+    letter-spacing:.14em!important;
+    white-space:normal!important;
+    color:#60789b!important;
+  }
+  .premium-hero h1{
+    max-width:72%!important;
+    margin:8px 0 5px!important;
+    font-size:24px!important;
+    line-height:1.00!important;
+    letter-spacing:-.045em!important;
+  }
+  .premium-hero p{
+    max-width:70%!important;
+    margin:0!important;
+    font-size:8.8px!important;
+    line-height:1.4!important;
+  }
+
+  /* --- pesquisa sobre o hero --- */
+  .premium-search-shell{
+    position:relative!important;
+    z-index:20!important;
+    width:calc(100% - 16px)!important;
+    max-width:none!important;
+    margin:-64px 8px 10px!important;
+    padding:7px!important;
+    border:1px solid #dfe7f0!important;
+    border-radius:14px!important;
+    background:rgba(255,255,255,.98)!important;
+    box-shadow:0 9px 24px rgba(11,45,107,.10)!important;
+    overflow:hidden!important;
+  }
+  .premium-search-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,.74fr)!important;
+    gap:6px!important;
+    align-items:stretch!important;
+  }
+  .premium-field{
+    min-width:0!important;
+    padding:6px 8px!important;
+    gap:2px!important;
+    border:1px solid #e3eaf3!important;
+    border-radius:11px!important;
+    background:#f9fbfe!important;
+  }
+  .premium-field>span{
+    padding:0!important;
+    margin:0!important;
+    font-size:6.8px!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+    text-transform:none!important;
+  }
+  .premium-field .input{
+    width:100%!important;
+    min-width:0!important;
+    min-height:30px!important;
+    height:30px!important;
+    padding:0 18px 0 0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    font-size:9.2px!important;
+    font-weight:850!important;
+    line-height:30px!important;
+    color:#102851!important;
+  }
+  .premium-primary{
+    grid-column:1/-1!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:41px!important;
+    height:41px!important;
+    padding:0 10px!important;
+    border-radius:11px!important;
+    font-size:10px!important;
+    box-shadow:0 7px 18px rgba(20,116,230,.20)!important;
+  }
+  .premium-search-meta{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:4px 8px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:5px 2px 0!important;
+    overflow:hidden!important;
+  }
+  #fuelStatus,.quick-load,#priceCoverage{
+    width:auto!important;
+    max-width:100%!important;
+    min-height:0!important;
+    margin:0!important;
+    font-size:7.3px!important;
+    line-height:1.25!important;
+    white-space:normal!important;
+  }
+  .price-source-legend{
+    width:100%!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:4px 7px!important;
+    margin-top:3px!important;
+    padding-top:4px!important;
+    font-size:6.8px!important;
+    line-height:1.3!important;
+  }
+  .price-source-legend .legend-note{
+    flex:1 1 100%!important;
+    max-width:100%!important;
+  }
+
+  /* --- publicidade sem rebentar largura --- */
+  .managed-ad,.managed-ad-horizontal,.managed-ad-footer,.ad{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+  .managed-ad-horizontal{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px!important;
+    min-height:60px!important;
+    padding:9px 10px!important;
+    border-radius:13px!important;
+  }
+  .managed-ad-copy{
+    min-width:0!important;
+  }
+  .managed-ad-copy strong{
+    font-size:9px!important;
+  }
+  .managed-ad-copy small{
+    font-size:7px!important;
+    line-height:1.3!important;
+  }
+  .managed-ad-button{
+    min-height:30px!important;
+    padding:5px 7px!important;
+    font-size:7px!important;
+  }
+
+  /* --- melhor escolha --- */
+  .smart-choice-card{
+    width:100%!important;
+    max-width:100%!important;
+    margin:9px 0!important;
+    padding:12px!important;
+    border-radius:17px!important;
+    overflow:hidden!important;
+  }
+  .smart-choice-top{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:7px!important;
+  }
+  .smart-choice-card h2{
+    font-size:17px!important;
+    line-height:1.12!important;
+    overflow-wrap:anywhere!important;
+  }
+  .smart-choice-price{
+    text-align:left!important;
+    display:flex!important;
+    align-items:baseline!important;
+    gap:6px!important;
+  }
+  .smart-choice-price strong{
+    font-size:25px!important;
+  }
+  .smart-choice-grid{
+    grid-template-columns:1fr 1fr!important;
+    gap:6px!important;
+    margin-top:10px!important;
+  }
+  .smart-choice-stat{
+    min-width:0!important;
+    padding:8px!important;
+  }
+  .smart-choice-stat.saving{
+    grid-column:1/-1!important;
+  }
+  .smart-choice-stat span{
+    font-size:6.8px!important;
+  }
+  .smart-choice-stat strong{
+    font-size:14px!important;
+  }
+  .smart-choice-settings{
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+  }
+  .smart-choice-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+
+  /* --- layout principal em ordem útil --- */
+  .premium-layout,.social-layout{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:9px!important;
+    margin-top:9px!important;
+  }
+  .social-left-rail{
+    display:none!important;
+  }
+  .social-map-rail,.premium-map-card{
+    order:1!important;
+    position:relative!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .social-feed-panel,.premium-stations-panel{
+    order:2!important;
+  }
+  .premium-map-card,.premium-stations-panel,.social-feed-head{
+    padding:9px!important;
+    border-radius:15px!important;
+  }
+  .premium-panel-head,.social-feed-head{
+    min-width:0!important;
+  }
+  .premium-panel-head h2,.social-feed-head h2{
+    font-size:14px!important;
+  }
+  .premium-panel-head .btn,.social-feed-head .btn{
+    min-height:32px!important;
+    padding:6px 8px!important;
+    font-size:7.5px!important;
+  }
+
+  /* --- mapa --- */
+  #fuelMap{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:245px!important;
+    min-height:245px!important;
+    max-height:245px!important;
+    border-radius:12px!important;
+    overflow:hidden!important;
+    touch-action:pan-x pan-y!important;
+  }
+  .leaflet-container{
+    font-size:9px!important;
+  }
+  .leaflet-popup-content{
+    min-width:0!important;
+    width:215px!important;
+    max-width:72vw!important;
+    margin:9px!important;
+  }
+
+  /* --- cartões de posto --- */
+  .station-list,.social-feed.station-list{
+    width:100%!important;
+    max-width:100%!important;
+    gap:8px!important;
+  }
+  .station,.social-feed .station{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    border-radius:14px!important;
+    overflow:visible!important;
+  }
+  .social-feed .station-main,.station-main{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px!important;
+    width:100%!important;
+    padding:10px 10px 0!important;
+  }
+  .station-top{
+    min-width:0!important;
+  }
+  .station h3{
+    max-width:100%!important;
+    font-size:12px!important;
+    line-height:1.15!important;
+    overflow-wrap:anywhere!important;
+  }
+  .station-meta{
+    font-size:7.8px!important;
+    line-height:1.35!important;
+  }
+  .price{
+    min-width:0!important;
+    max-width:105px!important;
+    font-size:18px!important;
+    text-align:right!important;
+    white-space:nowrap!important;
+  }
+  .price small{
+    font-size:6.7px!important;
+  }
+
+  /* scroll horizontal só nos combustíveis */
+  .fuel-price-grid,.social-feed .fuel-price-grid{
+    display:flex!important;
+    width:auto!important;
+    max-width:calc(100% - 20px)!important;
+    margin:8px 10px 0!important;
+    padding:0 0 6px!important;
+    gap:6px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior-x:contain!important;
+    touch-action:pan-x pan-y!important;
+    scrollbar-width:none!important;
+  }
+  .fuel-price-grid::-webkit-scrollbar{
+    display:none!important;
+  }
+  .fuel-price-chip{
+    flex:0 0 96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    min-height:58px!important;
+    padding:7px 6px!important;
+    border-radius:10px!important;
+  }
+  .fuel-price-chip .fuel-name{
+    min-height:17px!important;
+    font-size:6.7px!important;
+  }
+  .fuel-price-chip strong{
+    font-size:11.5px!important;
+  }
+  .fuel-price-chip .fuel-source{
+    font-size:5.9px!important;
+  }
+  .price-update,.author-line,.validation-line{
+    font-size:7px!important;
+  }
+
+  /* ações dos postos */
+  .utility-actions,.station-actions{
+    width:100%!important;
+    max-width:100%!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:5px!important;
+    padding:7px 9px 9px!important;
+    box-sizing:border-box!important;
+  }
+  .station-actions button,.utility-actions button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:32px!important;
+    padding:6px 5px!important;
+    font-size:7.2px!important;
+    white-space:normal!important;
+  }
+
+  /* social */
+  .facebook-action-row{
+    padding:3px 7px 6px!important;
+  }
+  .facebook-icon-btn{
+    min-width:31px!important;
+    height:31px!important;
+    min-height:31px!important;
+    padding:0 4px!important;
+  }
+  .social-main-icon{
+    font-size:15px!important;
+  }
+  .social-inline-count,.social-stat-button,.social-shares-summary{
+    font-size:7px!important;
+  }
+  .social-comments-panel{
+    padding:8px 9px!important;
+  }
+
+  /* --- viagem --- */
+  .trip-hero{
+    display:block!important;
+    padding:14px!important;
+    margin:5px 0 9px!important;
+    border-radius:16px!important;
+  }
+  .trip-hero h1{
+    font-size:25px!important;
+  }
+  .trip-hero p{
+    font-size:9px!important;
+  }
+  .trip-location-grid,.trip-car-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+  }
+  .trip-route-choice-wrap{
+    grid-column:auto!important;
+  }
+  .trip-route-choice{
+    grid-template-columns:1fr!important;
+  }
+  .trip-form-card,.trip-summary-card,.trip-map-card,
+  .trip-stops-card,.trip-alternatives-card{
+    padding:11px!important;
+    border-radius:15px!important;
+  }
+  .trip-form-foot{
+    display:block!important;
+  }
+  .trip-calc-btn{
+    width:100%!important;
+    margin-top:8px!important;
+  }
+  .trip-summary-main{
+    grid-template-columns:1fr!important;
+  }
+  .trip-saving-big{
+    text-align:left!important;
+  }
+  .trip-kpis,.trip-savings-breakdown,.trip-route-comparison{
+    grid-template-columns:1fr 1fr!important;
+    gap:6px!important;
+  }
+  .trip-results-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+  }
+  #tripMap{
+    width:100%!important;
+    height:255px!important;
+    min-height:255px!important;
+    border-radius:12px!important;
+  }
+  .trip-summary-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+
+  /* --- análise / perfil / admin --- */
+  .grid2,.rank-grid,.community-game,.kpis,
+  .admin-ad-kpis,.admin-daily-views,.unlock-grid{
+    grid-template-columns:1fr 1fr!important;
+    gap:7px!important;
+  }
+  .chart{
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .profile{
+    flex-direction:column!important;
+  }
+  .quick-profile-actions{
+    grid-template-columns:1fr!important;
+  }
+  .profile-account-actions{
+    grid-template-columns:1fr!important;
+  }
+  .admin-ad-table-wrap,.history{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  /* --- modais --- */
+  .modal{
+    padding:6px!important;
+    align-items:flex-end!important;
+  }
+  .modal-card{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:88dvh!important;
+    padding:12px!important;
+    border-radius:18px 18px 0 0!important;
+    overflow:auto!important;
+  }
+
+  /* --- ticker sempre acima da nav --- */
+  .community-activity-footer{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:64px!important;
+    z-index:1450!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 7px!important;
+    border-radius:0!important;
+    grid-template-columns:max-content minmax(0,1fr)!important;
+    column-gap:6px!important;
+  }
+  .community-activity-label,
+  .community-activity-marquee,
+  .community-activity-text,
+  .community-activity-item{
+    height:34px!important;
+    min-height:34px!important;
+  }
+  .community-activity-label{
+    font-size:6.6px!important;
+  }
+  .community-activity-text{
+    font-size:7.8px!important;
+  }
+
+  /* --- navegação inferior: fixa e sem cortar --- */
+  .bottom-nav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    top:auto!important;
+    bottom:0!important;
+    transform:none!important;
+    z-index:1550!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:4px 3px calc(6px + env(safe-area-inset-bottom))!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:1px!important;
+    border:0!important;
+    border-top:1px solid #e1e7ef!important;
+    border-radius:14px 14px 0 0!important;
+    background:rgba(255,255,255,.985)!important;
+    box-shadow:0 -5px 18px rgba(15,23,42,.10)!important;
+    backdrop-filter:blur(15px)!important;
+  }
+  .bottom-nav.admin-enabled{
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  }
+  .nav{
+    width:100%!important;
+    min-width:0!important;
+    min-height:52px!important;
+    padding:4px 1px 5px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    border-radius:10px!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .nav-icon{
+    width:25px!important;
+    height:25px!important;
+    display:grid!important;
+    place-items:center!important;
+    font-size:14px!important;
+    border:0!important;
+    border-radius:9px!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .nav-label{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    padding:0!important;
+    font-size:6.8px!important;
+    line-height:1!important;
+    font-weight:850!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    text-align:center!important;
+  }
+  .nav.active{
+    color:#1268db!important;
+    background:transparent!important;
+  }
+  .nav.active .nav-icon{
+    color:#1268db!important;
+    background:#eaf3ff!important;
+  }
+  .nav.active::after{
+    display:none!important;
+  }
+}
+
+/* smartphones mais pequenos */
+@media (max-width: 430px){
+  .app{
+    padding-left:6px!important;
+    padding-right:6px!important;
+  }
+  .header-in{
+    padding:4px 6px!important;
+  }
+  .header-in>.brand{
+    max-width:124px!important;
+  }
+  .header-in>.brand img{
+    height:31px!important;
+    max-width:122px!important;
+  }
+  .top-profile-btn{
+    max-width:93px!important;
+  }
+  .top-profile-copy{
+    display:none!important;
+  }
+  .premium-hero{
+    min-height:195px!important;
+    padding:17px 11px 75px!important;
+    background-position:76% center!important;
+  }
+  .premium-hero .eyebrow{
+    max-width:79%!important;
+    font-size:6px!important;
+  }
+  .premium-hero h1{
+    max-width:73%!important;
+    font-size:21px!important;
+  }
+  .premium-hero p{
+    max-width:72%!important;
+    font-size:8px!important;
+  }
+  .premium-search-shell{
+    width:calc(100% - 12px)!important;
+    margin:-61px 6px 9px!important;
+    padding:6px!important;
+  }
+  .premium-field .input{
+    font-size:8.6px!important;
+  }
+  .premium-primary{
+    height:38px!important;
+    min-height:38px!important;
+    font-size:9px!important;
+  }
+  #fuelMap{
+    height:220px!important;
+    min-height:220px!important;
+    max-height:220px!important;
+  }
+  .station-main,.social-feed .station-main{
+    padding:9px 9px 0!important;
+  }
+  .fuel-price-grid,.social-feed .fuel-price-grid{
+    max-width:calc(100% - 18px)!important;
+    margin-left:9px!important;
+    margin-right:9px!important;
+  }
+  .fuel-price-chip{
+    flex-basis:90px!important;
+    min-width:90px!important;
+    max-width:90px!important;
+  }
+  .price{
+    font-size:17px!important;
+    max-width:92px!important;
+  }
+  .smart-choice-grid,.trip-kpis,.trip-savings-breakdown,
+  .trip-route-comparison,.kpis,.admin-ad-kpis,
+  .admin-daily-views,.unlock-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .community-activity-footer{
+    bottom:62px!important;
+  }
+  .bottom-nav{
+    padding-left:2px!important;
+    padding-right:2px!important;
+  }
+  .nav{
+    min-height:50px!important;
+  }
+  .nav-icon{
+    width:23px!important;
+    height:23px!important;
+    font-size:13px!important;
+  }
+  .nav-label{
+    font-size:6.3px!important;
+  }
+}
+
+/* ecrãs muito estreitos */
+@media (max-width: 350px){
+  .header-in>.brand{
+    max-width:108px!important;
+  }
+  .header-in>.brand img{
+    height:28px!important;
+    max-width:106px!important;
+  }
+  .premium-hero h1{
+    font-size:19px!important;
+  }
+  .premium-search-row{
+    grid-template-columns:1fr!important;
+  }
+  .smart-choice-grid,.trip-kpis,.trip-savings-breakdown,
+  .trip-route-comparison,.kpis,.admin-ad-kpis,
+  .admin-daily-views,.unlock-grid{
+    grid-template-columns:1fr!important;
+  }
+  .nav-label{
+    font-size:5.9px!important;
+  }
+}
+
 </style>
 </head>
 <body>

@@ -1,15 +1,21 @@
-# MyGGas — top visual ajustado
+# MyGGas — Mobile Perfeito
 
-Versão atualizada com correções visuais do topo, sem alterar a lógica principal da app.
+Versão focada na utilização em telemóvel, mantendo integralmente a lógica da versão funcional.
 
-## Correções aplicadas
-- logomarca MyGGas embebida diretamente no HTML (deixa de falhar quando faltam assets);
-- imagem hero embebida diretamente no HTML;
-- cabeçalho ajustado para coincidir com o exemplo enviado;
-- logótipo com melhor escala em desktop e mobile;
-- hero com imagem, headline e pesquisa melhor alinhadas;
-- preservação das funcionalidades já existentes.
+## Ajustes móveis
+- elimina overflow horizontal;
+- cabeçalho MyGGas compacto;
+- logótipo e perfil sempre dentro do ecrã;
+- hero e pesquisa reajustados;
+- pesquisa em 2 colunas + botão a toda a largura;
+- mapa redimensionado;
+- cartões de postos adaptados;
+- preços com scroll horizontal próprio;
+- botões com grelha 2x;
+- Viagem, Perfil, Análise e Admin responsivos;
+- modais adaptados ao viewport;
+- ticker acima da navegação;
+- navegação inferior fixa e sempre visível;
+- regras específicas para 430 px e 350 px.
 
-## Ficheiros
-- `index.html` — versão pronta a publicar;
-- `README.md` — notas da versão.
+Nenhum fluxo funcional foi removido.
