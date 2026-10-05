@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
-<title>Bomba Certa v10.9 — Como Chegar</title>
+<title>MyGGas v10.9 — Como Chegar</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -248,7 +248,7 @@ header{
   .app{padding-bottom:136px}
 }
 
-/* ===== Bomba Certa v8.0 · Premium UI ===== */
+/* ===== MyGGas v8.0 · Premium UI ===== */
 :root{
   --accent:#2f7df6;
   --accent-2:#5b9cff;
@@ -2986,12 +2986,62 @@ input,select,textarea,button{max-width:100%}
   font-weight:900!important
 }
 
+
+/* ===== MyGGas · rebrand mínimo sobre a versão estável ===== */
+.header-in>.brand{
+  display:flex!important;
+  align-items:center!important;
+  min-width:96px!important;
+  height:46px!important;
+  overflow:visible!important;
+}
+.header-in>.brand img{
+  display:block!important;
+  width:auto!important;
+  height:44px!important;
+  max-width:128px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+.auth-logo{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-height:112px!important;
+  font-size:0!important;
+}
+.auth-logo::after{display:none!important}
+.auth-logo img{
+  display:block!important;
+  width:150px!important;
+  height:150px!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+@media(max-width:900px){
+  .header-in>.brand{
+    display:flex!important;
+    height:42px!important;
+    min-width:76px!important;
+  }
+  .header-in>.brand img{
+    height:40px!important;
+    max-width:104px!important;
+  }
+}
+@media(max-width:560px){
+  .header-in>.brand{height:38px!important;min-width:68px!important}
+  .header-in>.brand img{height:36px!important;max-width:92px!important}
+  .auth-logo{justify-content:center!important;min-height:96px!important}
+  .auth-logo img{width:118px!important;height:118px!important}
+}
+
 </style>
 </head>
 <body>
 
 <div id="authScreen" class="auth">
-  <div class="auth-logo">Bomba Certa</div>
+  <div class="auth-logo"><img src="assets/myggas-logo.png" alt="MyGGas"></div>
   <h1 id="authTitle">Combustível mais inteligente.</h1>
   <p id="authLead">Entre com o seu username e palavra-passe. Se preferir, também pode usar o email associado à conta.</p>
 
@@ -3106,7 +3156,7 @@ input,select,textarea,button{max-width:100%}
 <main class="app">
   <section id="postos" class="section active premium-home">
     <div class="hero premium-hero">
-      <div class="eyebrow">BOMBA CERTA · PREÇOS EM TEMPO REAL</div>
+      <div class="eyebrow">MYGGAS · PREÇOS EM TEMPO REAL</div>
       <h1>Encontre o combustível <span>certo.</span></h1>
       <p>Compare preços, descubra postos perto de si e ajude a comunidade a manter a informação atualizada.</p>
     </div>
@@ -3228,7 +3278,7 @@ input,select,textarea,button{max-width:100%}
           <img id="socialRailAvatar" class="social-rail-avatar" src="" alt="">
           <div class="social-rail-profile-copy">
             <strong id="socialRailName">Condutor</strong>
-            <span id="socialRailLevel">Comunidade Bomba Certa</span>
+            <span id="socialRailLevel">Comunidade MyGGas</span>
           </div>
         </div>
 
@@ -3397,7 +3447,7 @@ input,select,textarea,button{max-width:100%}
     <div class="managed-ad managed-ad-horizontal managed-ad-footer" data-ad-key="estatisticas_bottom" data-ad-section="estatisticas">
       <div class="managed-ad-copy">
         <span class="managed-ad-label">PUBLICIDADE</span>
-        <strong>Parceiro Bomba Certa</strong>
+        <strong>Parceiro MyGGas</strong>
         <small>Publicidade discreta depois da análise, sem interferir com os gráficos.</small>
       </div>
       <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
@@ -3409,7 +3459,7 @@ input,select,textarea,button{max-width:100%}
       <div>
         <div class="eyebrow">EXCLUSIVO · EXPLORADOR+</div>
         <h1>Viagem Inteligente</h1>
-        <p>Diga onde quer ir e qual a autonomia que ainda tem. A Bomba Certa calcula apenas as paragens realmente necessárias e escolhe, entre elas, os postos que fazem mais sentido para poupar.</p>
+        <p>Diga onde quer ir e qual a autonomia que ainda tem. A MyGGas calcula apenas as paragens realmente necessárias e escolhe, entre elas, os postos que fazem mais sentido para poupar.</p>
       </div>
       <span id="tripAccessBadge" class="trip-access-badge">A verificar acesso…</span>
     </div>
@@ -3621,7 +3671,7 @@ input,select,textarea,button{max-width:100%}
       <div class="managed-ad-copy">
         <span class="managed-ad-label">PUBLICIDADE</span>
         <strong>Benefícios para condutores</strong>
-        <small>Espaço reservado a parceiros relevantes para a comunidade Bomba Certa.</small>
+        <small>Espaço reservado a parceiros relevantes para a comunidade MyGGas.</small>
       </div>
       <button class="managed-ad-button" type="button" data-ad-click>Saber mais</button>
     </div>
@@ -3715,7 +3765,7 @@ input,select,textarea,button{max-width:100%}
   <section id="admin" class="section">
     <div class="section-title"><h2>Administração</h2><span class="pill">Acesso reservado</span></div>
     <div class="admin-warning">
-      Esta área permite gerir contas da Bomba Certa. A eliminação de uma conta é permanente. A conta proprietária fica protegida de eliminação acidental enquanto for o único administrador.
+      Esta área permite gerir contas da MyGGas. A eliminação de uma conta é permanente. A conta proprietária fica protegida de eliminação acidental enquanto for o único administrador.
     </div>
     <div class="managed-ad managed-ad-horizontal" data-ad-key="admin_top" data-ad-section="admin">
       <div class="managed-ad-copy">
@@ -4297,7 +4347,7 @@ function showWelcomeMission(){
 
   $('rewardTitle').textContent='Parabéns!';
   $('rewardPoints').textContent='Conta criada com sucesso';
-  $('rewardSub').textContent='Bem-vindo à Bomba Certa.';
+  $('rewardSub').textContent='Bem-vindo à MyGGas.';
   const o=$('rewardOverlay');
   o.classList.add('show');
   confettiBurst();
@@ -4306,8 +4356,8 @@ function showWelcomeMission(){
 }
 $('shareAppBtn').onclick=async()=>{
   const data={
-    title:'Bomba Certa',
-    text:'Ajuda-me a manter os preços de combustível atualizados na Bomba Certa.',
+    title:'MyGGas',
+    text:'Ajuda-me a manter os preços de combustível atualizados na MyGGas.',
     url:window.location.origin
   };
   try{
@@ -4990,7 +5040,7 @@ function tripShareText(plan){
   const stops=[...(plan.stops||[])].sort((a,b)=>a.routeKm-b.routeKm);
   const routeName=plan.routePreference==='eco'?'mais económica':'mais rápida';
   const lines=[
-    '🧭 Bomba Certa — Viagem Inteligente',
+    '🧭 MyGGas — Viagem Inteligente',
     `${plan.origin.label||'Origem'} → ${plan.destination.label||'Destino'}${plan.mode==='roundtrip'?' → regresso':''}`,
     `Rota: ${routeName} · ${tripNum(plan.totalKm,0)} km`,
     stops.length?`${stops.length} ${stops.length===1?'paragem necessária':'paragens necessárias'}:`:'Sem paragens de abastecimento necessárias.'
@@ -5009,7 +5059,7 @@ async function shareTripRoute(){
   try{
     if(navigator.share){
       await navigator.share({
-        title:'Bomba Certa — Viagem Inteligente',
+        title:'MyGGas — Viagem Inteligente',
         text,
         url
       });
@@ -5846,7 +5896,7 @@ async function loginWithNewAccount(username,password){
 function showAccountCreatedToast(){
   document.getElementById('accountCreatedToast')?.remove();
   const el=document.createElement('div');el.id='accountCreatedToast';el.className='account-created-toast';
-  el.innerHTML='🎉 Conta criada com sucesso<small>Bem-vindo à Bomba Certa.</small>';
+  el.innerHTML='🎉 Conta criada com sucesso<small>Bem-vindo à MyGGas.</small>';
   document.body.appendChild(el);setTimeout(()=>el.remove(),3800)
 }
 $('signupBtn').onclick=async()=>{
@@ -7299,7 +7349,7 @@ window.shareStation=async(token)=>{
   let shared=false;
   try{
     if(navigator.share){
-      await navigator.share({title:'Bomba Certa',text,url});
+      await navigator.share({title:'MyGGas',text,url});
       shared=true
     }else{
       await navigator.clipboard.writeText(`${text}\n${url}`);
@@ -7805,7 +7855,7 @@ window.startRoute=async rawKey=>{
   }catch{
     if(box){
       box.innerHTML=`<b>${esc(s.name)}</b>
-        <div class="status">Não foi possível desenhar o percurso dentro da Bomba Certa.</div>
+        <div class="status">Não foi possível desenhar o percurso dentro da MyGGas.</div>
         <div class="actions" style="margin-top:8px">
           <a class="btn route-google-btn" style="text-decoration:none" href="${google}" target="_blank" rel="noopener">▶ Iniciar navegação</a>
         </div>`
