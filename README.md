@@ -1,18 +1,10 @@
-# Bomba Certa v10.6 — Responsive Perfeito
+# Bomba Certa v10.7 — Texto Dinâmico Centrado
 
-## Correção estrutural
-Foi acrescentada uma camada de proteção responsiva para impedir qualquer página, cartão, grelha, mapa, tabela ou painel de ultrapassar a largura real do ecrã.
+Correção visual do texto dinâmico “Comunidade em direto”:
 
-## Mobile
-- todas as páginas passam para uma coluna;
-- nenhum contentor pode ultrapassar 100% do viewport;
-- tabelas largas fazem scroll dentro do próprio componente;
-- combustíveis mantêm scroll horizontal local;
-- mapas ajustam a 100% da largura;
-- KPIs e grelhas reorganizam-se automaticamente;
-- cabeçalho adapta nome + perfil;
-- navegação de páginas permanece fixa e sempre visível em baixo;
-- safe-area de iPhone respeitada.
-
-## Ecrãs muito pequenos
-Abaixo de 330 px, labels e perfil compactam automaticamente para evitar cortes e scroll lateral.
+- alinhamento vertical perfeito;
+- texto centrado dentro da altura da barra;
+- espaçamento constante entre etiqueta e conteúdo;
+- adaptação específica para 560 px e 390 px;
+- animação horizontal sem alterar a posição vertical;
+- mantém a barra fixa acima da navegação inferior.
