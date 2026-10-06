@@ -1,43 +1,17 @@
-# MyGGas
+# MyGGas — Perfil redesenhado
 
-Repositório oficial do website e aplicação web MyGGas.
+Foi reorganizado o painel **Perfil** para deixar de ficar comprimido e difícil de ler.
 
-## Estrutura
+## Alterações principais
+- cartão principal do utilizador passa a ocupar toda a largura;
+- avatar, nome, nível, pontos e progresso reorganizados;
+- Radar e EcoDrive ficam lado a lado em desktop e empilhados em mobile;
+- Driver Score ocupa a largura completa e tem interruptor visível;
+- ações de perfil ficam em grelha 4×1 no desktop e 2×2 no telemóvel;
+- botões Sair / Apagar perfil ficam organizados;
+- Desbloqueios e Ranking ficam abaixo do perfil, equilibrados;
+- espaçamentos e tamanhos revistos para telemóvel;
+- sem overflow horizontal;
+- mantém as funcionalidades existentes.
 
-- `/index.html` — website público
-- `/app/` — aplicação MyGGas
-- `/privacy.html` — Política de Privacidade
-- `/cookies.html` — Cookies e Publicidade
-- `/terms.html` — Termos de Utilização
-- `/delete-account.html` — Eliminação de conta
-- `/ads.txt` — preparado para Google AdSense
-- `/app-ads.txt` — preparado para Google AdMob
-- `/robots.txt`
-- `/sitemap.xml`
-- `/.htaccess` — configuração para Hostinger/Apache
-
-## Publicação no Hostinger
-
-O conteúdo deste repositório deve ser publicado diretamente em `public_html`.
-
-Não ative publicidade real antes de:
-1. obter aprovação do AdSense/AdMob;
-2. configurar a CMP/consentimento;
-3. substituir os placeholders em `ads.txt` e `app-ads.txt`;
-4. inserir os IDs reais de produção.
-
-## Segurança
-
-Nunca coloque no repositório:
-- service role keys;
-- passwords;
-- ficheiros `.env`;
-- chaves privadas;
-- keystores Android;
-- credenciais Hostinger.
-
-A app frontend deve usar apenas chaves públicas/publicáveis.
-
-## Estado
-
-Base pronta para GitHub e posterior deployment para Hostinger.
+Esta versão é a nova base recomendada para o painel Perfil.
