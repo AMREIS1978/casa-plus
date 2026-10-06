@@ -5020,6 +5020,72 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .station-brand-badge img{width:23px!important;height:23px!important}
 }
 
+
+/* ===== MyGGas competitor upgrade: logos + comparison tools ===== */
+.market-tools{
+  margin:10px 0 12px;
+  padding:12px;
+  border:1px solid #e2eaf3;
+  border-radius:17px;
+  background:linear-gradient(180deg,#ffffff,#fbfdff);
+  box-shadow:0 7px 22px rgba(15,38,75,.045)
+}
+.market-tools-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:9px
+}
+.market-tools-head>div{display:grid;gap:2px}
+.market-tools-head span{font-size:6.5px;letter-spacing:.16em;font-weight:950;color:#7790ae}
+.market-tools-head strong{font-size:13px;color:#102755}
+.market-tools-head small{font-size:6.5px;color:#8190a3}
+.market-tools-grid{
+  display:grid;grid-template-columns:1.35fr .8fr .8fr;gap:7px
+}
+.market-tools-grid label{
+  display:grid;gap:4px;padding:7px 9px;border:1px solid #e6edf5;border-radius:11px;background:#f9fbfe
+}
+.market-tools-grid label>span{font-size:6px;font-weight:900;color:#73839a}
+.market-tools-grid input,.market-tools-grid select{
+  width:100%;min-width:0;border:0;outline:0;background:transparent;color:#102851;
+  font-size:9px;font-weight:800
+}
+.market-kpis{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px
+}
+.market-kpis>div{
+  min-width:0;padding:9px;border:1px solid #edf1f5;border-radius:11px;background:#fff
+}
+.market-kpis span{display:block;font-size:5.8px;color:#7a899c;font-weight:850}
+.market-kpis strong{display:block;margin-top:3px;font-size:15px;color:#0f2a5b}
+.market-kpis small{display:block;margin-top:2px;font-size:5.6px;line-height:1.25;color:#8995a5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.station-brand-badge{
+  display:grid!important;place-items:center!important;background:#fff!important;
+  border:1px solid #e3eaf3!important
+}
+.station-brand-badge img{
+  width:100%!important;height:100%!important;max-width:58px!important;max-height:44px!important;
+  object-fit:contain!important;padding:2px!important
+}
+.station-brand-fallback{display:none!important}
+@media(max-width:900px){
+  .market-tools{margin:8px 0 9px;padding:8px;border-radius:14px}
+  .market-tools-head{align-items:flex-start}
+  .market-tools-head strong{font-size:10px}
+  .market-tools-head small{display:none}
+  .market-tools-grid{grid-template-columns:1fr 1fr}
+  .market-tools-grid label:first-child{grid-column:1/-1}
+  .market-tools-grid label{padding:6px 8px}
+  .market-tools-grid input,.market-tools-grid select{font-size:8px}
+  .market-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .market-kpis>div{padding:7px 6px}
+  .market-kpis strong{font-size:11px}
+  .market-kpis small{font-size:5px}
+  .station-brand-badge img{max-width:38px!important;max-height:30px!important}
+}
+@media(max-width:430px){
+  .market-kpis{grid-template-columns:1fr 1fr}
+  .market-kpis>div:last-child{grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>
@@ -5255,6 +5321,41 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
         <div class="smart-choice-note">Estimativa baseada na distância em linha aproximada até ao posto. A rota real pode alterar ligeiramente o resultado.</div>
       </div>
     </section>
+    <section class="market-tools" aria-label="Ferramentas de comparação">
+      <div class="market-tools-head">
+        <div>
+          <span>COMPARAR MELHOR</span>
+          <strong>Encontre rapidamente o posto certo</strong>
+        </div>
+        <small>Filtros locais · sem preços inventados</small>
+      </div>
+      <div class="market-tools-grid">
+        <label>
+          <span>Pesquisar posto ou marca</span>
+          <input id="stationQuickSearch" type="search" placeholder="Ex.: Galp, Repsol, Anta…">
+        </label>
+        <label>
+          <span>Marca</span>
+          <select id="stationBrandFilter">
+            <option value="">Todas as marcas</option>
+          </select>
+        </label>
+        <label>
+          <span>Ordenar por</span>
+          <select id="stationSortMode">
+            <option value="price">Mais barato</option>
+            <option value="distance">Mais perto</option>
+            <option value="freshness">Mais recente</option>
+          </select>
+        </label>
+      </div>
+      <div class="market-kpis">
+        <div><span>Mais barato no raio</span><strong id="localCheapest">—</strong><small id="localCheapestName">A atualizar</small></div>
+        <div><span>Poupança potencial</span><strong id="localSaving">—</strong><small>face ao mais caro encontrado</small></div>
+        <div><span>Postos com preço</span><strong id="localCoverage">—</strong><small id="localCoverageText">dados reais disponíveis</small></div>
+      </div>
+    </section>
+
 
     <div class="premium-layout social-layout">
       <aside class="social-left-rail" aria-label="Atalhos">
@@ -9389,17 +9490,44 @@ document.addEventListener('click',e=>{
 });
 
 
+function brandSvgData(label,bg='#ffffff',fg='#163b6d',accent=''){
+  const safe=String(label||'?').slice(0,16);
+  const sub=accent?`<rect x="5" y="37" width="54" height="4" rx="2" fill="${accent}"/>`:'';
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+    <rect x="1" y="1" width="62" height="46" rx="11" fill="${bg}" stroke="#e3eaf3"/>
+    <text x="32" y="29" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="${safe.length>10?8:safe.length>6?10:12}" font-weight="800" fill="${fg}">${safe.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</text>${sub}
+  </svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
+}
 function stationBrandAsset(station){
   const txt=`${station?.brand||''} ${station?.name||''}`.toLowerCase();
-  if(txt.includes('repsol')) return {name:'Repsol',url:'https://logo.clearbit.com/repsol.com'};
-  if(txt.includes('galp')) return {name:'Galp',url:'https://logo.clearbit.com/galp.com'};
-  if(/\bbp\b/.test(txt) || txt.includes('bp ')) return {name:'BP',url:'https://logo.clearbit.com/bp.com'};
-  if(txt.includes('prio')) return {name:'Prio',url:'https://logo.clearbit.com/prio.pt'};
-  if(txt.includes('intermarch')) return {name:'Intermarché',url:'https://logo.clearbit.com/intermarche.pt'};
-  if(txt.includes('cepsa') || txt.includes('moeve')) return {name:'Moeve',url:'https://logo.clearbit.com/moeveglobal.com'};
-  if(txt.includes('shell')) return {name:'Shell',url:'https://logo.clearbit.com/shell.com'};
-  if(txt.includes('auchan')) return {name:'Auchan',url:'https://logo.clearbit.com/auchan-retail.com'};
-  return {name:String(station?.brand||station?.name||'?'),url:''}
+  const brands=[
+    [/repsol/, 'Repsol','#fff7ef','#e85d24','#e5322c'],
+    [/galp/, 'Galp','#fff8ef','#ed6b21','#ed6b21'],
+    [/(^|\s)bp(\s|$)|british petroleum/, 'bp','#f5fff8','#16864b','#b7d433'],
+    [/prio/, 'PRIO','#fff7f7','#d9282f','#111827'],
+    [/intermarch/, 'Intermarché','#fff8f8','#e1262f','#164b9b'],
+    [/cepsa|moeve/, 'Moeve','#faf5ff','#6d28d9','#8b5cf6'],
+    [/shell/, 'Shell','#fffbea','#d71920','#f6c915'],
+    [/auchan/, 'Auchan','#fff7f7','#df2027','#df2027'],
+    [/petroprix/, 'Petroprix','#fff7f5','#e8492e','#f7941d'],
+    [/plenergy/, 'Plenergy','#f3fbff','#0874c9','#56b947'],
+    [/e\.?leclerc|leclerc/, 'E.Leclerc','#f5f9ff','#1763b4','#1763b4'],
+    [/pingo doce/, 'Pingo Doce','#f6fff7','#1c7a42','#f2cf24'],
+    [/\bq8\b/, 'Q8','#f7f9ff','#173d8f','#e82933'],
+    [/rede energia/, 'Rede Energia','#f3fff9','#13845b','#27ae60'],
+    [/oz energia|\boz\b/, 'OZ','#fff9f0','#e47a1f','#e47a1f'],
+    [/alves bandeira/, 'A. Bandeira','#f4f8ff','#194c94','#e6b31e'],
+    [/bxpress/, 'Bxpress','#f4f9ff','#1565a9','#1aa8e2'],
+    [/ecobrent/, 'Ecobrent','#f3fff9','#1c8d60','#83bd46'],
+    [/freitas/, 'Freitas','#fff7f8','#8e2d45','#8e2d45']
+  ];
+  for(const [rx,name,bg,fg,accent] of brands){
+    if(rx.test(txt)) return {name,url:brandSvgData(name,bg,fg,accent)}
+  }
+  const raw=String(station?.brand||station?.name||'Posto').trim();
+  const short=raw.length>12?raw.slice(0,11)+'…':raw;
+  return {name:raw,url:brandSvgData(short,'#f8fbfe','#355b88','#9bbce0')}
 }
 function stationBrandBadgeHTML(station){
   const a=stationBrandAsset(station);
@@ -9428,7 +9556,7 @@ function renderBasicStations(){
       :s.officialPrice!=null
         ?'<span class="source official">DGEG</span>'
         :'<span class="source none">A atualizar</span>';
-    return `<div class="station">
+    return `<div class="station" data-station-name="${esc(String(s.name||'').toLowerCase())}" data-station-brand="${esc(String(s.brand||s.name||'').toLowerCase())}" data-distance="${Number(s.distance||0)}" data-price="${s.displayPrice??s.officialPrice??''}" data-updated="${esc(String(s.lastUpdated||s.officialUpdated||''))}">
       <div class="station-main">
         <div class="station-identity">
           ${stationBrandBadgeHTML(s)}
@@ -9454,6 +9582,8 @@ function renderBasicStations(){
   populateFillStations();
   updatePriceCoverage();
   renderSmartChoice();
+  bindMarketTools();
+  updateMarketTools();
 
   ensureMap();
   if(map && currentLat!=null){
@@ -9471,6 +9601,70 @@ function renderBasicStations(){
     }
   }
 }
+
+function updateMarketTools(){
+  const brandSel=$('stationBrandFilter');
+  if(!brandSel)return;
+
+  const prev=brandSel.value;
+  const brands=[...new Set((nearbyStations||[]).map(s=>String(s.brand||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'pt'));
+  brandSel.innerHTML='<option value="">Todas as marcas</option>'+brands.map(b=>`<option value="${esc(b.toLowerCase())}">${esc(b)}</option>`).join('');
+  if([...brandSel.options].some(o=>o.value===prev))brandSel.value=prev;
+
+  const valid=(nearbyStations||[]).filter(s=>Number.isFinite(Number(s.displayPrice??s.officialPrice)));
+  if(valid.length){
+    const sorted=[...valid].sort((a,b)=>Number(a.displayPrice??a.officialPrice)-Number(b.displayPrice??b.officialPrice));
+    const low=sorted[0],high=sorted[sorted.length-1];
+    $('localCheapest').textContent=Number(low.displayPrice??low.officialPrice).toFixed(3).replace('.',',')+' €';
+    $('localCheapestName').textContent=low.name||'Posto mais barato';
+    const diff=Math.max(0,Number(high.displayPrice??high.officialPrice)-Number(low.displayPrice??low.officialPrice));
+    $('localSaving').textContent=(diff*50).toFixed(2).replace('.',',')+' €';
+    $('localCoverage').textContent=`${valid.length}/${nearbyStations.length||valid.length}`;
+    $('localCoverageText').textContent='postos com preço confirmado';
+  }else{
+    $('localCheapest').textContent='—';
+    $('localCheapestName').textContent='Sem preço disponível';
+    $('localSaving').textContent='—';
+    $('localCoverage').textContent=`0/${nearbyStations?.length||0}`;
+  }
+  applyMarketTools();
+}
+function applyMarketTools(){
+  const list=$('stationList');
+  if(!list)return;
+  const q=String($('stationQuickSearch')?.value||'').trim().toLowerCase();
+  const brand=String($('stationBrandFilter')?.value||'').toLowerCase();
+  const mode=$('stationSortMode')?.value||'price';
+  const cards=[...list.querySelectorAll('.station')];
+
+  cards.forEach(card=>{
+    const hitQ=!q||card.dataset.stationName.includes(q)||card.dataset.stationBrand.includes(q);
+    const hitB=!brand||card.dataset.stationBrand.includes(brand);
+    card.style.display=(hitQ&&hitB)?'':'none';
+  });
+
+  const visible=cards.filter(c=>c.style.display!=='none');
+  visible.sort((a,b)=>{
+    if(mode==='distance')return Number(a.dataset.distance||Infinity)-Number(b.dataset.distance||Infinity);
+    if(mode==='freshness'){
+      const at=Date.parse(a.dataset.updated||'')||0,bt=Date.parse(b.dataset.updated||'')||0;
+      return bt-at
+    }
+    const ap=Number(a.dataset.price),bp=Number(b.dataset.price);
+    const av=Number.isFinite(ap)&&ap>0,bv=Number.isFinite(bp)&&bp>0;
+    if(av&&bv)return ap-bp;
+    if(av)return -1;if(bv)return 1;
+    return Number(a.dataset.distance||Infinity)-Number(b.dataset.distance||Infinity)
+  });
+  visible.forEach(c=>list.appendChild(c));
+}
+function bindMarketTools(){
+  ['stationQuickSearch','stationBrandFilter','stationSortMode'].forEach(id=>{
+    const el=$(id);if(el&&!el.dataset.bound){el.addEventListener('input',applyMarketTools);el.addEventListener('change',applyMarketTools);el.dataset.bound='1'}
+  })
+}
+
 function renderFastCache(lat,lon){
   const c=getFastStationCache(lat,lon);
   if(!c)return false;
@@ -9511,7 +9705,7 @@ async function renderStations(){
       ? `<div class="validation-line">${c.confirmed?`<span class="validation-ok">✓ ${c.confirmed} confirmação${c.confirmed===1?'':'ões'}</span>`:''}${c.rejected?`<span class="validation-bad">✕ ${c.rejected} rejeição${c.rejected===1?'':'ões'}</span>`:''}${!c.confirmed&&!c.rejected?'<span class="validation-pending">A aguardar validação</span>':''}${c.rejected>c.confirmed?'<span class="validation-bad">Preço contestado</span>':''}</div>`
       : '';
     const canValidate=c&&c.authorUserId!==currentAuthUserId;
-    return `<div class="station">
+    return `<div class="station" data-station-name="${esc(String(s.name||'').toLowerCase())}" data-station-brand="${esc(String(s.brand||s.name||'').toLowerCase())}" data-distance="${Number(s.distance||0)}" data-price="${s.displayPrice??''}" data-updated="${esc(String(s.lastUpdated||''))}">
       <div class="station-main">
         <div class="station-identity">
           ${stationBrandBadgeHTML(s)}
@@ -9548,6 +9742,8 @@ async function renderStations(){
   const bounds=L.latLngBounds([[currentLat,currentLon],...nearbyStations.map(s=>[s.lat,s.lon])]);if(bounds.isValid())map.fitBounds(bounds.pad(.15),{maxZoom:14});
   populateFillStations();updatePriceCoverage();
   renderSmartChoice();
+  bindMarketTools();
+  updateMarketTools();
   refreshSmartRoadDistances().catch(()=>{});
   // Guardar também a resolução final do preço. Assim, um refresh não volta
   // temporariamente ao valor DGEG quando existe um preço comunitário mais recente.

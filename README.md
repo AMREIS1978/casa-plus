@@ -1,24 +1,27 @@
-# MyGGas — Premium Stations
+# MyGGas — Competitor Upgrade
 
-Versão ajustada para reproduzir mais de perto o mockup aprovado.
+Atualização baseada numa análise funcional de Mais Gasolina, PreçoCombustíveis.pt e GasBuddy.
 
-## Desktop
-- lista de postos equilibrada com a coluna do mapa;
-- aproximadamente três cartões visíveis antes do scroll interno;
-- scroll suave e discreto apenas na lista de postos;
-- logótipos de marcas conhecidas com fallback seguro;
-- mapa lateral;
-- bloco “Preço médio nacional”;
-- banner “Viaje mais. Gaste menos.”;
-- aspeto mais compacto e premium.
+## Melhorias implementadas
+- logótipos/marcas deixam de depender de Clearbit ou de serviços externos;
+- marcas embebidas como SVG local/data URI, garantindo que aparecem no browser e na app;
+- pesquisa rápida por posto ou marca;
+- filtro por marca;
+- ordenação por preço, distância ou atualização;
+- indicador do posto mais barato no raio;
+- cálculo de poupança potencial para um depósito de 50 L entre o mais barato e o mais caro encontrados;
+- indicador de cobertura de preços reais;
+- desktop e telemóvel ajustados.
 
-## Mobile
-- sem scroll interno forçado na lista;
-- a página faz scroll naturalmente;
-- logótipos reduzidos;
-- mapa, média nacional e banner ajustados ao viewport;
-- navegação inferior permanece fixa.
+## Mantido
+- preços DGEG e comunidade;
+- mapa;
+- melhor escolha;
+- Como chegar;
+- social;
+- abastecimentos;
+- viagem;
+- análise;
+- perfil e admin.
 
-## Funcionalidade preservada
-Login, pesquisa, mapa, preços, comunidade, Como chegar, abastecimentos,
-Viagem Inteligente, Análise, Perfil e Admin.
+A poupança local é calculada apenas a partir dos preços efetivamente carregados; não são inventados valores.
