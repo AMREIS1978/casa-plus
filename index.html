@@ -5193,6 +5193,395 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .driver-score-head-actions{gap:7px}
 }
 
+
+/* ===== Perfil MyGGas — redesenho 2026-10 ===== */
+#perfil{
+  --profile-gap:14px;
+}
+#perfil .rank-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:14px!important;
+  align-items:start;
+}
+#perfil .rank-grid > .card:first-child{
+  grid-column:1 / -1;
+  padding:18px;
+}
+#perfil .rank-grid > .unlock-panel,
+#perfil .rank-grid > .card:not(:first-child){
+  min-width:0;
+}
+
+/* Cabeçalho do perfil: compacto, legível e horizontal em desktop */
+#perfil .profile-hero{
+  display:grid!important;
+  grid-template-columns:96px minmax(0,1fr) auto;
+  grid-template-areas:
+    "avatar name points"
+    "avatar status points"
+    "avatar progress progress"
+    "avatar next next";
+  align-items:center;
+  column-gap:16px;
+  row-gap:5px;
+  text-align:left!important;
+  padding:14px!important;
+  margin-top:8px;
+  border:1px solid #e7edf4;
+  border-radius:18px;
+  background:linear-gradient(135deg,#fbfdff,#f5f9fe);
+}
+#perfil .avatar-wrap{
+  grid-area:avatar;
+  width:86px!important;
+  height:86px!important;
+  align-self:center;
+}
+#perfil .avatar-wrap .avatar{
+  width:86px!important;
+  height:86px!important;
+}
+#perfil .avatar-edit{
+  width:32px!important;
+  height:32px!important;
+  font-size:14px!important;
+  border-width:2px!important;
+}
+#perfil .profile-name{
+  grid-area:name;
+  margin:0!important;
+  font-size:22px!important;
+  line-height:1.05;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#perfil .profile-status-card{
+  grid-area:status;
+  margin:0!important;
+  justify-self:start;
+  padding:5px 9px!important;
+  font-size:10px!important;
+}
+#perfil .profile-points{
+  grid-area:points;
+  margin:0!important;
+  text-align:right;
+  font-size:30px!important;
+  white-space:nowrap;
+}
+#perfil .profile-hero .progress{
+  grid-area:progress;
+  width:100%!important;
+  max-width:none!important;
+  margin-top:5px!important;
+  height:8px!important;
+}
+#perfil #rankNext{
+  grid-area:next;
+  margin:0!important;
+  min-height:16px;
+  font-size:8px;
+}
+
+/* Ações principais */
+#perfil .quick-profile-actions{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin-top:12px!important;
+}
+#perfil .quick-profile-actions .btn{
+  min-height:42px!important;
+  padding:8px 10px!important;
+  font-size:9px!important;
+  line-height:1.2;
+}
+
+/* Ferramentas: Radar + EcoDrive lado a lado, Driver Score a toda a largura */
+#perfil .profile-tools-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:10px;
+  margin-top:12px;
+  align-items:start;
+}
+#perfil .profile-tools-grid > .radar-card,
+#perfil .profile-tools-grid > .ecodrive-card,
+#perfil .profile-tools-grid > .driver-score-card{
+  margin-top:0!important;
+  min-width:0;
+  height:100%;
+  box-shadow:none;
+}
+#perfil .profile-tools-grid > .driver-score-card{
+  grid-column:1 / -1;
+  height:auto;
+}
+#perfil .radar-card,
+#perfil .ecodrive-card{
+  padding:12px!important;
+  border-radius:15px!important;
+}
+#perfil .radar-title-row b,
+#perfil .ecodrive-title-row b{
+  font-size:11px!important;
+}
+#perfil .radar-title-row small,
+#perfil .ecodrive-title-row small{
+  font-size:7px!important;
+}
+#perfil .radar-settings,
+#perfil .ecodrive-settings{
+  gap:6px!important;
+}
+#perfil .ecodrive-options{
+  gap:6px!important;
+}
+#perfil .eco-option{
+  min-width:0;
+}
+
+/* Driver Score */
+#perfil .driver-score-card{
+  padding:14px!important;
+  border-radius:16px!important;
+}
+#perfil .driver-score-head{
+  align-items:center!important;
+}
+#perfil .driver-score-head-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto;
+}
+#perfil .driver-score-ring{
+  width:62px!important;
+  height:62px!important;
+  flex-basis:62px!important;
+  border-width:6px!important;
+}
+#perfil .driver-subscore-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+#perfil .driver-trip-summary{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#perfil .driver-classification{
+  min-width:0;
+}
+#perfil .driver-ranking-row{
+  align-items:stretch!important;
+}
+#perfil .driver-rank-option{
+  min-width:0;
+}
+
+/* Conta */
+#perfil .profile-account-actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:8px!important;
+  margin-top:12px;
+}
+#perfil .profile-account-btn{
+  min-width:0;
+  min-height:52px;
+}
+
+/* Ranking driver */
+#perfil .driver-ranking-panel{
+  margin-top:12px!important;
+  border-radius:16px!important;
+}
+
+/* Cartões inferiores */
+#perfil .unlock-panel,
+#perfil .rank-grid > .card:not(:first-child){
+  border-radius:16px;
+}
+#perfil > .card{
+  border-radius:16px;
+}
+
+/* Tablet */
+@media(max-width:900px){
+  #perfil .rank-grid{
+    grid-template-columns:1fr!important;
+  }
+  #perfil .rank-grid > .card:first-child{
+    grid-column:auto;
+  }
+  #perfil .profile-tools-grid{
+    grid-template-columns:1fr;
+  }
+  #perfil .profile-tools-grid > .driver-score-card{
+    grid-column:auto;
+  }
+  #perfil .quick-profile-actions{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+/* Telemóvel */
+@media(max-width:560px){
+  #perfil{
+    padding-left:2px!important;
+    padding-right:2px!important;
+  }
+  #perfil .managed-ad{
+    margin-left:0;
+    margin-right:0;
+  }
+  #perfil .rank-grid{
+    gap:9px!important;
+  }
+  #perfil .rank-grid > .card:first-child{
+    padding:10px!important;
+  }
+  #perfil .section-title{
+    margin-bottom:5px;
+  }
+  #perfil .section-title h2{
+    font-size:15px!important;
+  }
+
+  #perfil .profile-hero{
+    grid-template-columns:66px minmax(0,1fr) auto;
+    grid-template-areas:
+      "avatar name points"
+      "avatar status points"
+      "progress progress progress"
+      "next next next";
+    column-gap:10px;
+    row-gap:5px;
+    padding:10px!important;
+    border-radius:14px;
+  }
+  #perfil .avatar-wrap{
+    width:62px!important;
+    height:62px!important;
+  }
+  #perfil .avatar-wrap .avatar{
+    width:62px!important;
+    height:62px!important;
+  }
+  #perfil .avatar-edit{
+    width:26px!important;
+    height:26px!important;
+    font-size:11px!important;
+  }
+  #perfil .profile-name{
+    font-size:16px!important;
+  }
+  #perfil .profile-status-card{
+    font-size:7px!important;
+    padding:4px 7px!important;
+  }
+  #perfil .profile-points{
+    font-size:20px!important;
+  }
+
+  #perfil .quick-profile-actions{
+    grid-template-columns:1fr 1fr!important;
+    gap:6px!important;
+  }
+  #perfil .quick-profile-actions .btn{
+    min-height:40px!important;
+    font-size:8px!important;
+    padding:7px!important;
+  }
+
+  #perfil .profile-tools-grid{
+    gap:8px;
+    margin-top:9px;
+  }
+  #perfil .radar-card,
+  #perfil .ecodrive-card{
+    grid-template-columns:34px minmax(0,1fr)!important;
+    gap:8px!important;
+    padding:9px!important;
+  }
+  #perfil .radar-icon,
+  #perfil .ecodrive-icon{
+    width:34px!important;
+    height:34px!important;
+    border-radius:10px!important;
+    font-size:15px!important;
+  }
+  #perfil .radar-title-row,
+  #perfil .ecodrive-title-row{
+    gap:7px!important;
+  }
+  #perfil .radar-title-row b,
+  #perfil .ecodrive-title-row b{
+    font-size:10px!important;
+  }
+  #perfil .radar-title-row small,
+  #perfil .ecodrive-title-row small{
+    font-size:6.7px!important;
+  }
+  #perfil .radar-settings,
+  #perfil .ecodrive-settings,
+  #perfil .ecodrive-options{
+    grid-template-columns:1fr!important;
+  }
+  #perfil .ecodrive-live{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #perfil .ecodrive-live>div:last-child{
+    grid-column:1 / -1;
+  }
+
+  #perfil .driver-score-card{
+    padding:10px!important;
+  }
+  #perfil .driver-score-head{
+    gap:8px!important;
+  }
+  #perfil .driver-score-head h3{
+    font-size:11px!important;
+  }
+  #perfil .driver-score-head p{
+    font-size:6.5px!important;
+  }
+  #perfil .driver-score-head-actions{
+    gap:6px;
+  }
+  #perfil .driver-score-ring{
+    width:50px!important;
+    height:50px!important;
+    flex-basis:50px!important;
+    border-width:5px!important;
+  }
+  #perfil .driver-score-ring strong{
+    font-size:16px!important;
+  }
+  #perfil .driver-subscore-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #perfil .driver-trip-summary{
+    grid-template-columns:1fr 1fr!important;
+  }
+  #perfil .driver-trip-summary>div:last-child{
+    grid-column:1/-1;
+  }
+  #perfil .driver-ranking-row{
+    flex-direction:column!important;
+  }
+  #perfil .driver-ranking-row .btn{
+    width:100%;
+  }
+  #perfil .driver-scale{
+    padding-bottom:4px;
+  }
+
+  #perfil .profile-account-actions{
+    grid-template-columns:1fr!important;
+  }
+}
+
 </style>
   <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -5908,6 +6297,7 @@ Depois retiramos o combustível estimado gasto nos desvios aos postos. Não comp
 <button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
 </div>
 
+<div class="profile-tools-grid">
 <div class="radar-card">
 <div class="radar-icon">📍</div>
 <div class="radar-copy">
@@ -6013,12 +6403,27 @@ A sinalização rodoviária prevalece sempre sobre a informação cartográfica.
 </div>
 
 <div class="driver-score-card">
-  <div class="driver-score-head"><div><span class="driver-kicker">MYGGAS DRIVER SCORE</span><h3>O seu perfil de condutor</h3><p>Uma classificação divertida baseada nas suas viagens EcoDrive.</p></div><div class="driver-score-ring"><strong id="driverScoreValue">—</strong><small>/100</small></div></div>
+  <div class="driver-score-head">
+  <div>
+    <span class="driver-kicker">MYGGAS DRIVER SCORE</span>
+    <h3>O seu perfil de condutor</h3>
+    <p>Uma classificação divertida baseada nas suas viagens EcoDrive.</p>
+  </div>
+  <div class="driver-score-head-actions">
+    <label class="radar-switch" aria-label="Ativar ou desativar MyGGas Driver Score">
+      <input id="driverScoreToggle" type="checkbox">
+      <span></span>
+    </label>
+    <div class="driver-score-ring"><strong id="driverScoreValue">—</strong><small>/100</small></div>
+  </div>
+</div>
+<div id="driverScoreStateText" class="radar-state">Driver Score desativado</div>
   <div class="driver-classification"><div class="driver-avatar-badge" id="driverClassIcon">🌱</div><div><small>Classificação atual</small><strong id="driverClassName">Ainda sem viagens</strong><span id="driverClassDesc">Ative o Driver Score e o EcoDrive para começar a construir o seu perfil.</span></div></div>
   <div class="driver-subscore-grid"><div><span>Eficiência</span><b id="driverEfficiency">—</b></div><div><span>Segurança</span><b id="driverSafety">—</b></div><div><span>Suavidade</span><b id="driverSmoothness">—</b></div><div><span>Economia</span><b id="driverEconomy">—</b></div></div>
   <div class="driver-trip-summary"><div><small>Viagens avaliadas</small><strong id="driverTrips">0</strong></div><div><small>Distância analisada</small><strong id="driverDistance">0 km</strong></div><div><small>Tendência</small><strong id="driverTrend">A começar</strong></div></div>
   <div class="driver-ranking-row"><label class="eco-option driver-rank-option"><input id="driverRankingToggle" type="checkbox"><span><b>Participar no ranking MyGGas</b><small>Opcional. Só aparece o seu nome público MyGGas e a pontuação.</small></span></label><button id="openDriverRankingBtn" class="btn secondary" type="button">🏆 Ver ranking</button></div>
   <div class="driver-scale"><span>🌿 Mestre da Poupança</span><span>🪽 Pé de Pluma</span><span>🐢 Poupadinho</span><span>⚖️ Equilibrado</span><span>🧱 Pé Pesado</span><span>⛽ Papa-Gasolina</span><span>🔥 Rei da Bomba</span></div>
+</div>
 </div>
 <div id="driverRankingPanel" class="driver-ranking-panel hidden"><div class="driver-ranking-head"><div><span class="driver-kicker">LIGA DOS POUPADINHOS</span><h3>Ranking MyGGas</h3><p>Os condutores que optaram por participar.</p></div><button id="closeDriverRankingBtn" class="btn secondary" type="button">Fechar</button></div><div id="driverRankingList" class="driver-ranking-list"><div class="empty">Ainda não existem participantes suficientes.</div></div></div>
 <div class="profile-account-actions">
@@ -8996,7 +9401,9 @@ function setDriverScoreEnabled(v){
 async function loadDriverScore(){try{const{data:{user}}=await supabase.auth.getUser();if(!user)return;const{data,error}=await supabase.from('driver_score_stats').select('*').eq('user_id',user.id).maybeSingle();if(error)throw error;if(!data)return;const cls=driverClassFor(Number(data.score));$('driverScoreValue').textContent=data.score;$('driverClassIcon').textContent=cls.icon;$('driverClassName').textContent=cls.name;$('driverClassDesc').textContent=cls.desc;$('driverEfficiency').textContent=data.efficiency_score;$('driverSafety').textContent=data.safety_score;$('driverSmoothness').textContent=data.smoothness_score;$('driverEconomy').textContent=data.economy_score;$('driverTrips').textContent=data.trips;$('driverDistance').textContent=Number(data.total_distance_km||0).toFixed(1).replace('.',',')+' km';$('driverRankingToggle').checked=Boolean(data.ranking_opt_in)}catch(e){console.warn(e)}}
 async function setDriverRankingOptIn(v){try{const{data:{user}}=await supabase.auth.getUser();if(!user){alert('Inicie sessão para participar no ranking.');return}const{data:cur}=await supabase.from('driver_score_stats').select('user_id').eq('user_id',user.id).maybeSingle();const q=cur?supabase.from('driver_score_stats').update({ranking_opt_in:v,updated_at:new Date().toISOString()}).eq('user_id',user.id):supabase.from('driver_score_stats').insert({user_id:user.id,ranking_opt_in:v});const{error}=await q;if(error)throw error;await loadDriverRanking()}catch(e){alert(errPT(e))}}
 async function loadDriverRanking(){const list=$('driverRankingList');if(!list)return;list.innerHTML='<div class="empty">A carregar ranking…</div>';try{const{data,error}=await supabase.rpc('driver_score_leaderboard',{p_limit:30});if(error)throw error;if(!data?.length){list.innerHTML='<div class="empty">Ainda não existem participantes no ranking.</div>';return}list.innerHTML=data.map(r=>{const cls=driverClassFor(Number(r.score)),medal=Number(r.rank_position)===1?'🥇':Number(r.rank_position)===2?'🥈':Number(r.rank_position)===3?'🥉':'#'+r.rank_position;return `<div class="driver-rank-row"><div class="driver-rank-pos">${medal}</div><div><b>${esc(r.display_name||'Condutor MyGGas')}</b><small>${cls.icon} ${cls.name} · ${Number(r.trips||0)} viagens</small></div><div class="driver-rank-score">${r.score}</div></div>`}).join('')}catch(e){list.innerHTML=`<div class="empty">${esc(errPT(e))}</div>`}}
-function initDriverScore(){$('driverRankingToggle')?.addEventListener('change',e=>setDriverRankingOptIn(e.target.checked));$('openDriverRankingBtn')?.addEventListener('click',async()=>{$('driverRankingPanel')?.classList.remove('hidden');await loadDriverRanking()});$('closeDriverRankingBtn')?.addEventListener('click',()=>$('driverRankingPanel')?.classList.add('hidden'));loadDriverScore().catch(()=>{})}
+function initDriverScore(){
+  updateDriverScoreUI();
+  $('driverScoreToggle')?.addEventListener('change',e=>setDriverScoreEnabled(e.target.checked));$('driverRankingToggle')?.addEventListener('change',e=>setDriverRankingOptIn(e.target.checked));$('openDriverRankingBtn')?.addEventListener('click',async()=>{$('driverRankingPanel')?.classList.remove('hidden');await loadDriverRanking()});$('closeDriverRankingBtn')?.addEventListener('click',()=>$('driverRankingPanel')?.classList.add('hidden'));loadDriverScore().catch(()=>{})}
 
 function ecoAdvice(speed){
   ecoSpeedHistory.push({t:Date.now(),v:speed});
