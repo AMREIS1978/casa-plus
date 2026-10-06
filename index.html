@@ -5645,6 +5645,144 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .live-route-tools{grid-template-columns:1fr}
 }
 
+
+/* ===== MyGGas Live — entrada visível em todas as vistas ===== */
+.nav-live-btn{
+  border:0!important;
+  background:linear-gradient(135deg,#1769d2,#0b2d6b)!important;
+  color:#fff!important;
+  min-height:36px!important;
+  padding:8px 12px!important;
+  border-radius:999px!important;
+  font-size:9px!important;
+  font-weight:950!important;
+  letter-spacing:.06em!important;
+  box-shadow:0 6px 16px rgba(23,105,210,.20)!important;
+}
+.nav-live-btn:hover{filter:brightness(1.04)}
+
+.bottom-live-btn{
+  border:0!important;
+  background:#edf5ff!important;
+  color:#1769d2!important;
+  min-height:52px!important;
+  border-radius:10px!important;
+  display:grid!important;
+  place-items:center!important;
+  gap:1px!important;
+  font-size:6.5px!important;
+  font-weight:900!important;
+}
+.bottom-live-btn span{font-size:16px!important}
+.bottom-live-btn b{font-size:6.5px!important}
+
+.myggas-live-fab{
+  right:14px!important;
+  bottom:148px!important;
+  min-width:82px!important;
+  height:48px!important;
+  background:linear-gradient(135deg,#1769d2,#0b2d6b)!important;
+  border:2px solid #fff!important;
+  box-shadow:0 12px 28px rgba(16,39,85,.32)!important;
+}
+.myggas-live-fab b{font-size:9px!important}
+.myggas-live-fab::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:999px;
+  border:1px solid rgba(23,105,210,.20);
+  pointer-events:none;
+}
+
+@media(max-width:760px){
+  .nav-live-btn{display:none!important}
+  .myggas-live-fab{
+    right:10px!important;
+    bottom:122px!important;
+    min-width:66px!important;
+    height:42px!important;
+    padding:5px 9px!important;
+  }
+}
+
+
+/* ===== LIVE V2: visibilidade corrigida ===== */
+.bottom-nav{
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+}
+.bottom-nav.admin-enabled{
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+}
+body.guest-mode .bottom-nav{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  max-width:none!important;
+}
+.nav-live-entry{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:#1769d2!important;
+  min-width:0!important;
+}
+.nav-live-entry .nav-icon{
+  background:linear-gradient(180deg,#eef6ff,#dcecff)!important;
+  color:#1769d2!important;
+  border-color:#cbdff7!important;
+}
+.nav-live-entry .nav-label{
+  color:#1769d2!important;
+  font-weight:950!important;
+}
+.live-header-btn{
+  border:0!important;
+  background:linear-gradient(135deg,#1769d2,#0b2d6b)!important;
+  color:#fff!important;
+  border-radius:999px!important;
+  font-size:9px!important;
+  font-weight:950!important;
+  padding:9px 12px!important;
+  box-shadow:0 6px 16px rgba(23,105,210,.20)!important;
+}
+.myggas-live-fab{
+  display:flex!important;
+  z-index:2500!important;
+}
+@media(max-width:720px){
+  .live-header-btn{display:none!important}
+  .bottom-nav{
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  }
+  .bottom-nav.admin-enabled{
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  }
+  .nav-live-entry{
+    display:flex!important;
+  }
+}
+@media(max-width:430px){
+  .bottom-nav{
+    width:calc(100% - 8px)!important;
+    gap:2px!important;
+    padding-left:4px!important;
+    padding-right:4px!important;
+  }
+  .nav{
+    min-width:0!important;
+    padding-left:1px!important;
+    padding-right:1px!important;
+  }
+  .nav-icon{
+    width:27px!important;
+    height:27px!important;
+    font-size:15px!important;
+  }
+  .nav-label{
+    font-size:7px!important;
+  }
+}
+
 </style>
   <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -5731,6 +5869,7 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
 </span>
 </button>
 <button id="adminTopBtn" class="btn secondary hidden">⚙️ Admin</button>
+<button id="myggasLiveHeaderBtn" class="btn live-header-btn" type="button">🚦 MyGGas LIVE</button>
 <button id="logoutBtn" class="btn secondary">Sair</button>
 </div>
 </div>
@@ -5759,6 +5898,11 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
 <button id="adminNav" class="nav hidden" data-section="admin" aria-label="Administração">
 <span class="nav-icon" aria-hidden="true">⚙️</span>
 <span class="nav-label">Admin</span>
+</button>
+
+  <button id="myggasLiveBottomBtn" class="nav nav-live-entry" type="button" aria-label="Abrir MyGGas Live">
+  <span class="nav-icon" aria-hidden="true">🚦</span>
+  <span class="nav-label">LIVE</span>
 </button>
 </nav>
 
@@ -11926,14 +12070,11 @@ function startLiveAutoRefresh(){
   liveRefreshTimer=setInterval(()=>loadLiveReports().catch(()=>{}),60000)
 }
 function initMyGGasLive(){
+  document.getElementById('myggasLiveTopBtn')?.addEventListener('click',openMyGGasLive);
+  document.getElementById('myggasLiveBottomBtn')?.addEventListener('click',openMyGGasLive);
+  document.getElementById('myggasLiveHeaderBtn')?.addEventListener('click',openMyGGasLive);
   const btn=document.getElementById('myggasLiveBtn'),modal=document.getElementById('myggasLiveModal');
-  btn?.addEventListener('click',async()=>{
-    modal?.classList.add('open');populateLiveDestinations();setLiveMode(liveMode);
-    document.getElementById('liveVoiceToggle').checked=liveVoiceEnabled();
-    document.getElementById('liveAutoRefreshToggle').checked=localStorage.getItem(LIVE_AUTO_KEY)==='1';
-    try{await loadLiveReports()}catch(e){document.getElementById('liveNearbyReports').innerHTML=`<div class="empty">${esc(errPT(e))}</div>`}
-    startLiveAutoRefresh()
-  });
+  btn?.addEventListener('click',openMyGGasLive);
   document.querySelectorAll('.live-tab').forEach(b=>b.addEventListener('click',()=>setLiveTab(b.dataset.liveTab)));
   document.querySelectorAll('.live-mode').forEach(b=>b.addEventListener('click',()=>setLiveMode(b.dataset.liveMode)));
   document.querySelectorAll('.live-report-type').forEach(b=>b.addEventListener('click',()=>{
@@ -11947,6 +12088,25 @@ function initMyGGasLive(){
 }
 
 initMyGGasLive();
+
+
+function openMyGGasLive(){
+  const modal=document.getElementById('myggasLiveModal');
+  if(!modal)return;
+  modal.classList.add('open');
+  try{populateLiveDestinations()}catch{}
+  try{setLiveMode(liveMode)}catch{}
+  const voice=document.getElementById('liveVoiceToggle');
+  const auto=document.getElementById('liveAutoRefreshToggle');
+  if(voice)voice.checked=liveVoiceEnabled();
+  if(auto)auto.checked=localStorage.getItem(LIVE_AUTO_KEY)==='1';
+  loadLiveReports().catch(e=>{
+    const list=document.getElementById('liveNearbyReports');
+    if(list)list.innerHTML=`<div class="empty">${esc(errPT(e))}</div>`;
+  });
+  startLiveAutoRefresh()
+}
+
 </script>
 </body>
 </html>

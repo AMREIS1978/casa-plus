@@ -1,36 +1,16 @@
-# MyGGas Live
+# MyGGas Live V2 — botão visível corrigido
 
-Função nova e isolada adicionada à app existente através de um único botão flutuante **LIVE**.
+Correção da entrada para a nova funcionalidade LIVE.
 
-Não foram alteradas as funções nem a navegação existentes.
+## Agora existem 3 acessos
+- botão **LIVE** integrado na navegação principal;
+- botão **MyGGas LIVE** no cabeçalho desktop;
+- botão flutuante **LIVE** mantido como atalho.
 
-## MyGGas Live
-- alertas próximos da comunidade;
-- acidentes;
-- trânsito;
-- obras;
-- perigos;
-- estrada fechada;
-- inundação;
-- veículo parado;
-- outros alertas;
-- publicação georreferenciada;
-- expiração automática dos alertas;
-- avisos por voz opcionais;
-- atualização automática opcional;
-- modos de rota:
-  - Chegar primeiro;
-  - Fugir à confusão;
-  - Ir nas calmas;
-  - Poupar uns trocos;
-- cálculo de alternativas;
-- cruzamento das rotas com alertas ativos da comunidade;
-- recomendação de percurso.
+## Correção importante
+A navegação antiga estava definida para 5/6 colunas. Ao acrescentar LIVE, o novo botão podia ficar fora da grelha e parecer invisível. A grelha foi corrigida para:
+- 6 opções normais;
+- 7 quando Admin está ativo;
+- 3 no modo visitante.
 
-## Dados de trânsito
-A função comunitária é real e partilhada via Supabase.
-OSRM calcula alternativas, mas não fornece congestionamento live de terceiros.
-Para velocidades reais de trânsito e ETA dinâmico deverá ser adicionada posteriormente uma API de tráfego (HERE, TomTom, Google Routes ou Mapbox).
-
-## Privacidade
-A localização só é solicitada quando o utilizador abre/use o MyGGas Live ou publica um alerta.
+Nenhuma das funcionalidades existentes foi removida.
