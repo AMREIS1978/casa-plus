@@ -5582,6 +5582,69 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   }
 }
 
+
+/* ===== MyGGas Live — função isolada ===== */
+.myggas-live-fab{
+  position:fixed;right:16px;bottom:88px;z-index:950;
+  min-width:70px;height:50px;padding:6px 12px;border:0;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:#102755;color:#fff;box-shadow:0 12px 28px rgba(16,39,85,.28);
+  font-size:10px;font-weight:950;letter-spacing:.08em
+}
+.myggas-live-fab span{font-size:18px}
+.live-modal-card{width:min(760px,100%);max-height:90vh;padding:16px}
+.live-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.live-brand{display:flex;align-items:center;gap:10px;min-width:0}
+.live-logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#102755;color:#fff;font-size:22px}
+.live-brand span,.live-route-intro span,.live-report-title span{display:block;font-size:6px;font-weight:950;letter-spacing:.17em;color:#7087a5}
+.live-brand h2{margin:2px 0;font-size:19px;color:#102755}
+.live-brand p{margin:0;font-size:7px;color:#76879a}
+.live-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:13px;padding:4px;background:#f2f5f8;border-radius:12px}
+.live-tab{border:0;border-radius:9px;background:transparent;padding:9px;color:#66768c;font-size:8px;font-weight:900}
+.live-tab.active{background:#fff;color:#1769d2;box-shadow:0 2px 8px rgba(16,39,85,.08)}
+.live-tab-panel{display:none;margin-top:11px}
+.live-tab-panel.active{display:block}
+.live-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.live-summary-grid>div{padding:9px;border:1px solid #e7edf4;border-radius:11px;background:#fbfdff}
+.live-summary-grid small{display:block;font-size:6px;color:#7c8b9e}.live-summary-grid strong{display:block;margin-top:3px;font-size:11px;color:#102755}
+.live-settings-inline{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.live-report-list{display:grid;gap:7px;margin-top:9px}
+.live-report-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px;border:1px solid #e7edf4;border-radius:11px;background:#fff}
+.live-report-row .icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#f3f6fa;font-size:18px}
+.live-report-row b{display:block;font-size:9px;color:#203a5c}.live-report-row small{display:block;margin-top:2px;font-size:6.4px;color:#7d8b9e}
+.live-report-row .distance{font-size:8px;font-weight:900;color:#1769d2;white-space:nowrap}
+.live-route-intro strong,.live-report-title strong{display:block;margin-top:2px;font-size:12px;color:#102755}
+.live-route-modes{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:9px}
+.live-mode{min-width:0;padding:10px;border:1px solid #e4eaf2;border-radius:12px;background:#fbfdff;text-align:left;color:#223d60}
+.live-mode b{display:block;font-size:9px}.live-mode small{display:block;margin-top:3px;font-size:6.3px;line-height:1.4;color:#7c8a9b}
+.live-mode.active{border-color:#9dc3ed;background:#eef6ff}
+.live-route-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:10px}
+.live-route-tools label{display:grid;gap:4px}.live-route-tools label>span,.live-report-form label>span{font-size:6px;font-weight:900;color:#73849a}
+.live-route-results{display:grid;gap:7px;margin-top:9px}
+.live-route-option{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px;border:1px solid #e6ecf3;border-radius:11px;background:#fbfdff}
+.live-route-option.best{border-color:#9fc3ee;background:#f2f8ff}
+.live-route-option b{display:block;font-size:9px;color:#213a5c}.live-route-option small{display:block;margin-top:2px;font-size:6.2px;color:#7b899a}.live-route-option strong{font-size:11px;color:#102755}
+.live-source-note{margin-top:8px;padding:7px 8px;border-radius:9px;background:#f7f8fa;color:#78879a;font-size:6.2px;line-height:1.4}
+.live-report-types{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:9px}
+.live-report-type{min-height:62px;border:1px solid #e5ebf2;border-radius:11px;background:#fff;font-size:17px;color:#213a5c}
+.live-report-type b{display:block;margin-top:4px;font-size:6.5px}
+.live-report-type.active{border-color:#9fc3ee;background:#eef6ff}
+.live-report-form{display:grid;grid-template-columns:.7fr 1.3fr;gap:7px;margin-top:9px}
+.live-report-form label{display:grid;gap:4px}.live-send-report{width:100%;margin-top:9px}
+@media(max-width:760px){
+  .myggas-live-fab{right:10px;bottom:78px;height:44px;min-width:60px;padding:5px 10px}
+  .myggas-live-fab span{font-size:15px}.myggas-live-fab b{font-size:8px}
+  .live-modal-card{max-height:92vh;padding:11px;border-radius:18px 18px 0 0!important}
+  .live-logo{width:38px;height:38px;border-radius:11px;font-size:18px}
+  .live-brand h2{font-size:15px}
+  .live-summary-grid{grid-template-columns:1fr 1fr}.live-summary-grid>div:last-child{grid-column:1/-1}
+  .live-settings-inline{grid-template-columns:1fr}
+  .live-route-modes{grid-template-columns:1fr 1fr}
+  .live-report-types{grid-template-columns:repeat(2,1fr)}
+  .live-report-form{grid-template-columns:1fr}
+  .live-route-tools{grid-template-columns:1fr}
+}
+
 </style>
   <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -6913,6 +6976,130 @@ Até lá, este painel confirma que o espaço está ativo e mensurável.
 <div id="ecoToast" class="eco-toast" aria-live="polite">
 <div id="ecoToastIcon" class="eco-toast-icon">◉</div>
 <div><b id="ecoToastTitle">EcoDrive</b><small id="ecoToastText">—</small></div>
+</div>
+
+
+<button id="myggasLiveBtn" class="myggas-live-fab" type="button" aria-label="Abrir MyGGas Live">
+  <span>🚦</span><b>LIVE</b>
+</button>
+
+
+<div id="myggasLiveModal" class="modal">
+  <div class="modal-card live-modal-card">
+    <div class="live-head">
+      <div class="live-brand">
+        <div class="live-logo">🚦</div>
+        <div>
+          <span>MYGGAS LIVE</span>
+          <h2>Trânsito inteligente</h2>
+          <p>Comunidade, rotas alternativas e alertas num só lugar.</p>
+        </div>
+      </div>
+      <button class="btn secondary" type="button" data-close="myggasLiveModal">Fechar</button>
+    </div>
+
+    <div class="live-tabs" role="tablist">
+      <button class="live-tab active" type="button" data-live-tab="now">⚡ Agora</button>
+      <button class="live-tab" type="button" data-live-tab="route">🧭 Rota</button>
+      <button class="live-tab" type="button" data-live-tab="report">📣 Alertar</button>
+    </div>
+
+    <section id="liveTabNow" class="live-tab-panel active">
+      <div class="live-summary-grid">
+        <div><small>Zona</small><strong id="liveAreaStatus">A localizar…</strong></div>
+        <div><small>Alertas próximos</small><strong id="liveNearbyCount">—</strong></div>
+        <div><small>Última atualização</small><strong id="liveUpdatedAt">—</strong></div>
+      </div>
+      <div class="live-settings-inline">
+        <label class="eco-option">
+          <input id="liveVoiceToggle" type="checkbox">
+          <span><b>Avisos por voz</b><small>Lê alertas relevantes durante a utilização da app.</small></span>
+        </label>
+        <label class="eco-option">
+          <input id="liveAutoRefreshToggle" type="checkbox">
+          <span><b>Atualização automática</b><small>Atualiza os alertas enquanto o MyGGas Live estiver aberto.</small></span>
+        </label>
+      </div>
+      <div id="liveNearbyReports" class="live-report-list">
+        <div class="empty">A procurar alertas próximos…</div>
+      </div>
+    </section>
+
+    <section id="liveTabRoute" class="live-tab-panel">
+      <div class="live-route-intro">
+        <span>COMO QUER IR?</span>
+        <strong>Escolha a personalidade da viagem</strong>
+      </div>
+      <div class="live-route-modes">
+        <button class="live-mode active" type="button" data-live-mode="fast">
+          <b>🏁 Chegar primeiro</b><small>Prioridade absoluta ao tempo.</small>
+        </button>
+        <button class="live-mode" type="button" data-live-mode="traffic">
+          <b>🚦 Fugir à confusão</b><small>Evita rotas próximas de alertas fortes da comunidade.</small>
+        </button>
+        <button class="live-mode" type="button" data-live-mode="eco">
+          <b>🌿 Ir nas calmas</b><small>Prefere trajetos mais simples e estáveis.</small>
+        </button>
+        <button class="live-mode" type="button" data-live-mode="cheap">
+          <b>💸 Poupar uns trocos</b><small>Combina caminho curto com postos próximos.</small>
+        </button>
+      </div>
+
+      <div class="live-route-tools">
+        <label>
+          <span>Destino</span>
+          <select id="liveDestinationSelect" class="input">
+            <option value="">Escolha um posto próximo</option>
+          </select>
+        </label>
+        <button id="liveAnalyzeRouteBtn" class="btn primary" type="button">Analisar alternativas</button>
+      </div>
+
+      <div id="liveRouteResult" class="live-route-results">
+        <div class="empty">Escolha um destino para comparar percursos.</div>
+      </div>
+      <div class="live-source-note">
+        Rotas calculadas pelo motor atual e cruzadas com alertas da comunidade MyGGas. 
+        Trânsito rodoviário em tempo real de terceiros exige integração adicional.
+      </div>
+    </section>
+
+    <section id="liveTabReport" class="live-tab-panel">
+      <div class="live-report-title">
+        <span>AVISAR A COMUNIDADE</span>
+        <strong>O que encontrou?</strong>
+      </div>
+      <div class="live-report-types">
+        <button type="button" class="live-report-type active" data-report-type="accident">💥<b>Acidente</b></button>
+        <button type="button" class="live-report-type" data-report-type="traffic">🚗<b>Trânsito</b></button>
+        <button type="button" class="live-report-type" data-report-type="roadworks">🚧<b>Obras</b></button>
+        <button type="button" class="live-report-type" data-report-type="hazard">⚠️<b>Perigo</b></button>
+        <button type="button" class="live-report-type" data-report-type="road_closed">⛔<b>Estrada fechada</b></button>
+        <button type="button" class="live-report-type" data-report-type="flood">🌧️<b>Inundação</b></button>
+        <button type="button" class="live-report-type" data-report-type="vehicle_stopped">🚙<b>Veículo parado</b></button>
+        <button type="button" class="live-report-type" data-report-type="other">📍<b>Outro</b></button>
+      </div>
+
+      <div class="live-report-form">
+        <label>
+          <span>Gravidade</span>
+          <select id="liveReportSeverity" class="input">
+            <option value="1">Baixa</option>
+            <option value="2" selected>Média</option>
+            <option value="3">Alta</option>
+          </select>
+        </label>
+        <label>
+          <span>Nota opcional</span>
+          <input id="liveReportNote" class="input" maxlength="180" placeholder="Ex.: fila parada na faixa direita">
+        </label>
+      </div>
+
+      <button id="liveSendReportBtn" class="btn primary live-send-report" type="button">📣 Enviar alerta nesta localização</button>
+      <div id="liveReportStatus" class="status"></div>
+      <div class="live-source-note">Só utilizadores com sessão iniciada podem publicar. Os alertas expiram automaticamente.</div>
+    </section>
+  </div>
 </div>
 
 <script type="module">
@@ -11565,6 +11752,201 @@ initRadar();
 initEcoDrive();
 
 initDriverScore();
+
+
+/* ========================= MyGGas Live ========================= */
+const LIVE_VOICE_KEY='myggas_live_voice_v1';
+const LIVE_AUTO_KEY='myggas_live_auto_v1';
+const LIVE_MODE_KEY='myggas_live_mode_v1';
+let liveMode=localStorage.getItem(LIVE_MODE_KEY)||'fast';
+let liveReportType='accident';
+let livePosition=null;
+let liveReports=[];
+let liveRefreshTimer=null;
+
+const LIVE_REPORT_META={
+  accident:{icon:'💥',label:'Acidente'},
+  traffic:{icon:'🚗',label:'Trânsito'},
+  roadworks:{icon:'🚧',label:'Obras'},
+  hazard:{icon:'⚠️',label:'Perigo'},
+  road_closed:{icon:'⛔',label:'Estrada fechada'},
+  flood:{icon:'🌧️',label:'Inundação'},
+  vehicle_stopped:{icon:'🚙',label:'Veículo parado'},
+  other:{icon:'📍',label:'Outro alerta'}
+};
+function liveVoiceEnabled(){return localStorage.getItem(LIVE_VOICE_KEY)==='1'}
+function liveSpeak(msg){
+  if(!liveVoiceEnabled()||!('speechSynthesis' in window))return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(msg);u.lang='pt-PT';u.rate=1;speechSynthesis.speak(u)}catch{}
+}
+function liveDistanceMeters(a,b,c,d){
+  return haversine(a,b,c,d)*1000
+}
+async function ensureLivePosition(){
+  if(livePosition)return livePosition;
+  return await new Promise((resolve,reject)=>{
+    if(!navigator.geolocation)return reject(new Error('Localização indisponível.'));
+    navigator.geolocation.getCurrentPosition(
+      p=>{livePosition={lat:p.coords.latitude,lon:p.coords.longitude};resolve(livePosition)},
+      ()=>reject(new Error('Autorize a localização para usar o MyGGas Live.')),
+      {enableHighAccuracy:true,maximumAge:10000,timeout:12000}
+    )
+  })
+}
+async function loadLiveReports(){
+  const pos=await ensureLivePosition();
+  const {data,error}=await supabase.from('traffic_reports')
+    .select('id,report_type,severity,latitude,longitude,road_name,note,created_at,expires_at')
+    .gt('expires_at',new Date().toISOString())
+    .order('created_at',{ascending:false})
+    .limit(120);
+  if(error)throw error;
+  liveReports=(data||[]).map(r=>({...r,distance:liveDistanceMeters(pos.lat,pos.lon,Number(r.latitude),Number(r.longitude))}))
+    .filter(r=>r.distance<=15000).sort((a,b)=>a.distance-b.distance);
+  renderLiveReports()
+}
+function renderLiveReports(){
+  const list=document.getElementById('liveNearbyReports');
+  const count=document.getElementById('liveNearbyCount');
+  const updated=document.getElementById('liveUpdatedAt');
+  const area=document.getElementById('liveAreaStatus');
+  if(count)count.textContent=String(liveReports.length);
+  if(updated)updated.textContent=new Date().toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+  if(area)area.textContent=liveReports.length?'Comunidade ativa':'Sem alertas próximos';
+  if(!list)return;
+  if(!liveReports.length){list.innerHTML='<div class="empty">Sem alertas ativos num raio de 15 km.</div>';return}
+  list.innerHTML=liveReports.slice(0,20).map(r=>{
+    const meta=LIVE_REPORT_META[r.report_type]||LIVE_REPORT_META.other;
+    const d=r.distance<1000?`${Math.round(r.distance)} m`:`${(r.distance/1000).toFixed(1).replace('.',',')} km`;
+    const age=Math.max(1,Math.round((Date.now()-new Date(r.created_at).getTime())/60000));
+    return `<div class="live-report-row">
+      <div class="icon">${meta.icon}</div>
+      <div><b>${meta.label}${r.severity===3?' · importante':''}</b><small>${r.note?esc(r.note)+' · ':''}há ${age} min</small></div>
+      <div class="distance">${d}</div>
+    </div>`
+  }).join('');
+  const nearest=liveReports[0];
+  if(nearest&&nearest.distance<1200){
+    const meta=LIVE_REPORT_META[nearest.report_type]||LIVE_REPORT_META.other;
+    liveSpeak(`${meta.label} reportado a cerca de ${Math.max(100,Math.round(nearest.distance/100)*100)} metros.`)
+  }
+}
+function setLiveTab(tab){
+  document.querySelectorAll('.live-tab').forEach(b=>b.classList.toggle('active',b.dataset.liveTab===tab));
+  document.querySelectorAll('.live-tab-panel').forEach(p=>p.classList.remove('active'));
+  const id={now:'liveTabNow',route:'liveTabRoute',report:'liveTabReport'}[tab];
+  document.getElementById(id)?.classList.add('active')
+}
+function setLiveMode(mode){
+  liveMode=mode;localStorage.setItem(LIVE_MODE_KEY,mode);
+  document.querySelectorAll('.live-mode').forEach(b=>b.classList.toggle('active',b.dataset.liveMode===mode))
+}
+function populateLiveDestinations(){
+  const sel=document.getElementById('liveDestinationSelect');if(!sel)return;
+  const current=sel.value;
+  const arr=Array.isArray(nearbyStations)?nearbyStations:[];
+  sel.innerHTML='<option value="">Escolha um posto próximo</option>'+arr.slice(0,40).map((s,i)=>`<option value="${i}">${esc(s.name||'Posto')}</option>`).join('');
+  if(current&&sel.querySelector(`option[value="${current}"]`))sel.value=current
+}
+function pointToSegmentDistanceM(p,a,b){
+  const x=p.lon,y=p.lat,x1=a[0],y1=a[1],x2=b[0],y2=b[1];
+  const dx=x2-x1,dy=y2-y1;
+  const t=(dx||dy)?Math.max(0,Math.min(1,((x-x1)*dx+(y-y1)*dy)/(dx*dx+dy*dy))):0;
+  const qx=x1+t*dx,qy=y1+t*dy;
+  return liveDistanceMeters(y,x,qy,qx)
+}
+function routeIncidentPenalty(coords){
+  let penalty=0,hits=0;
+  const relevant=liveReports.filter(r=>r.severity>=2);
+  for(const r of relevant){
+    let best=Infinity;
+    for(let i=1;i<coords.length;i+=Math.max(1,Math.floor(coords.length/80))){
+      best=Math.min(best,pointToSegmentDistanceM({lat:Number(r.latitude),lon:Number(r.longitude)},coords[i-1],coords[i]));
+      if(best<200)break
+    }
+    if(best<700){hits++;penalty+=(r.severity===3?420:180)*(1-best/700)}
+  }
+  return {penaltySec:penalty,hits}
+}
+async function analyzeLiveRoute(){
+  const sel=document.getElementById('liveDestinationSelect');
+  const out=document.getElementById('liveRouteResult');
+  if(!sel||!out)return;
+  const idx=Number(sel.value);
+  const station=(Array.isArray(nearbyStations)?nearbyStations:[])[idx];
+  if(!station){out.innerHTML='<div class="empty">Escolha um destino.</div>';return}
+  const start=await ensureLivePosition();
+  await loadLiveReports().catch(()=>{});
+  out.innerHTML='<div class="empty">A comparar percursos…</div>';
+  const url=`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${Number(station.lon)},${Number(station.lat)}?alternatives=true&overview=full&geometries=geojson`;
+  const r=await fetch(url);if(!r.ok)throw new Error('Não foi possível calcular as rotas.');
+  const d=await r.json();
+  let routes=(d.routes||[]).map((x,i)=>{
+    const inc=routeIncidentPenalty(x.geometry?.coordinates||[]);
+    const duration=Number(x.duration||0),distance=Number(x.distance||0);
+    let score=duration;
+    if(liveMode==='traffic')score+=inc.penaltySec;
+    if(liveMode==='eco')score+=distance/1000*9;
+    if(liveMode==='cheap')score+=distance/1000*13;
+    return {i,duration,distance,hits:inc.hits,score}
+  });
+  routes.sort((a,b)=>a.score-b.score);
+  if(!routes.length){out.innerHTML='<div class="empty">Sem alternativas disponíveis.</div>';return}
+  out.innerHTML=routes.map((x,i)=>`<div class="live-route-option ${i===0?'best':''}">
+    <div><b>${i===0?'⭐ Recomendada':`Alternativa ${i+1}`}</b><small>${(x.distance/1000).toFixed(1).replace('.',',')} km · ${x.hits?`${x.hits} alerta(s) próximo(s)`:'sem alertas próximos da comunidade'}</small></div>
+    <strong>${Math.max(1,Math.round(x.duration/60))} min</strong>
+  </div>`).join('');
+  if(routes[0].hits===0&&liveMode==='traffic')liveSpeak('Encontrei uma rota sem alertas próximos da comunidade.')
+}
+async function sendLiveReport(){
+  const status=document.getElementById('liveReportStatus');
+  if(status)status.textContent='A enviar…';
+  try{
+    const pos=await ensureLivePosition();
+    const {data:{user}}=await supabase.auth.getUser();
+    if(!user)throw new Error('Inicie sessão para publicar um alerta.');
+    const severity=Number(document.getElementById('liveReportSeverity')?.value||2);
+    const note=String(document.getElementById('liveReportNote')?.value||'').trim().slice(0,180);
+    const hours=liveReportType==='road_closed'?6:liveReportType==='roadworks'?4:2;
+    const {error}=await supabase.from('traffic_reports').insert({
+      user_id:user.id,report_type:liveReportType,severity,
+      latitude:pos.lat,longitude:pos.lon,note:note||null,
+      expires_at:new Date(Date.now()+hours*3600000).toISOString()
+    });
+    if(error)throw error;
+    if(status)status.textContent='Alerta publicado. Obrigado por ajudar a comunidade.';
+    document.getElementById('liveReportNote').value='';
+    await loadLiveReports();
+    setLiveTab('now')
+  }catch(e){if(status)status.textContent=errPT(e)}
+}
+function startLiveAutoRefresh(){
+  clearInterval(liveRefreshTimer);liveRefreshTimer=null;
+  if(localStorage.getItem(LIVE_AUTO_KEY)!=='1')return;
+  liveRefreshTimer=setInterval(()=>loadLiveReports().catch(()=>{}),60000)
+}
+function initMyGGasLive(){
+  const btn=document.getElementById('myggasLiveBtn'),modal=document.getElementById('myggasLiveModal');
+  btn?.addEventListener('click',async()=>{
+    modal?.classList.add('open');populateLiveDestinations();setLiveMode(liveMode);
+    document.getElementById('liveVoiceToggle').checked=liveVoiceEnabled();
+    document.getElementById('liveAutoRefreshToggle').checked=localStorage.getItem(LIVE_AUTO_KEY)==='1';
+    try{await loadLiveReports()}catch(e){document.getElementById('liveNearbyReports').innerHTML=`<div class="empty">${esc(errPT(e))}</div>`}
+    startLiveAutoRefresh()
+  });
+  document.querySelectorAll('.live-tab').forEach(b=>b.addEventListener('click',()=>setLiveTab(b.dataset.liveTab)));
+  document.querySelectorAll('.live-mode').forEach(b=>b.addEventListener('click',()=>setLiveMode(b.dataset.liveMode)));
+  document.querySelectorAll('.live-report-type').forEach(b=>b.addEventListener('click',()=>{
+    liveReportType=b.dataset.reportType;
+    document.querySelectorAll('.live-report-type').forEach(x=>x.classList.toggle('active',x===b))
+  }));
+  document.getElementById('liveVoiceToggle')?.addEventListener('change',e=>localStorage.setItem(LIVE_VOICE_KEY,e.target.checked?'1':'0'));
+  document.getElementById('liveAutoRefreshToggle')?.addEventListener('change',e=>{localStorage.setItem(LIVE_AUTO_KEY,e.target.checked?'1':'0');startLiveAutoRefresh()});
+  document.getElementById('liveAnalyzeRouteBtn')?.addEventListener('click',()=>analyzeLiveRoute().catch(e=>document.getElementById('liveRouteResult').innerHTML=`<div class="empty">${esc(errPT(e))}</div>`));
+  document.getElementById('liveSendReportBtn')?.addEventListener('click',sendLiveReport);
+}
+
+initMyGGasLive();
 </script>
 </body>
 </html>

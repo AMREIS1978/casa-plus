@@ -1,17 +1,36 @@
-# MyGGas — Perfil redesenhado
+# MyGGas Live
 
-Foi reorganizado o painel **Perfil** para deixar de ficar comprimido e difícil de ler.
+Função nova e isolada adicionada à app existente através de um único botão flutuante **LIVE**.
 
-## Alterações principais
-- cartão principal do utilizador passa a ocupar toda a largura;
-- avatar, nome, nível, pontos e progresso reorganizados;
-- Radar e EcoDrive ficam lado a lado em desktop e empilhados em mobile;
-- Driver Score ocupa a largura completa e tem interruptor visível;
-- ações de perfil ficam em grelha 4×1 no desktop e 2×2 no telemóvel;
-- botões Sair / Apagar perfil ficam organizados;
-- Desbloqueios e Ranking ficam abaixo do perfil, equilibrados;
-- espaçamentos e tamanhos revistos para telemóvel;
-- sem overflow horizontal;
-- mantém as funcionalidades existentes.
+Não foram alteradas as funções nem a navegação existentes.
 
-Esta versão é a nova base recomendada para o painel Perfil.
+## MyGGas Live
+- alertas próximos da comunidade;
+- acidentes;
+- trânsito;
+- obras;
+- perigos;
+- estrada fechada;
+- inundação;
+- veículo parado;
+- outros alertas;
+- publicação georreferenciada;
+- expiração automática dos alertas;
+- avisos por voz opcionais;
+- atualização automática opcional;
+- modos de rota:
+  - Chegar primeiro;
+  - Fugir à confusão;
+  - Ir nas calmas;
+  - Poupar uns trocos;
+- cálculo de alternativas;
+- cruzamento das rotas com alertas ativos da comunidade;
+- recomendação de percurso.
+
+## Dados de trânsito
+A função comunitária é real e partilhada via Supabase.
+OSRM calcula alternativas, mas não fornece congestionamento live de terceiros.
+Para velocidades reais de trânsito e ETA dinâmico deverá ser adicionada posteriormente uma API de tráfego (HERE, TomTom, Google Routes ou Mapbox).
+
+## Privacidade
+A localização só é solicitada quando o utilizador abre/use o MyGGas Live ou publica um alerta.
