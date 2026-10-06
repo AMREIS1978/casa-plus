@@ -1,31 +1,38 @@
-# MyGGas Radar + EcoDrive
+# MyGGas — Versão Otimizada Final
 
-## Novas opções
-### MyGGas Radar
-- ativar/desativar;
-- confirmação de preços;
-- pontos;
-- distância e limites de alertas.
+Versão consolidada da aplicação MyGGas com as funcionalidades atuais preservadas.
 
-### MyGGas EcoDrive
-- ativar/desativar independentemente;
+## Incluído
+- mapa e postos próximos;
+- preços DGEG/comunidade;
+- logos de marcas embebidos localmente;
+- pesquisa e filtros;
+- ordenação por preço, distância e atualização;
+- melhor escolha;
+- navegação para o posto;
+- comunidade;
+- pontos e ranking;
+- perfil;
+- administração;
+- planeador de viagem;
+- MyGGas Radar;
+- confirmação de preços por proximidade;
+- recompensas por validação;
+- MyGGas EcoDrive;
 - alerta de excesso de velocidade;
-- tolerância configurável;
-- opção de sugestões de condução eficiente;
-- frequência de alertas configurável;
-- leitura da velocidade por GPS;
-- consulta do `maxspeed` OpenStreetMap quando existe;
-- sem alerta de excesso quando o limite não é conhecido;
-- aviso claro de que a sinalização rodoviária prevalece.
+- opção independente para desligar alertas de velocidade;
+- opção independente para desligar otimização de condução;
+- sugestões de condução eficiente;
+- interface mobile e desktop.
 
-## Otimização de consumo
-O EcoDrive desta versão não mede consumo real do veículo. As sugestões usam velocidade GPS e variação de velocidade:
-- aceleração progressiva;
-- evitar acelerações/desacelerações fortes;
-- manter velocidade estável;
-- aviso de que velocidades elevadas aumentam o consumo.
+## Otimizações aplicadas
+- limpeza do HTML;
+- remoção de espaços e quebras redundantes;
+- viewport preparado para dispositivos com safe-area;
+- idioma PT-PT definido;
+- estrutura consolidada numa única versão;
+- ficheiros desnecessários removidos;
+- pacote pronto para GitHub/Hostinger.
 
-Para consumo real (L/100 km, carga do motor, rpm, etc.) a evolução correta é integração OBD/Bluetooth.
-
-## Segurança
-A funcionalidade é opcional. Não deve ser usada como substituto da sinalização rodoviária ou do velocímetro do veículo.
+## Nota
+O limite de velocidade cartográfico é apenas auxiliar. A sinalização rodoviária prevalece sempre.
