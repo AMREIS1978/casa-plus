@@ -5170,6 +5170,61 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .radar-actions{grid-template-columns:1fr}
 }
 
+
+/* ===== MyGGas EcoDrive ===== */
+.ecodrive-card{
+  margin-top:10px;padding:12px;border:1px solid #e3e8f2;border-radius:16px;
+  background:linear-gradient(135deg,#fff,#f8fbfe);
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:11px
+}
+.ecodrive-icon{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:#102755;color:#fff;font-size:18px;box-shadow:0 8px 18px rgba(16,39,85,.15)
+}
+.ecodrive-copy{min-width:0}
+.ecodrive-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ecodrive-title-row b{display:block;font-size:12px;color:#102755}
+.ecodrive-title-row small{display:block;margin-top:3px;font-size:8px;line-height:1.45;color:#657792}
+.ecodrive-options{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.eco-option{
+  display:flex;align-items:flex-start;gap:8px;padding:8px;border:1px solid #e5ebf3;border-radius:11px;background:#fff
+}
+.eco-option input{margin-top:2px}
+.eco-option b{display:block;font-size:8px;color:#213a5e}
+.eco-option small{display:block;margin-top:2px;font-size:6.4px;line-height:1.4;color:#78879a}
+.ecodrive-settings{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.ecodrive-settings label{display:grid;gap:4px}
+.ecodrive-settings label>span{font-size:6.5px;font-weight:850;color:#73849a}
+.ecodrive-settings .input{min-height:34px;padding:6px 8px;font-size:8px}
+.ecodrive-live{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.ecodrive-live>div{padding:8px;border:1px solid #e8edf4;border-radius:10px;background:#fbfdff}
+.ecodrive-live small{display:block;font-size:6px;color:#7e8c9e}
+.ecodrive-live strong{display:block;margin-top:3px;font-size:12px;color:#102755}
+.ecodrive-live strong.warn{color:#d53d32}
+.ecodrive-live strong.good{color:#178451}
+
+.eco-toast{
+  position:fixed;left:50%;bottom:92px;transform:translateX(-50%);
+  z-index:1800;width:min(420px,calc(100% - 22px));padding:10px 12px;border-radius:14px;
+  background:#102755;color:#fff;box-shadow:0 14px 35px rgba(15,23,42,.20);
+  display:none;align-items:center;gap:9px
+}
+.eco-toast.show{display:flex}
+.eco-toast .eco-toast-icon{font-size:20px}
+.eco-toast b{display:block;font-size:9px}
+.eco-toast small{display:block;margin-top:2px;font-size:7px;color:#dce8f6}
+
+@media(max-width:560px){
+  .ecodrive-card{grid-template-columns:36px minmax(0,1fr);gap:8px;padding:10px}
+  .ecodrive-icon{width:36px;height:36px;border-radius:11px;font-size:16px}
+  .ecodrive-title-row b{font-size:10px}
+  .ecodrive-title-row small{font-size:7px}
+  .ecodrive-options,.ecodrive-settings{grid-template-columns:1fr}
+  .ecodrive-live{grid-template-columns:1fr 1fr}
+  .ecodrive-live>div:last-child{grid-column:1/-1}
+  .eco-toast{bottom:104px}
+}
+
 </style>
 </head>
 <body>
@@ -6417,6 +6472,12 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
     </div>
     <div id="radarStatus" class="status"></div>
   </div>
+</div>
+
+
+<div id="ecoToast" class="eco-toast" aria-live="polite">
+  <div id="ecoToastIcon" class="eco-toast-icon">◉</div>
+  <div><b id="ecoToastTitle">EcoDrive</b><small id="ecoToastText">—</small></div>
 </div>
 
 <script type="module">
@@ -8768,6 +8829,181 @@ function initRadar(){
   if(radarPrefs().enabled)startRadarWatch()
 }
 
+
+/* ========================= MyGGas EcoDrive ========================= */
+const ECO_ENABLED_KEY='myggas_ecodrive_enabled_v1';
+const ECO_SPEED_KEY='myggas_speed_alert_enabled_v1';
+const ECO_COACH_KEY='myggas_eco_coach_enabled_v1';
+const ECO_TOLERANCE_KEY='myggas_speed_tolerance_v1';
+const ECO_COOLDOWN_KEY='myggas_eco_alert_cooldown_v1';
+
+let ecoWatchId=null;
+let ecoLastPos=null;
+let ecoLastAlertAt=0;
+let ecoLastLimitQueryAt=0;
+let ecoLastLimitQueryPos=null;
+let ecoCurrentLimit=null;
+let ecoCurrentRoad='';
+let ecoSpeedHistory=[];
+
+function ecoPrefs(){
+  return {
+    enabled:localStorage.getItem(ECO_ENABLED_KEY)==='1',
+    speedAlert:localStorage.getItem(ECO_SPEED_KEY)!=='0',
+    coach:localStorage.getItem(ECO_COACH_KEY)!=='0',
+    tolerance:Number(localStorage.getItem(ECO_TOLERANCE_KEY)||5),
+    cooldown:Number(localStorage.getItem(ECO_COOLDOWN_KEY)||30)
+  }
+}
+function updateEcoUI(){
+  const p=ecoPrefs();
+  if($('ecoDriveToggle'))$('ecoDriveToggle').checked=p.enabled;
+  if($('speedAlertToggle'))$('speedAlertToggle').checked=p.speedAlert;
+  if($('ecoCoachToggle'))$('ecoCoachToggle').checked=p.coach;
+  if($('speedTolerance'))$('speedTolerance').value=String(p.tolerance);
+  if($('ecoAlertCooldown'))$('ecoAlertCooldown').value=String(p.cooldown);
+  if($('ecoDriveStateText')){
+    $('ecoDriveStateText').textContent=p.enabled?'EcoDrive ativo':'EcoDrive desativado';
+    $('ecoDriveStateText').classList.toggle('on',p.enabled)
+  }
+  if(!p.enabled){
+    $('ecoCurrentSpeed')&&($('ecoCurrentSpeed').textContent='—');
+    $('ecoSpeedLimit')&&($('ecoSpeedLimit').textContent='—');
+    $('ecoDriveAdvice')&&($('ecoDriveAdvice').textContent='Inativo');
+  }
+}
+function setEcoEnabled(v){
+  localStorage.setItem(ECO_ENABLED_KEY,v?'1':'0');
+  v?startEcoWatch():stopEcoWatch();
+  updateEcoUI()
+}
+function startEcoWatch(){
+  if(!ecoPrefs().enabled || ecoWatchId!==null || !navigator.geolocation)return;
+  ecoWatchId=navigator.geolocation.watchPosition(
+    pos=>handleEcoPosition(pos).catch(()=>{}),
+    ()=>{},
+    {enableHighAccuracy:true,maximumAge:4000,timeout:12000}
+  )
+}
+function stopEcoWatch(){
+  if(ecoWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(ecoWatchId);
+  ecoWatchId=null;ecoLastPos=null;ecoSpeedHistory=[]
+}
+function calcSpeedFallback(lat,lon,ts){
+  if(!ecoLastPos)return null;
+  const dt=(ts-ecoLastPos.ts)/1000;
+  if(dt<=0||dt>15)return null;
+  const m=haversine(lat,lon,ecoLastPos.lat,ecoLastPos.lon)*1000;
+  const kmh=(m/dt)*3.6;
+  return Number.isFinite(kmh)&&kmh<220?kmh:null
+}
+function parseMaxspeed(raw){
+  if(!raw)return null;
+  const s=String(raw).toLowerCase().trim();
+  const m=s.match(/(\d{2,3})/);
+  if(!m)return null;
+  const n=Number(m[1]);
+  if(!Number.isFinite(n)||n<10||n>160)return null;
+  return n
+}
+async function queryNearbySpeedLimit(lat,lon){
+  const now=Date.now();
+  if(now-ecoLastLimitQueryAt<15000)return;
+  if(ecoLastLimitQueryPos){
+    const moved=haversine(lat,lon,ecoLastLimitQueryPos.lat,ecoLastLimitQueryPos.lon)*1000;
+    if(moved<80 && now-ecoLastLimitQueryAt<45000)return
+  }
+  ecoLastLimitQueryAt=now;ecoLastLimitQueryPos={lat,lon};
+  try{
+    const q=`[out:json][timeout:4];way(around:35,${lat},${lon})[highway][maxspeed];out tags center 12;`;
+    const url='https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q);
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const candidates=(d.elements||[]).map(w=>({
+      limit:parseMaxspeed(w.tags?.maxspeed),
+      name:w.tags?.name||w.tags?.ref||''
+    })).filter(x=>x.limit);
+    if(candidates.length){
+      ecoCurrentLimit=candidates[0].limit;
+      ecoCurrentRoad=candidates[0].name||'via atual'
+    }else{
+      ecoCurrentLimit=null;ecoCurrentRoad=''
+    }
+  }catch{
+    ecoCurrentLimit=null;ecoCurrentRoad=''
+  }
+  if($('ecoSpeedLimit'))$('ecoSpeedLimit').textContent=ecoCurrentLimit?ecoCurrentLimit+' km/h':'—'
+}
+function showEcoToast(title,text,icon='◉'){
+  const box=$('ecoToast');if(!box)return;
+  $('ecoToastTitle').textContent=title;$('ecoToastText').textContent=text;$('ecoToastIcon').textContent=icon;
+  box.classList.add('show');
+  setTimeout(()=>box.classList.remove('show'),4500)
+}
+function ecoAdvice(speed){
+  ecoSpeedHistory.push({t:Date.now(),v:speed});
+  ecoSpeedHistory=ecoSpeedHistory.filter(x=>Date.now()-x.t<12000);
+  if(ecoSpeedHistory.length<3)return {text:'Condução estável',kind:'good'};
+  const first=ecoSpeedHistory[0].v,last=ecoSpeedHistory[ecoSpeedHistory.length-1].v;
+  const delta=last-first;
+  if(delta>14)return {text:'Aceleração forte · acelere de forma mais progressiva',kind:'warn'};
+  if(delta<-18)return {text:'Desaceleração intensa · antecipe mais cedo quando possível',kind:'warn'};
+  if(speed>105)return {text:'Velocidade elevada aumenta significativamente o consumo',kind:'warn'};
+  if(speed>=50&&speed<=95&&Math.abs(delta)<8)return {text:'Boa estabilidade · condução eficiente',kind:'good'};
+  return {text:'Mantenha velocidade e aceleração suaves',kind:''}
+}
+async function handleEcoPosition(pos){
+  const p=ecoPrefs();if(!p.enabled)return;
+  const lat=pos.coords.latitude,lon=pos.coords.longitude,ts=pos.timestamp||Date.now();
+  let speed=Number.isFinite(pos.coords.speed)&&pos.coords.speed>=0?pos.coords.speed*3.6:null;
+  if(speed===null)speed=calcSpeedFallback(lat,lon,ts);
+  ecoLastPos={lat,lon,ts};
+
+  if(speed!==null){
+    speed=Math.max(0,Math.round(speed));
+    if($('ecoCurrentSpeed'))$('ecoCurrentSpeed').textContent=speed+' km/h';
+  }else{
+    if($('ecoCurrentSpeed'))$('ecoCurrentSpeed').textContent='—'
+  }
+
+  await queryNearbySpeedLimit(lat,lon);
+
+  if(speed!==null && p.speedAlert && ecoCurrentLimit){
+    const over=speed-(ecoCurrentLimit+p.tolerance);
+    if(over>0 && Date.now()-ecoLastAlertAt>p.cooldown*1000){
+      ecoLastAlertAt=Date.now();
+      showEcoToast('Excesso de velocidade',`${speed} km/h · limite cartográfico ${ecoCurrentLimit} km/h${ecoCurrentRoad?' · '+ecoCurrentRoad:''}`,'⚠️');
+      try{navigator.vibrate?.([150,100,150])}catch{}
+      $('ecoCurrentSpeed')?.classList.add('warn');
+    }else{
+      $('ecoCurrentSpeed')?.classList.remove('warn')
+    }
+  }
+
+  if(speed!==null && p.coach){
+    const a=ecoAdvice(speed);
+    if($('ecoDriveAdvice')){
+      $('ecoDriveAdvice').textContent=a.text;
+      $('ecoDriveAdvice').classList.toggle('warn',a.kind==='warn');
+      $('ecoDriveAdvice').classList.toggle('good',a.kind==='good')
+    }
+    if(a.kind==='warn' && Date.now()-ecoLastAlertAt>p.cooldown*1000){
+      ecoLastAlertAt=Date.now();
+      showEcoToast('Sugestão EcoDrive',a.text,'🌿')
+    }
+  }
+}
+function initEcoDrive(){
+  updateEcoUI();
+  $('ecoDriveToggle')?.addEventListener('change',e=>setEcoEnabled(e.target.checked));
+  $('speedAlertToggle')?.addEventListener('change',e=>{localStorage.setItem(ECO_SPEED_KEY,e.target.checked?'1':'0');updateEcoUI()});
+  $('ecoCoachToggle')?.addEventListener('change',e=>{localStorage.setItem(ECO_COACH_KEY,e.target.checked?'1':'0');updateEcoUI()});
+  $('speedTolerance')?.addEventListener('change',e=>{localStorage.setItem(ECO_TOLERANCE_KEY,String(e.target.value));updateEcoUI()});
+  $('ecoAlertCooldown')?.addEventListener('change',e=>{localStorage.setItem(ECO_COOLDOWN_KEY,String(e.target.value));updateEcoUI()});
+  if(ecoPrefs().enabled)startEcoWatch()
+}
+
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
   const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
@@ -10875,6 +11111,8 @@ function subscribeRealtime(){
 
 authCheck();
 initRadar();
+
+initEcoDrive();
 </script>
 </body>
 </html>

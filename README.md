@@ -1,28 +1,31 @@
-# MyGGas v10.9 — Radar
+# MyGGas Radar + EcoDrive
 
-Nova funcionalidade **MyGGas Radar**, opt-in e totalmente controlada pelo utilizador.
+## Novas opções
+### MyGGas Radar
+- ativar/desativar;
+- confirmação de preços;
+- pontos;
+- distância e limites de alertas.
 
-## Funcionamento
-- opção Ativar/Desativar no Perfil;
-- distância configurável: 120 / 180 / 250 m;
-- limite diário configurável: 1 / 2 / 3 / 5 alertas;
-- não repete o mesmo posto durante 24 horas;
-- só pergunta quando existe preço real disponível;
-- mostra posto, combustível, preço e idade da informação;
-- “Está correto” atribui +2 pontos;
-- “O preço mudou” abre a atualização de preço existente;
-- “Fotografar painel” abre diretamente a leitura fotográfica existente;
-- “Agora não” fecha o convite;
-- no browser/app ativa, acompanha a posição apenas quando o utilizador ativou o Radar.
+### MyGGas EcoDrive
+- ativar/desativar independentemente;
+- alerta de excesso de velocidade;
+- tolerância configurável;
+- opção de sugestões de condução eficiente;
+- frequência de alertas configurável;
+- leitura da velocidade por GPS;
+- consulta do `maxspeed` OpenStreetMap quando existe;
+- sem alerta de excesso quando o limite não é conhecido;
+- aviso claro de que a sinalização rodoviária prevalece.
 
-## Backend
-Foi criado o RPC autenticado `confirm_radar_price`, com:
-- validação de proximidade até 300 m;
-- cooldown de 24 h por utilizador/posto/combustível;
-- +2 pontos por confirmação;
-- registo privado de auditoria;
-- sem acesso `anon`.
+## Otimização de consumo
+O EcoDrive desta versão não mede consumo real do veículo. As sugestões usam velocidade GPS e variação de velocidade:
+- aceleração progressiva;
+- evitar acelerações/desacelerações fortes;
+- manter velocidade estável;
+- aviso de que velocidades elevadas aumentam o consumo.
 
-## Nota Android
-Esta versão não pede localização em background. Isso reduz risco de rejeição na Play Store.
-Para alertas com a app totalmente fechada, a fase seguinte deve usar um modo Radar/Viagem nativo iniciado expressamente pelo utilizador.
+Para consumo real (L/100 km, carga do motor, rpm, etc.) a evolução correta é integração OBD/Bluetooth.
+
+## Segurança
+A funcionalidade é opcional. Não deve ser usada como substituto da sinalização rodoviária ou do velocímetro do veículo.
