@@ -5178,6 +5178,21 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .eco-toast{bottom:104px}
 }
 
+
+.driver-score-card,.driver-ranking-panel{margin-top:12px;padding:14px;border:1px solid #e2e9f2;border-radius:17px;background:#fff}.driver-score-head,.driver-ranking-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.driver-kicker{display:block;font-size:6px;font-weight:950;letter-spacing:.16em;color:#7188a7}.driver-score-head h3,.driver-ranking-head h3{margin:3px 0 2px;font-size:15px;color:#102755}.driver-score-head p,.driver-ranking-head p{margin:0;font-size:7px;color:#7a899c}.driver-score-ring{width:68px;height:68px;border-radius:50%;border:7px solid #dce8f6;background:#f8fbff;display:flex;align-items:center;justify-content:center;gap:1px;flex:0 0 68px}.driver-score-ring strong{font-size:21px;color:#102755}.driver-score-ring small{font-size:6px;color:#74849a}.driver-classification{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border-radius:13px;background:#f8fbfe;border:1px solid #edf1f5}.driver-avatar-badge{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#fff;border:1px solid #e4eaf2;font-size:20px}.driver-classification small{display:block;font-size:6px;color:#7d8a9b}.driver-classification strong{display:block;margin-top:2px;font-size:12px;color:#18345c}.driver-classification span{display:block;margin-top:2px;font-size:6.5px;color:#77879a}.driver-subscore-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.driver-trip-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px}.driver-subscore-grid>div,.driver-trip-summary>div{padding:8px;border:1px solid #e9eef5;border-radius:10px;background:#fbfdff}.driver-subscore-grid span,.driver-trip-summary small{display:block;font-size:6px;color:#7f8da0}.driver-subscore-grid b,.driver-trip-summary strong{display:block;margin-top:3px;font-size:12px;color:#102755}.driver-ranking-row{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:9px}.driver-rank-option{flex:1;margin:0}.driver-ranking-row .btn{white-space:nowrap}.driver-scale{display:flex;gap:5px;overflow:auto;padding:9px 1px 1px;margin-top:8px}.driver-scale span{flex:0 0 auto;padding:5px 7px;border-radius:999px;background:#f2f5f8;color:#66768c;font-size:5.8px;font-weight:800}.driver-ranking-list{display:grid;gap:6px;margin-top:10px}.driver-rank-row{display:grid;grid-template-columns:32px minmax(0,1fr) 54px;gap:8px;align-items:center;padding:8px;border:1px solid #e8edf4;border-radius:11px;background:#fbfdff}.driver-rank-pos{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#eef4fb;color:#204c84;font-size:8px;font-weight:950}.driver-rank-row b{display:block;font-size:8px}.driver-rank-row small{display:block;margin-top:2px;font-size:6px;color:#7d8b9e}.driver-rank-score{text-align:right;font-size:13px;font-weight:950;color:#102755}.driver-ranking-panel.hidden{display:none}@media(max-width:560px){.driver-score-card,.driver-ranking-panel{padding:10px}.driver-subscore-grid{grid-template-columns:1fr 1fr}.driver-trip-summary{grid-template-columns:1fr 1fr}.driver-trip-summary>div:last-child{grid-column:1/-1}.driver-ranking-row{align-items:stretch;flex-direction:column}.driver-ranking-row .btn{width:100%}}
+
+.driver-score-head-actions{display:flex;align-items:center;gap:10px}
+.driver-score-card.driver-disabled .driver-classification,
+.driver-score-card.driver-disabled .driver-subscore-grid,
+.driver-score-card.driver-disabled .driver-trip-summary,
+.driver-score-card.driver-disabled .driver-ranking-row,
+.driver-score-card.driver-disabled .driver-scale{opacity:.45}
+.driver-score-card.driver-disabled .driver-ranking-row,
+.driver-score-card.driver-disabled .driver-ranking-row *{pointer-events:none}
+@media(max-width:560px){
+  .driver-score-head-actions{gap:7px}
+}
+
 </style>
   <link rel="manifest" href="manifest.webmanifest">
 </head>
@@ -5997,6 +6012,15 @@ A sinalização rodoviária prevalece sempre sobre a informação cartográfica.
 </div>
 </div>
 
+<div class="driver-score-card">
+  <div class="driver-score-head"><div><span class="driver-kicker">MYGGAS DRIVER SCORE</span><h3>O seu perfil de condutor</h3><p>Uma classificação divertida baseada nas suas viagens EcoDrive.</p></div><div class="driver-score-ring"><strong id="driverScoreValue">—</strong><small>/100</small></div></div>
+  <div class="driver-classification"><div class="driver-avatar-badge" id="driverClassIcon">🌱</div><div><small>Classificação atual</small><strong id="driverClassName">Ainda sem viagens</strong><span id="driverClassDesc">Ative o Driver Score e o EcoDrive para começar a construir o seu perfil.</span></div></div>
+  <div class="driver-subscore-grid"><div><span>Eficiência</span><b id="driverEfficiency">—</b></div><div><span>Segurança</span><b id="driverSafety">—</b></div><div><span>Suavidade</span><b id="driverSmoothness">—</b></div><div><span>Economia</span><b id="driverEconomy">—</b></div></div>
+  <div class="driver-trip-summary"><div><small>Viagens avaliadas</small><strong id="driverTrips">0</strong></div><div><small>Distância analisada</small><strong id="driverDistance">0 km</strong></div><div><small>Tendência</small><strong id="driverTrend">A começar</strong></div></div>
+  <div class="driver-ranking-row"><label class="eco-option driver-rank-option"><input id="driverRankingToggle" type="checkbox"><span><b>Participar no ranking MyGGas</b><small>Opcional. Só aparece o seu nome público MyGGas e a pontuação.</small></span></label><button id="openDriverRankingBtn" class="btn secondary" type="button">🏆 Ver ranking</button></div>
+  <div class="driver-scale"><span>🌿 Mestre da Poupança</span><span>🪽 Pé de Pluma</span><span>🐢 Poupadinho</span><span>⚖️ Equilibrado</span><span>🧱 Pé Pesado</span><span>⛽ Papa-Gasolina</span><span>🔥 Rei da Bomba</span></div>
+</div>
+<div id="driverRankingPanel" class="driver-ranking-panel hidden"><div class="driver-ranking-head"><div><span class="driver-kicker">LIGA DOS POUPADINHOS</span><h3>Ranking MyGGas</h3><p>Os condutores que optaram por participar.</p></div><button id="closeDriverRankingBtn" class="btn secondary" type="button">Fechar</button></div><div id="driverRankingList" class="driver-ranking-list"><div class="empty">Ainda não existem participantes suficientes.</div></div></div>
 <div class="profile-account-actions">
 <button id="profileLogoutBtn" class="profile-account-btn logout" type="button">
 <span>↪</span>
@@ -8857,7 +8881,7 @@ function updateEcoUI(){
 }
 function setEcoEnabled(v){
   localStorage.setItem(ECO_ENABLED_KEY,v?'1':'0');
-  v?startEcoWatch():stopEcoWatch();
+  if(v){if(driverScoreEnabled())startDriverTrip();startEcoWatch()}else{saveDriverTripScore().catch(()=>{});stopEcoWatch()}
   updateEcoUI()
 }
 function startEcoWatch(){
@@ -8924,6 +8948,56 @@ function showEcoToast(title,text,icon='◉'){
   box.classList.add('show');
   setTimeout(()=>box.classList.remove('show'),4500)
 }
+
+const DRIVER_SCORE_ENABLED_KEY='myggas_driver_score_enabled_v1';
+function driverScoreEnabled(){return localStorage.getItem(DRIVER_SCORE_ENABLED_KEY)==='1'}
+let driverTrip={active:false,startAt:0,lastAt:0,lastLat:null,lastLon:null,lastSpeed:null,distanceKm:0,samples:0,overspeedSeconds:0,harshAccel:0,harshBrake:0,highSpeedSeconds:0,steadySamples:0};let driverPreviousScore=null;
+function driverClassFor(score){if(score>=90)return{name:'Mestre da Poupança',icon:'🌿',desc:'Condução muito eficiente, suave e económica.'};if(score>=80)return{name:'Pé de Pluma',icon:'🪽',desc:'Conduz com suavidade e poupa combustível.'};if(score>=70)return{name:'Poupadinho',icon:'🐢',desc:'Boa gestão do acelerador e do consumo.'};if(score>=60)return{name:'Equilibrado',icon:'⚖️',desc:'Perfil equilibrado, ainda com margem para poupar.'};if(score>=45)return{name:'Pé Pesado',icon:'🧱',desc:'Algumas acelerações e velocidades aumentam o consumo.'};if(score>=30)return{name:'Papa-Gasolina',icon:'⛽',desc:'O estilo de condução está a gastar mais combustível do que o necessário.'};return{name:'Rei da Bomba',icon:'🔥',desc:'Há bastante potencial para reduzir consumo e suavizar a condução.'}}
+function clampScore(v){return Math.max(0,Math.min(100,Math.round(v)))}
+function startDriverTrip(){if(!driverScoreEnabled()||driverTrip.active)return;driverTrip={active:true,startAt:Date.now(),lastAt:0,lastLat:null,lastLon:null,lastSpeed:null,distanceKm:0,samples:0,overspeedSeconds:0,harshAccel:0,harshBrake:0,highSpeedSeconds:0,steadySamples:0}}
+function recordDriverSample(lat,lon,speed,limit,ts){if(!driverTrip.active)startDriverTrip();if(!Number.isFinite(speed))return;if(driverTrip.lastAt&&driverTrip.lastLat!==null){const dt=Math.max(.2,Math.min(10,(ts-driverTrip.lastAt)/1000));const dist=haversine(driverTrip.lastLat,driverTrip.lastLon,lat,lon);if(Number.isFinite(dist)&&dist<.2)driverTrip.distanceKm+=dist;if(Number.isFinite(driverTrip.lastSpeed)){const dv=speed-driverTrip.lastSpeed;if(dv/dt>8)driverTrip.harshAccel++;if(dv/dt<-10)driverTrip.harshBrake++;if(Math.abs(dv)<2.5)driverTrip.steadySamples++}if(limit&&speed>limit+5)driverTrip.overspeedSeconds+=dt;if(speed>105)driverTrip.highSpeedSeconds+=dt}driverTrip.samples++;driverTrip.lastAt=ts;driverTrip.lastLat=lat;driverTrip.lastLon=lon;driverTrip.lastSpeed=speed}
+function calculateDriverTripScore(){const duration=Math.max(1,(Date.now()-driverTrip.startAt)/1000),n=Math.max(1,driverTrip.samples),harshRate=(driverTrip.harshAccel+driverTrip.harshBrake)/n,steadyRate=driverTrip.steadySamples/Math.max(1,n-1),overRate=driverTrip.overspeedSeconds/duration,highRate=driverTrip.highSpeedSeconds/duration;const safety=clampScore(100-overRate*115-driverTrip.harshBrake*2.8),smooth=clampScore(72+steadyRate*30-harshRate*180),efficiency=clampScore(92-highRate*45-harshRate*150),economy=clampScore(efficiency*.7+smooth*.3);return{score:clampScore(efficiency*.32+safety*.30+smooth*.23+economy*.15),efficiency,safety,smooth,economy,distanceKm:Number(driverTrip.distanceKm.toFixed(2))}}
+async function saveDriverTripScore(){if(!driverTrip.active||driverTrip.samples<8){driverTrip.active=false;return}const trip=calculateDriverTripScore();try{const{data:{user}}=await supabase.auth.getUser();if(!user){driverTrip.active=false;return}const{data:cur}=await supabase.from('driver_score_stats').select('*').eq('user_id',user.id).maybeSingle();const trips=Number(cur?.trips||0),weight=Math.min(12,trips),avg=(o,n)=>clampScore(((Number(o??70)*weight)+n)/(weight+1));const next={user_id:user.id,score:avg(cur?.score,trip.score),efficiency_score:avg(cur?.efficiency_score,trip.efficiency),safety_score:avg(cur?.safety_score,trip.safety),smoothness_score:avg(cur?.smoothness_score,trip.smooth),economy_score:avg(cur?.economy_score,trip.economy),trips:trips+1,total_distance_km:Number(cur?.total_distance_km||0)+trip.distanceKm,ranking_opt_in:Boolean(cur?.ranking_opt_in),updated_at:new Date().toISOString()};driverPreviousScore=Number(cur?.score??next.score);const{error}=await supabase.from('driver_score_stats').upsert(next,{onConflict:'user_id'});if(error)throw error;await loadDriverScore();const cls=driverClassFor(next.score),delta=next.score-driverPreviousScore;showEcoToast('Driver Score',`${next.score}/100 · ${cls.name}${delta?` · ${delta>0?'+':''}${delta} pontos`:''}`,'🏁')}catch(e){console.warn(e)}finally{driverTrip.active=false}}
+
+function updateDriverScoreUI(){
+  const enabled=driverScoreEnabled();
+  const toggle=$('driverScoreToggle');
+  const state=$('driverScoreStateText');
+  const card=document.querySelector('.driver-score-card');
+  if(toggle)toggle.checked=enabled;
+  if(state){
+    state.textContent=enabled?'Driver Score ativo · as viagens EcoDrive contam para a classificação':'Driver Score desativado · não são registadas novas viagens';
+    state.classList.toggle('on',enabled)
+  }
+  card?.classList.toggle('driver-disabled',!enabled);
+  if(!enabled){
+    $('driverScoreValue')&&($('driverScoreValue').textContent='—');
+    $('driverClassIcon')&&($('driverClassIcon').textContent='⏸️');
+    $('driverClassName')&&($('driverClassName').textContent='Driver Score desligado');
+    $('driverClassDesc')&&($('driverClassDesc').textContent='Ative quando quiser voltar a avaliar as suas viagens.');
+    $('driverEfficiency')&&($('driverEfficiency').textContent='—');
+    $('driverSafety')&&($('driverSafety').textContent='—');
+    $('driverSmoothness')&&($('driverSmoothness').textContent='—');
+    $('driverEconomy')&&($('driverEconomy').textContent='—');
+    $('driverTrend')&&($('driverTrend').textContent='Inativo');
+  }
+}
+function setDriverScoreEnabled(v){
+  localStorage.setItem(DRIVER_SCORE_ENABLED_KEY,v?'1':'0');
+  if(v){
+    if(ecoPrefs?.().enabled)startDriverTrip();
+    loadDriverScore().catch(()=>{})
+  }else{
+    driverTrip.active=false;
+  }
+  updateDriverScoreUI()
+}
+
+async function loadDriverScore(){try{const{data:{user}}=await supabase.auth.getUser();if(!user)return;const{data,error}=await supabase.from('driver_score_stats').select('*').eq('user_id',user.id).maybeSingle();if(error)throw error;if(!data)return;const cls=driverClassFor(Number(data.score));$('driverScoreValue').textContent=data.score;$('driverClassIcon').textContent=cls.icon;$('driverClassName').textContent=cls.name;$('driverClassDesc').textContent=cls.desc;$('driverEfficiency').textContent=data.efficiency_score;$('driverSafety').textContent=data.safety_score;$('driverSmoothness').textContent=data.smoothness_score;$('driverEconomy').textContent=data.economy_score;$('driverTrips').textContent=data.trips;$('driverDistance').textContent=Number(data.total_distance_km||0).toFixed(1).replace('.',',')+' km';$('driverRankingToggle').checked=Boolean(data.ranking_opt_in)}catch(e){console.warn(e)}}
+async function setDriverRankingOptIn(v){try{const{data:{user}}=await supabase.auth.getUser();if(!user){alert('Inicie sessão para participar no ranking.');return}const{data:cur}=await supabase.from('driver_score_stats').select('user_id').eq('user_id',user.id).maybeSingle();const q=cur?supabase.from('driver_score_stats').update({ranking_opt_in:v,updated_at:new Date().toISOString()}).eq('user_id',user.id):supabase.from('driver_score_stats').insert({user_id:user.id,ranking_opt_in:v});const{error}=await q;if(error)throw error;await loadDriverRanking()}catch(e){alert(errPT(e))}}
+async function loadDriverRanking(){const list=$('driverRankingList');if(!list)return;list.innerHTML='<div class="empty">A carregar ranking…</div>';try{const{data,error}=await supabase.rpc('driver_score_leaderboard',{p_limit:30});if(error)throw error;if(!data?.length){list.innerHTML='<div class="empty">Ainda não existem participantes no ranking.</div>';return}list.innerHTML=data.map(r=>{const cls=driverClassFor(Number(r.score)),medal=Number(r.rank_position)===1?'🥇':Number(r.rank_position)===2?'🥈':Number(r.rank_position)===3?'🥉':'#'+r.rank_position;return `<div class="driver-rank-row"><div class="driver-rank-pos">${medal}</div><div><b>${esc(r.display_name||'Condutor MyGGas')}</b><small>${cls.icon} ${cls.name} · ${Number(r.trips||0)} viagens</small></div><div class="driver-rank-score">${r.score}</div></div>`}).join('')}catch(e){list.innerHTML=`<div class="empty">${esc(errPT(e))}</div>`}}
+function initDriverScore(){$('driverRankingToggle')?.addEventListener('change',e=>setDriverRankingOptIn(e.target.checked));$('openDriverRankingBtn')?.addEventListener('click',async()=>{$('driverRankingPanel')?.classList.remove('hidden');await loadDriverRanking()});$('closeDriverRankingBtn')?.addEventListener('click',()=>$('driverRankingPanel')?.classList.add('hidden'));loadDriverScore().catch(()=>{})}
+
 function ecoAdvice(speed){
   ecoSpeedHistory.push({t:Date.now(),v:speed});
   ecoSpeedHistory=ecoSpeedHistory.filter(x=>Date.now()-x.t<12000);
@@ -8945,6 +9019,7 @@ async function handleEcoPosition(pos){
 
   if(speed!==null){
     speed=Math.max(0,Math.round(speed));
+    recordDriverSample(lat,lon,speed,ecoCurrentLimit,ts);
     if($('ecoCurrentSpeed'))$('ecoCurrentSpeed').textContent=speed+' km/h';
   }else{
     if($('ecoCurrentSpeed'))$('ecoCurrentSpeed').textContent='—'
@@ -8984,7 +9059,7 @@ function initEcoDrive(){
   $('ecoCoachToggle')?.addEventListener('change',e=>{localStorage.setItem(ECO_COACH_KEY,e.target.checked?'1':'0');updateEcoUI()});
   $('speedTolerance')?.addEventListener('change',e=>{localStorage.setItem(ECO_TOLERANCE_KEY,String(e.target.value));updateEcoUI()});
   $('ecoAlertCooldown')?.addEventListener('change',e=>{localStorage.setItem(ECO_COOLDOWN_KEY,String(e.target.value));updateEcoUI()});
-  if(ecoPrefs().enabled)startEcoWatch()
+  if(ecoPrefs().enabled){if(driverScoreEnabled())startDriverTrip();startEcoWatch()}
 }
 
 function haversine(a,b,c,d){
@@ -11081,6 +11156,8 @@ authCheck();
 initRadar();
 
 initEcoDrive();
+
+initDriverScore();
 </script>
 </body>
 </html>
