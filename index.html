@@ -5086,6 +5086,90 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
   .market-kpis>div:last-child{grid-column:1/-1}
 }
 
+
+/* ===== MyGGas Radar ===== */
+.radar-card{
+  margin-top:12px;padding:12px;border:1px solid #dce8f5;border-radius:16px;
+  background:linear-gradient(135deg,#f6fbff,#eef6ff);
+  display:grid;grid-template-columns:42px minmax(0,1fr);gap:11px
+}
+.radar-icon{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:#1769d2;color:#fff;font-size:20px;box-shadow:0 8px 18px rgba(23,105,210,.18)
+}
+.radar-copy{min-width:0}
+.radar-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.radar-title-row b{display:block;font-size:12px;color:#102755}
+.radar-title-row small{display:block;margin-top:3px;font-size:8px;line-height:1.45;color:#657792}
+.radar-switch{position:relative;flex:0 0 46px;width:46px;height:26px}
+.radar-switch input{position:absolute;opacity:0;pointer-events:none}
+.radar-switch span{
+  position:absolute;inset:0;border-radius:999px;background:#d4dce7;transition:.2s;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)
+}
+.radar-switch span::after{
+  content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 6px rgba(15,23,42,.20);transition:.2s
+}
+.radar-switch input:checked+span{background:#1769d2}
+.radar-switch input:checked+span::after{transform:translateX(20px)}
+.radar-state{
+  display:inline-flex;margin-top:7px;padding:4px 7px;border-radius:999px;
+  background:#f0f3f7;color:#68788e;font-size:7px;font-weight:900
+}
+.radar-state.on{background:#e8f7ee;color:#14824f}
+.radar-settings{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.radar-settings label{display:grid;gap:4px}
+.radar-settings label>span{font-size:6.5px;font-weight:850;color:#73849a}
+.radar-settings .input{min-height:34px;padding:6px 8px;font-size:8px}
+.radar-note{margin-top:7px;font-size:6.5px;line-height:1.45;color:#8491a2}
+
+.radar-modal-card{width:min(540px,100%)}
+.radar-modal-head{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:start}
+.radar-modal-pin{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#1769d2;color:#fff;font-size:19px}
+.radar-modal-kicker{font-size:6px;font-weight:950;letter-spacing:.16em;color:#6885a8}
+.radar-modal-head h2{margin:3px 0 2px;font-size:18px}
+.radar-modal-head p{margin:0;font-size:8px;color:#718198}
+.radar-close{padding:7px 9px!important;font-size:7px!important}
+.radar-price-panel{
+  margin-top:13px;padding:12px;border:1px solid #e4ebf4;border-radius:14px;background:#f9fbfe;
+  display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.radar-price-panel small{display:block;font-size:7px;color:#718198}
+.radar-price-panel strong{display:block;margin-top:3px;font-size:26px;color:#102755}
+.radar-age{text-align:right}
+.radar-age span{display:block;font-size:6px;color:#8290a2}
+.radar-age b{display:block;margin-top:3px;font-size:8px;color:#475b76}
+.radar-question{margin-top:13px;font-size:11px;font-weight:900;color:#172b4d}
+.radar-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.radar-action{
+  min-height:68px;padding:10px;border-radius:13px;border:1px solid #e2e9f2;background:#fff;
+  text-align:left;display:grid;grid-template-columns:25px minmax(0,1fr);grid-template-rows:auto auto;
+  column-gap:8px;color:#223b60
+}
+.radar-action>span{grid-row:1/3;width:25px;height:25px;border-radius:8px;display:grid;place-items:center;background:#f1f5f9;font-size:12px}
+.radar-action b{font-size:9px;align-self:end}
+.radar-action small{font-size:6.5px;color:#7a899b;align-self:start}
+.radar-action.correct{border-color:#ccebd9;background:#f8fffb}
+.radar-action.correct>span{background:#e8f7ee;color:#14824f}
+.radar-action.change>span{background:#eef5ff;color:#1769d2}
+.radar-action.photo>span{background:#f5efff;color:#7c3aed}
+.radar-action.later>span{background:#f3f4f6;color:#687386}
+
+@media(max-width:560px){
+  .radar-card{grid-template-columns:36px minmax(0,1fr);gap:8px;padding:10px}
+  .radar-icon{width:36px;height:36px;border-radius:11px;font-size:17px}
+  .radar-title-row b{font-size:10px}
+  .radar-title-row small{font-size:7px}
+  .radar-settings{grid-template-columns:1fr}
+  .radar-modal-card{border-radius:20px 20px 0 0!important}
+  .radar-modal-head{grid-template-columns:36px minmax(0,1fr) auto}
+  .radar-modal-pin{width:36px;height:36px;border-radius:11px;font-size:16px}
+  .radar-modal-head h2{font-size:15px}
+  .radar-price-panel strong{font-size:22px}
+  .radar-actions{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -5806,6 +5890,43 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
           <button id="profileAdminBtn" class="btn secondary hidden" type="button">⚙️ Administração</button>
         </div>
 
+        <div class="radar-card">
+          <div class="radar-icon">📍</div>
+          <div class="radar-copy">
+            <div class="radar-title-row">
+              <div>
+                <b>MyGGas Radar</b>
+                <small>Confirme preços quando estiver junto a um posto e ganhe pontos.</small>
+              </div>
+              <label class="radar-switch" aria-label="Ativar ou desativar MyGGas Radar">
+                <input id="radarToggle" type="checkbox">
+                <span></span>
+              </label>
+            </div>
+            <div id="radarStateText" class="radar-state">Radar desativado</div>
+            <div class="radar-settings">
+              <label>
+                <span>Distância para perguntar</span>
+                <select id="radarDistance" class="input">
+                  <option value="120">120 m</option>
+                  <option value="180" selected>180 m</option>
+                  <option value="250">250 m</option>
+                </select>
+              </label>
+              <label>
+                <span>Máximo de alertas/dia</span>
+                <select id="radarDailyLimit" class="input">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3" selected>3</option>
+                  <option value="5">5</option>
+                </select>
+              </label>
+            </div>
+            <div class="radar-note">Pode desligar a qualquer momento. O mesmo posto não volta a ser perguntado durante 24 horas.</div>
+          </div>
+        </div>
+
         <div class="profile-account-actions">
           <button id="profileLogoutBtn" class="profile-account-btn logout" type="button">
             <span>↪</span>
@@ -5850,7 +5971,7 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
       <div class="section-title"><h2>Como ganhar pontos</h2></div>
       <div class="kpis">
         <div class="kpi"><small>Novo preço</small><strong>+10</strong></div>
-        <div class="kpi"><small>Confirmar preço</small><strong>+2</strong></div>
+        <div class="kpi"><small>Radar: confirmar preço</small><strong>+2</strong></div>
         <div class="kpi"><small>Preço incorreto</small><strong>+3</strong></div>
         <div class="kpi"><small>Posto encerrado</small><strong>+4</strong></div>
       </div>
@@ -6252,6 +6373,49 @@ header{padding:8px 8px 0!important;background:rgba(246,249,253,.96)!important}
     <div id="rewardTitle" class="reward-title">Boa!</div>
     <div id="rewardPoints" class="reward-points">+10 pts</div>
     <div id="rewardSub" class="reward-sub">A comunidade ficou mais atualizada.</div>
+  </div>
+</div>
+
+
+<div id="radarModal" class="modal">
+  <div class="modal-card radar-modal-card">
+    <div class="radar-modal-head">
+      <div class="radar-modal-pin">⛽</div>
+      <div>
+        <div class="radar-modal-kicker">MYGGAS RADAR</div>
+        <h2 id="radarStationName">Posto próximo</h2>
+        <p id="radarStationMeta">Está suficientemente perto para ajudar a comunidade.</p>
+      </div>
+      <button class="btn secondary radar-close" type="button" data-close="radarModal">Fechar</button>
+    </div>
+
+    <div class="radar-price-panel">
+      <div>
+        <small id="radarFuelName">Combustível</small>
+        <strong id="radarPriceValue">—</strong>
+      </div>
+      <div class="radar-age">
+        <span>Última atualização</span>
+        <b id="radarPriceAge">—</b>
+      </div>
+    </div>
+
+    <div class="radar-question">Este preço está correto neste momento?</div>
+    <div class="radar-actions">
+      <button id="radarConfirmBtn" class="radar-action correct" type="button">
+        <span>✓</span><b>Está correto</b><small>Confirmar e ganhar +2 pontos</small>
+      </button>
+      <button id="radarChangeBtn" class="radar-action change" type="button">
+        <span>✎</span><b>O preço mudou</b><small>Introduzir o valor atual</small>
+      </button>
+      <button id="radarPhotoBtn" class="radar-action photo" type="button">
+        <span>📷</span><b>Fotografar painel</b><small>Usar a leitura de preços existente</small>
+      </button>
+      <button id="radarLaterBtn" class="radar-action later" type="button">
+        <span>×</span><b>Agora não</b><small>Continuar sem confirmar</small>
+      </button>
+    </div>
+    <div id="radarStatus" class="status"></div>
   </div>
 </div>
 
@@ -8393,6 +8557,217 @@ function makeFuelMarker(lat,lon,popupHtml,opts={}){
 
   return m
 }
+
+/* ========================= MyGGas Radar ========================= */
+const RADAR_PREF_KEY='myggas_radar_enabled_v1';
+const RADAR_DISTANCE_KEY='myggas_radar_distance_v1';
+const RADAR_LIMIT_KEY='myggas_radar_daily_limit_v1';
+const RADAR_SEEN_KEY='myggas_radar_seen_v1';
+const RADAR_DAY_KEY='myggas_radar_day_v1';
+
+let radarWatchId=null;
+let radarCurrentStation=null;
+let radarLastPosition=null;
+let radarBusy=false;
+
+function radarPrefs(){
+  return {
+    enabled:localStorage.getItem(RADAR_PREF_KEY)==='1',
+    distance:Math.max(80,Math.min(300,Number(localStorage.getItem(RADAR_DISTANCE_KEY)||180))),
+    limit:Math.max(1,Math.min(5,Number(localStorage.getItem(RADAR_LIMIT_KEY)||3)))
+  }
+}
+function radarDayState(){
+  const today=new Date().toISOString().slice(0,10);
+  let state={day:today,count:0};
+  try{state=JSON.parse(localStorage.getItem(RADAR_DAY_KEY)||'null')||state}catch{}
+  if(state.day!==today)state={day:today,count:0};
+  return state
+}
+function setRadarDayState(state){localStorage.setItem(RADAR_DAY_KEY,JSON.stringify(state))}
+function radarSeenMap(){
+  try{return JSON.parse(localStorage.getItem(RADAR_SEEN_KEY)||'{}')||{}}catch{return {}}
+}
+function radarStationSeenRecently(key){
+  const seen=radarSeenMap(),ts=Number(seen[key]||0);
+  return ts>0 && Date.now()-ts<24*60*60*1000
+}
+function markRadarStationSeen(key){
+  const seen=radarSeenMap();seen[key]=Date.now();
+  const keep=Object.fromEntries(Object.entries(seen).filter(([,v])=>Date.now()-Number(v)<7*24*60*60*1000));
+  localStorage.setItem(RADAR_SEEN_KEY,JSON.stringify(keep))
+}
+function updateRadarUI(){
+  const p=radarPrefs(),toggle=$('radarToggle'),state=$('radarStateText'),dist=$('radarDistance'),limit=$('radarDailyLimit');
+  if(toggle)toggle.checked=p.enabled;
+  if(dist)dist.value=String(p.distance);
+  if(limit)limit.value=String(p.limit);
+  if(state){
+    state.textContent=p.enabled?'Radar ativo · à procura de postos próximos':'Radar desativado';
+    state.classList.toggle('on',p.enabled)
+  }
+}
+async function setRadarEnabled(enabled){
+  if(isGuestMode && enabled){
+    alert('Crie uma conta para ganhar pontos com o MyGGas Radar.');
+    updateRadarUI();return
+  }
+  if(enabled){
+    if(!navigator.geolocation){
+      alert('Este dispositivo não disponibiliza localização.');
+      updateRadarUI();return
+    }
+    localStorage.setItem(RADAR_PREF_KEY,'1');
+    try{
+      if('Notification' in window && Notification.permission==='default'){
+        Notification.requestPermission().catch(()=>{})
+      }
+    }catch{}
+    startRadarWatch()
+  }else{
+    localStorage.setItem(RADAR_PREF_KEY,'0');
+    stopRadarWatch()
+  }
+  updateRadarUI()
+}
+function startRadarWatch(){
+  if(!radarPrefs().enabled || radarWatchId!==null || !navigator.geolocation)return;
+  radarWatchId=navigator.geolocation.watchPosition(
+    pos=>{
+      radarLastPosition={lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy};
+      maybeTriggerRadar(pos.coords.latitude,pos.coords.longitude).catch(()=>{})
+    },
+    ()=>{},
+    {enableHighAccuracy:true,maximumAge:12000,timeout:15000}
+  )
+}
+function stopRadarWatch(){
+  if(radarWatchId!==null && navigator.geolocation){
+    navigator.geolocation.clearWatch(radarWatchId)
+  }
+  radarWatchId=null
+}
+function radarPriceForStation(s){
+  const p=Number(s?.displayPrice??s?.officialPrice);
+  return Number.isFinite(p)&&p>.5&&p<5?p:null
+}
+function radarAgeText(s){
+  const raw=s?.lastUpdated||s?.officialUpdated||s?.candidate?.updatedAt;
+  if(!raw)return 'sem hora publicada';
+  const mins=Math.max(0,Math.round((Date.now()-new Date(raw).getTime())/60000));
+  if(mins<60)return `há ${mins} min`;
+  const h=Math.round(mins/60);if(h<48)return `há ${h} h`;
+  return `há ${Math.round(h/24)} dias`
+}
+async function maybeTriggerRadar(lat,lon){
+  if(radarBusy || !radarPrefs().enabled || !Array.isArray(nearbyStations) || !nearbyStations.length)return;
+  const prefs=radarPrefs(),day=radarDayState();
+  if(day.count>=prefs.limit)return;
+  if(document.getElementById('radarModal')?.classList.contains('open'))return;
+
+  const eligible=nearbyStations
+    .map(s=>({...s,_radarDistance:haversine(lat,lon,Number(s.lat),Number(s.lon))*1000}))
+    .filter(s=>Number.isFinite(s._radarDistance) && s._radarDistance<=prefs.distance && radarPriceForStation(s)!==null)
+    .filter(s=>!radarStationSeenRecently(s.key))
+    .sort((a,b)=>a._radarDistance-b._radarDistance);
+
+  const station=eligible[0];
+  if(!station)return;
+  radarBusy=true;
+  radarCurrentStation=station;
+  markRadarStationSeen(station.key);
+  day.count+=1;setRadarDayState(day);
+
+  $('radarStationName').textContent=station.name||'Posto próximo';
+  $('radarStationMeta').textContent=`A cerca de ${Math.max(1,Math.round(station._radarDistance))} m · ajude a manter os preços corretos`;
+  $('radarFuelName').textContent=$('fuelType')?.value||'Combustível';
+  $('radarPriceValue').textContent=radarPriceForStation(station).toFixed(3).replace('.',',')+' €/L';
+  $('radarPriceAge').textContent=radarAgeText(station);
+  $('radarStatus').textContent='';
+  $('radarModal').classList.add('open');
+
+  try{
+    if('Notification' in window && Notification.permission==='granted' && document.hidden){
+      new Notification('MyGGas Radar',{body:`${station.name}: confirme o preço e ganhe +2 pontos.`})
+    }
+  }catch{}
+  setTimeout(()=>{radarBusy=false},1500)
+}
+async function confirmRadarCurrentPrice(){
+  const s=radarCurrentStation;if(!s||!radarLastPosition)return;
+  const price=radarPriceForStation(s);if(price===null)return;
+  const fuel=$('fuelType')?.value||'Gasóleo simples';
+  const status=$('radarStatus');
+  status.textContent='A confirmar…';
+  try{
+    const reportId=s?.candidate?.report?.id;
+    if(reportId){
+      const before=await myPoints();
+      const {data:{user}}=await supabase.auth.getUser();
+      if(!user)throw new Error('authentication required');
+      const {error}=await supabase.from('fuel_price_validations').insert({
+        report_id:reportId,user_id:user.id,is_confirmed:true,created_at:new Date().toISOString()
+      });
+      if(error)throw error;
+      await Promise.all([renderStations(),loadLeaderboard()]);
+      const after=await myPoints(),gained=Math.max(0,after-before);
+      showReward(gained||2,'Preço confirmado pelo Radar!');
+    }else{
+      const {data,error}=await supabase.rpc('confirm_radar_price',{
+        p_station_key:s.key,
+        p_station_name:s.name,
+        p_fuel_type:fuel,
+        p_price:price,
+        p_user_latitude:radarLastPosition.lat,
+        p_user_longitude:radarLastPosition.lon
+      });
+      if(error)throw error;
+      const row=Array.isArray(data)?data[0]:data;
+      showReward(Number(row?.points_awarded||2),'Preço confirmado pelo Radar!');
+      await loadLeaderboard()
+    }
+    status.textContent='Obrigado. Confirmação registada e pontos atribuídos.';
+    loadCommunityGame().catch(()=>{});
+    setTimeout(()=>$('radarModal').classList.remove('open'),850)
+  }catch(e){
+    const msg=String(e?.message||e||'');
+    if(msg.toLowerCase().includes('already confirmed')||msg.toLowerCase().includes('duplicate')){
+      status.textContent='Este preço já foi confirmado recentemente por si.';
+    }else if(msg.toLowerCase().includes('too far')){
+      status.textContent='Já está demasiado longe do posto para confirmar.';
+    }else if(msg.toLowerCase().includes('cannot')&&msg.toLowerCase().includes('yourself')){
+      status.textContent='Este preço foi publicado por si; use “O preço mudou” se precisar de o atualizar.';
+    }else{
+      status.textContent=errPT(e)
+    }
+  }
+}
+function radarOpenChangedPrice(photo=false){
+  const s=radarCurrentStation;if(!s)return;
+  $('radarModal').classList.remove('open');
+  openPrice(s.key);
+  setTimeout(()=>{
+    const p=radarPriceForStation(s);
+    if(p!==null && $('priceValue'))$('priceValue').value=p.toFixed(3).replace('.',',');
+    if(photo && $('cameraInput'))$('cameraInput').click()
+  },120)
+}
+function initRadar(){
+  updateRadarUI();
+  $('radarToggle')?.addEventListener('change',e=>setRadarEnabled(e.target.checked));
+  $('radarDistance')?.addEventListener('change',e=>{
+    localStorage.setItem(RADAR_DISTANCE_KEY,String(e.target.value));updateRadarUI()
+  });
+  $('radarDailyLimit')?.addEventListener('change',e=>{
+    localStorage.setItem(RADAR_LIMIT_KEY,String(e.target.value));updateRadarUI()
+  });
+  $('radarConfirmBtn')?.addEventListener('click',confirmRadarCurrentPrice);
+  $('radarChangeBtn')?.addEventListener('click',()=>radarOpenChangedPrice(false));
+  $('radarPhotoBtn')?.addEventListener('click',()=>radarOpenChangedPrice(true));
+  $('radarLaterBtn')?.addEventListener('click',()=>$('radarModal').classList.remove('open'));
+  if(radarPrefs().enabled)startRadarWatch()
+}
+
 function haversine(a,b,c,d){
   const R=6371,rad=x=>x*Math.PI/180,dl=rad(c-a),dn=rad(d-b);
   const q=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
@@ -10499,6 +10874,7 @@ function subscribeRealtime(){
 }
 
 authCheck();
+initRadar();
 </script>
 </body>
 </html>
