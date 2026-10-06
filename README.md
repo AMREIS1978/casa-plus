@@ -1,16 +1,27 @@
-# MyGGas Live V2 — botão visível corrigido
+# MyGGas — Radar melhorado + Desafio Diário
 
-Correção da entrada para a nova funcionalidade LIVE.
+## MyGGas LIVE
+A função de trânsito LIVE não faz parte desta versão. A app volta a concentrar-se nas funções que já acrescentam valor real.
 
-## Agora existem 3 acessos
-- botão **LIVE** integrado na navegação principal;
-- botão **MyGGas LIVE** no cabeçalho desktop;
-- botão flutuante **LIVE** mantido como atalho.
+## Radar melhorado
+O Radar foi revisto porque podia falhar postos quando o utilizador passava em andamento.
 
-## Correção importante
-A navegação antiga estava definida para 5/6 colunas. Ao acrescentar LIVE, o novo botão podia ficar fora da grelha e parecer invisível. A grelha foi corrigida para:
-- 6 opções normais;
-- 7 quando Admin está ativo;
-- 3 no modo visitante.
+Melhorias:
+- GPS com `maximumAge: 0`;
+- raio por defeito: 250 m;
+- opção até 300 m;
+- deteção não apenas na posição atual, mas também no segmento percorrido entre duas leituras GPS;
+- deteta postos mesmo quando não existe preço atual;
+- nesses casos convida a atualizar ou fotografar o painel;
+- se a lista de postos ainda não estiver carregada, tenta atualizar os postos na zona;
+- ao afastar-se mais de 2 km da pesquisa original, atualiza a zona em segundo plano.
 
-Nenhuma das funcionalidades existentes foi removida.
+## Desafio do Dia
+Foi acrescentado um cartão na página principal.
+
+Os desafios rodam diariamente entre:
+- Confirma e ganha — confirmar um preço da comunidade: +5 pontos;
+- Caçador de preços — atualizar um preço: +8 pontos;
+- Olho vivo — reportar o estado de um posto: +6 pontos.
+
+A recompensa só pode ser recebida uma vez por dia e é validada no backend.
